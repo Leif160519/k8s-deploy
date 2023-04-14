@@ -13,7 +13,7 @@ metadata:
 data:
   # 关于如下参数的解释，请参考文档 https://kuboard.cn/install/v3/install-built-in.html
   # [common]
-  KUBOARD_ENDPOINT: 'http://192.168.32.101:30080'
+  KUBOARD_ENDPOINT: 'http://192.168.31.81:30080'
   KUBOARD_AGENT_SERVER_UDP_PORT: '30081'
   KUBOARD_AGENT_SERVER_TCP_PORT: '30081'
   KUBOARD_SERVER_LOGRUS_LEVEL: info  # error / debug / trace

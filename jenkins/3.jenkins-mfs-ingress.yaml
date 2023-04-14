@@ -104,7 +104,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: jenkins-dev.fjdynamics.com
+  - host: jenkins.github.icu
     http:
       paths:
       - pathType: Prefix
