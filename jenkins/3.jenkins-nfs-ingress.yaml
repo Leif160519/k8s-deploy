@@ -1,0 +1,116 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins
+  namespace: devops
+spec:
+  resources:
+    requests:
+      storage: 40Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: nfs-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: devops
+  labels:
+    app: jenkins
+spec:
+  selector:
+    app: jenkins
+  type: ClusterIP
+  ports:
+    - port: 8080
+      name: web
+      targetPort: web
+    - name: agent
+      port: 50000
+      targetPort: agent
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins
+      containers:
+        - name: jenkins
+          image: jenkins/jenkins:2.399
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: web
+              protocol: TCP
+            - containerPort: 50000
+              name: agent
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 500m
+              memory: 500Mi
+          livenessProbe:
+            httpGet:
+              port: 8080
+              path: /login
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              port: 8080
+              path: /login
+            initialDelaySeconds: 60
+          volumeMounts:
+            - mountPath: /var/jenkins_home
+              name: jenkins-volume
+              subPath: jenkins-home
+            - mountPath: /etc/localtime
+              name: localtime
+      #nodeSelector:
+      #  app: jenkins
+      volumes:
+        - name: jenkins-volume
+          persistentVolumeClaim:
+            claimName: jenkins
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion:  networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jenkins
+  namespace: devops
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: jenkins-dev.fjdynamics.com
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: jenkins
+            port:
+              number: 8080
