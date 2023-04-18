@@ -48,6 +48,27 @@ spec:
     spec:
       serviceAccountName: jenkins
       containers:
+        - env:
+          - name: LIMITS_MEMORY
+            valueFrom:
+              resourceFieldRef:
+                divisor: 1Mi
+                resource: limits.memory
+          - name: JAVA_OPTS
+            value: |
+              -Xmx$(LIMITS_MEMORY)m
+              -XshowSettings:vm
+              -Dhudson.slaves.NodeProvisioner.initialDelay=0
+              -Dhudson.slaves.NodeProvisioner.MARGIN=50
+              -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+              -Duser.timezone=Asia/Shanghai
+              -Dfile.encoding=UTF-8
+              -Djava.awt.headless=true
+          - name: JENKINS_OPTS
+            value: |
+              --prefix=/
+              --sessionTimeout=1440
+              --sessionEviction=1440
         - name: jenkins
           image: jenkins/jenkins:2.399
           securityContext:
