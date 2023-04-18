@@ -48,7 +48,8 @@ spec:
     spec:
       serviceAccountName: jenkins
       containers:
-        - env:
+        - name: jenkins
+          env:
           - name: LIMITS_MEMORY
             valueFrom:
               resourceFieldRef:
@@ -69,7 +70,6 @@ spec:
               --prefix=/
               --sessionTimeout=1440
               --sessionEviction=1440
-        - name: jenkins
           image: jenkins/jenkins:2.399
           securityContext:
             runAsUser: 0
