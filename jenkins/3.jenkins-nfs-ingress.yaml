@@ -7,7 +7,7 @@ metadata:
 spec:
   resources:
     requests:
-      storage: 40Gi
+      storage: 5Gi
   accessModes:
     - ReadWriteMany
   storageClassName: nfs-storage
@@ -49,6 +49,21 @@ spec:
       serviceAccountName: jenkins
       containers:
         - name: jenkins
+          env:
+          - name: JAVA_OPTS
+            value: |
+              -XshowSettings:vm
+              -Dhudson.slaves.NodeProvisioner.initialDelay=0
+              -Dhudson.slaves.NodeProvisioner.MARGIN=50
+              -Dhudson.slaves.NodeProvisioner.MARGIN0=0.85
+              -Duser.timezone=Asia/Shanghai
+              -Dfile.encoding=UTF-8
+              -Djava.awt.headless=true
+          - name: JENKINS_OPTS
+            value: |
+              --prefix=/
+              --sessionTimeout=1440
+              --sessionEviction=1440
           image: jenkins/jenkins:2.399
           securityContext:
             runAsUser: 0
@@ -62,11 +77,11 @@ spec:
               protocol: TCP
           resources:
             limits:
-              cpu: 1000m
-              memory: 1Gi
+              cpu: "2"
+              memory: 2Gi
             requests:
-              cpu: 500m
-              memory: 500Mi
+              cpu: "1"
+              memory: 1Gi
           livenessProbe:
             httpGet:
               port: 8080
