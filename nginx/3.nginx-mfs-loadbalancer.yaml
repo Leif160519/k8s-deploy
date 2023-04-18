@@ -117,6 +117,9 @@ spec:
     app: nginx
   type: LoadBalancer
   ports:
-    - name: web
+    - name: http
       protocol: TCP
       port: 80
+    - name: https
+      protocol: TCP
+      port: 443
