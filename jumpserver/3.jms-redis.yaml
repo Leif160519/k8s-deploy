@@ -88,7 +88,7 @@ spec:
       containers:
         - name: redis
           image: redis:6.2.3
-          command: ["redis-server /etc/redis/redis.conf"]
+          command: ["/usr/local/bin/redis-server"," /etc/redis/redis.conf"]
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
@@ -105,7 +105,7 @@ spec:
               command:
                 - /bin/sh
                 - "-c"
-                - /usr/bin/redis-cli -h 127.0.0.1 -p 6379 -a 123456 info Replication
+                - /usr/local/bin/redis-cli -h 127.0.0.1 -p 6379 -a 123456 info Replication
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5
