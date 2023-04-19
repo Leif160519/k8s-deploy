@@ -62,12 +62,13 @@ spec:
               port: 2222
             timeoutSeconds: 3
           readinessProbe:
+            httpGet:
+              port: 5000
+              path: /koko/health/
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5
             successThreshold: 1
-            tcpSocket:
-              port: 2222
             timeoutSeconds: 3
           ports:
             - containerPort: 2222

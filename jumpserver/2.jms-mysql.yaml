@@ -69,6 +69,23 @@ spec:
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - mysql -h127.0.0.1 -P3306 -uroot -p123456 -e 'SHOW DATABASES;create database if not exists jumpserver;'
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
           ports:
             - containerPort: 3306
               name: mysql

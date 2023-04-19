@@ -98,15 +98,16 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             tcpSocket:
-              port: 3306
+              port: 6379
             timeoutSeconds: 3
           readinessProbe:
+            exec:
+              command:
+                - redis-cli -h 127.0.0.1 -p 6379 -a 123456 info Replication
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5
             successThreshold: 1
-            tcpSocket:
-              port: 3306
             timeoutSeconds: 3
           ports:
             - containerPort: 6379

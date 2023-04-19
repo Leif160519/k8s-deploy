@@ -66,8 +66,9 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 5
             successThreshold: 1
-            tcpSocket:
+            httpGet:
               port: 80
+              path: /
             timeoutSeconds: 3
           ports:
             - containerPort: 80

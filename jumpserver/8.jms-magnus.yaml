@@ -61,6 +61,23 @@ spec:
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 33060
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - ps aux | grep -v grep | grep magnus
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
           ports:
             - containerPort: 33060
               name: mysql
