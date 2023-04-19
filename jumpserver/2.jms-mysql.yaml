@@ -1,0 +1,105 @@
+---
+apiVersion: v1
+data:
+  my.cnf: |
+    [client]
+    default-character-set = utf8mb4
+
+    [mysql]
+    default-character-set = utf8mb4
+
+    [mysql.server]
+    default-character-set = utf8mb4
+
+    [mysqld_safe]
+    default-character-set = utf8mb4
+
+    [mysqld]
+    port = 3306
+    bind-address = 0.0.0.0
+    character-set-server = utf8mb4
+    collation-server = utf8mb4_general_ci
+    skip-character-set-client-handshake
+    skip-external-locking
+    symbolic-links = 0
+    general_log = 1
+    max_connections = 2000
+    max_allowed_packet = 64M
+    lower_case_table_names = 1
+    default_authentication_plugin=mysql_native_password
+kind: ConfigMap
+metadata:
+  name: mysql-conf
+  namespace: jms
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-data
+  namespace: jms
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: moosefs-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: jms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: 123456
+          image: mysql:5.7.28
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql-data
+              subPath: data
+            - mountPath: /etc/mysql/my.cnf
+              name: mysql-conf
+              subPath: my.cnf
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: mysql-data
+          persistentVolumeClaim:
+            claimName: mysql-data
+        - name: mysql-conf
+          configMap:
+            defaultMode: 420
+            name: mysql-conf
+              - key: my.cnf
+                path: my.cnf
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

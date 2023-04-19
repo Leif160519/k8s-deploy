@@ -1,0 +1,63 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lion-data
+  namespace: jms
+spec:
+  resources:
+    requests:
+      storage: 5Mi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: moosefs-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lion
+  namespace: jms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lion
+  template:
+    metadata:
+      labels:
+        app: lion
+    spec:
+      containers:
+        - name: lion
+          env:
+            - name: CORE_HOST
+              value: http://core.jms.svc:8080
+            - name: BOOTSTRAP_TOKEN
+              value: X3uaAUpf6x83QMcn
+            - name: LOG_LEVEL
+              value: ERROR
+          image: jumpserver/lion:v2.28.10
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /opt/lion/data
+              name: lion-data
+              subPath: data
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: lion-data
+          persistentVolumeClaim:
+            claimName: lion-data
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

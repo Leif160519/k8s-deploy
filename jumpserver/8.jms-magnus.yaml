@@ -1,0 +1,94 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: magnus-data
+  namespace: jms
+spec:
+  resources:
+    requests:
+      storage: 5Mi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: moosefs-storage
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: magnus
+  namespace: jms
+spec:
+  type: NodePort
+  ports:
+    - name: mysql
+      port: 33060
+      protocol: TCP
+      targetPort: 33060
+    - name: redis
+      port: 63790
+      protocol: TCP
+      targetPort: 63790
+    - name: postgresql
+      port: 54320
+      protocol: TCP
+      targetPort: 54320
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magnus
+  namespace: jms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: magnus
+  template:
+    metadata:
+      labels:
+        app: magnus
+    spec:
+      containers:
+        - name: magnus
+          env:
+            - name: CORE_HOST
+              value: http://core.jms.svc:8080
+            - name: BOOTSTRAP_TOKEN
+              value: X3uaAUpf6x83QMcn
+            - name: LOG_LEVEL
+              value: ERROR
+          image: jumpserver/magnus:v2.28.10
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 33060
+              name: mysql
+              protocol: TCP
+            - containerPort: 63790
+              name: redis
+              protocol: TCP
+            - containerPort: 54320
+              name: postgresql
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /opt/magnus/data
+              name: magnus-data
+              subPath: data
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: magnus-data
+          persistentVolumeClaim:
+            claimName: magnus-data
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

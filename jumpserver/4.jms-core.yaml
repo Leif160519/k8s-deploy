@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: core-data
+  namespace: jms
+spec:
+  resources:
+    requests:
+      storage: 10Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: moosefs-storage
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: core-logs
+  namespace: jms
+spec:
+  resources:
+    requests:
+      storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: moosefs-storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: core
+  namespace: jms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: core
+  template:
+    metadata:
+      labels:
+        app: core
+    spec:
+      containers:
+        - name: core
+          env:
+            - name: SECRET_KEY
+              value: 0imoXuphwWKE6b5JuJrJTNjvD9uGhw4sRrbW6TXddPOiX8bmnw
+            - name: BOOTSTRAP_TOKEN
+              value: X3uaAUpf6x83QMcn
+            - name: DEBUG
+              value: FALSE
+            - name: LOG_LEVEL
+              value: ERROR
+            - name: DB_HOST
+              value: mysql.jms.svc
+            - name: DB_PORT
+              value: 3306
+            - name: DB_USER
+              value: root
+            - name: DB_PASSWORD
+              value: 123456
+            - name: DB_NAME
+              jumpserver: jumpserver
+            - name: REDIS_HOST
+              value: redis.jms.svc
+            - name: REDIS_PORT
+              value: 6379
+            - name: REDIS_PASSWORD
+              value: 123456
+          image: jumpserver/core:v2.28.10
+          command: start web
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+              name: core-1
+              protocol: TCP
+            - containerPort: 8070
+              name: core-2
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /opt/jumpserver/data
+              name: core-data
+              subPath: data
+            - mountPath: /opt/jumpserver/logs
+              name: core-logs
+              subPath: logs
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: core-data
+          persistentVolumeClaim:
+            claimName: core-data
+        - name: core-logs
+          persistentVolumeClaim:
+            claimName: core-logs
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
