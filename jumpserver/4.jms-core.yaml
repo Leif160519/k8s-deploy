@@ -2,25 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: core-data
+  name: core
   namespace: jms
 spec:
   resources:
     requests:
       storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: core-logs
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 1Gi
   accessModes:
     - ReadWriteMany
   storageClassName: moosefs-storage
@@ -48,27 +35,28 @@ spec:
             - name: BOOTSTRAP_TOKEN
               value: X3uaAUpf6x83QMcn
             - name: DEBUG
-              value: FALSE
+              value: "FALSE"
             - name: LOG_LEVEL
-              value: ERROR
+              value: "ERROR"
             - name: DB_HOST
               value: mysql.jms.svc
             - name: DB_PORT
-              value: 3306
+              value: "3306"
             - name: DB_USER
               value: root
             - name: DB_PASSWORD
-              value: 123456
+              value: "123456"
             - name: DB_NAME
-              jumpserver: jumpserver
+              value: jumpserver
             - name: REDIS_HOST
               value: redis.jms.svc
             - name: REDIS_PORT
-              value: 6379
+              value: "6379"
             - name: REDIS_PASSWORD
-              value: 123456
+              value: "123456"
           image: jumpserver/core:v2.28.10
-          command: ["start web"]
+          tty: true
+          command: ["/bin/bash","-c","/opt/jumpserver/entrypoint.sh","start","web"]
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
@@ -105,20 +93,17 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /opt/jumpserver/data
-              name: core-data
+              name: core
               subPath: data
             - mountPath: /opt/jumpserver/logs
-              name: core-logs
+              name: core
               subPath: logs
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: core-data
+        - name: core
           persistentVolumeClaim:
-            claimName: core-data
-        - name: core-logs
-          persistentVolumeClaim:
-            claimName: core-logs
+            claimName: core
         - hostPath:
             path: /etc/localtime
             type: ""
