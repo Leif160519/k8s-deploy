@@ -64,7 +64,7 @@ spec:
             - name: REDIS_HOST
               value: redis.jms.svc
             - name: REDIS_PORT
-              value: 6379
+              value: 8080
             - name: REDIS_PASSWORD
               value: 123456
           image: jumpserver/celery:v2.28.10
@@ -72,6 +72,22 @@ spec:
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
           ports:
             - containerPort: 8080
               name: celery-1

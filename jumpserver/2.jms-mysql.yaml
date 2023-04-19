@@ -64,7 +64,7 @@ spec:
         - name: mysql
           env:
           - name: MYSQL_ROOT_PASSWORD
-            value: 123456
+            value: "123456"
           image: mysql:5.7.28
           securityContext:
             runAsUser: 0

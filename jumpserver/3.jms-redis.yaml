@@ -92,6 +92,22 @@ spec:
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 3
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 3
           ports:
             - containerPort: 6379
               name: redis
