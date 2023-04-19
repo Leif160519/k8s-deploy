@@ -83,7 +83,9 @@ spec:
           readinessProbe:
             exec:
               command:
-                - bash /opt/jumpserver/utils/check_celery.sh
+                - /bin/bash
+                - "-c"
+                - /opt/jumpserver/utils/check_celery.sh
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5

@@ -72,7 +72,9 @@ spec:
           readinessProbe:
             exec:
               command:
-                - ps aux | grep -v grep | grep magnus
+                - /bin/sh
+                - "-c"
+                - /bin/ps aux | grep -v grep | grep magnus
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5

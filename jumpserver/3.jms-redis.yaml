@@ -103,7 +103,9 @@ spec:
           readinessProbe:
             exec:
               command:
-                - redis-cli -h 127.0.0.1 -p 6379 -a 123456 info Replication
+                - /bin/sh
+                - "-c"
+                - /usr/bin/redis-cli -h 127.0.0.1 -p 6379 -a 123456 info Replication
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5

@@ -80,7 +80,9 @@ spec:
           readinessProbe:
             exec:
               command:
-                - mysql -h127.0.0.1 -P3306 -uroot -p123456 -e 'SHOW DATABASES;create database if not exists jumpserver;'
+                - /bin/sh
+                - "-c"
+                - /usr/bin/mysql -h127.0.0.1 -P3306 -uroot -p123456 -e 'SHOW DATABASES;create database if not exists jumpserver;'
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5
