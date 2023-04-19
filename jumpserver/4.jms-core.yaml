@@ -68,7 +68,7 @@ spec:
             - name: REDIS_PASSWORD
               value: 123456
           image: jumpserver/core:v2.28.10
-          command: start web
+          command: ["start web"]
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
