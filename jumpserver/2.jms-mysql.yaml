@@ -97,6 +97,7 @@ spec:
           configMap:
             defaultMode: 420
             name: mysql-conf
+            items:
               - key: my.cnf
                 path: my.cnf
         - hostPath:

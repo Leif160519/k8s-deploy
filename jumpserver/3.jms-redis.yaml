@@ -120,6 +120,7 @@ spec:
           configMap:
             defaultMode: 420
             name: redis-conf
+            items:
               - key: redis.conf
                 path: redis.conf
         - hostPath:
