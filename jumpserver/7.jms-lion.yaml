@@ -37,26 +37,27 @@ spec:
             - name: LOG_LEVEL
               value: "ERROR"
           image: jumpserver/lion:v2.28.10
+          tty: true
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-#          livenessProbe:
-#            failureThreshold: 5
-#            initialDelaySeconds: 30
-#            periodSeconds: 5
-#            successThreshold: 1
-#            tcpSocket:
-#              port: 8081
-#            timeoutSeconds: 3
-#          readinessProbe:
-#            httpGet:
-#              port: 8081
-#              path: /lion/health/
-#            failureThreshold: 5
-#            initialDelaySeconds: 10
-#            periodSeconds: 5
-#            successThreshold: 1
-#            timeoutSeconds: 3
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8081
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              port: 8081
+              path: /lion/health/
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
           resources:
             limits:
               cpu: "1"

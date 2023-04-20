@@ -50,26 +50,27 @@ spec:
             - name: LOG_LEVEL
               value: "ERROR"
           image: jumpserver/web:v2.28.10
+          tty: true
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-#          livenessProbe:
-#            failureThreshold: 5
-#            initialDelaySeconds: 30
-#            periodSeconds: 5
-#            successThreshold: 1
-#            tcpSocket:
-#              port: 80
-#            timeoutSeconds: 3
-#          readinessProbe:
-#            failureThreshold: 5
-#            initialDelaySeconds: 10
-#            periodSeconds: 5
-#            successThreshold: 1
-#            httpGet:
-#              port: 80
-#              path: /
-#            timeoutSeconds: 3
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 3
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            httpGet:
+              port: 80
+              path: /
+            timeoutSeconds: 3
           ports:
             - containerPort: 80
               name: web

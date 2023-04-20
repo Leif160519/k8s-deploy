@@ -56,26 +56,27 @@ spec:
             - name: LOG_LEVEL
               value: "ERROR"
           image: jumpserver/koko:v2.28.10
+          tty: true
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-#          livenessProbe:
-#            failureThreshold: 5
-#            initialDelaySeconds: 30
-#            periodSeconds: 5
-#            successThreshold: 1
-#            tcpSocket:
-#              port: 2222
-#            timeoutSeconds: 3
-#          readinessProbe:
-#            httpGet:
-#              port: 5000
-#              path: /koko/health/
-#            failureThreshold: 5
-#            initialDelaySeconds: 10
-#            periodSeconds: 5
-#            successThreshold: 1
-#            timeoutSeconds: 3
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 2222
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              port: 5000
+              path: /koko/health/
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
           ports:
             - containerPort: 2222
               name: koko-2222

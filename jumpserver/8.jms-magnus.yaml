@@ -12,27 +12,6 @@ spec:
     - ReadWriteMany
   storageClassName: moosefs-storage
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: magnus
-  namespace: jms
-spec:
-  type: NodePort
-  ports:
-    - name: mysql
-      port: 33060
-      protocol: TCP
-      targetPort: 33060
-    - name: redis
-      port: 63790
-      protocol: TCP
-      targetPort: 63790
-    - name: postgresql
-      port: 54320
-      protocol: TCP
-      targetPort: 54320
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -58,38 +37,32 @@ spec:
             - name: LOG_LEVEL
               value: "ERROR"
           image: jumpserver/magnus:v2.28.10
+          tty: true
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-#          livenessProbe:
-#            failureThreshold: 5
-#            initialDelaySeconds: 30
-#            periodSeconds: 5
-#            successThreshold: 1
-#            tcpSocket:
-#              port: 33060
-#            timeoutSeconds: 3
-#          readinessProbe:
-#            exec:
-#              command:
-#                - /bin/sh
-#                - "-c"
-#                - /bin/ps aux | grep -v grep | grep magnus
-#            failureThreshold: 5
-#            initialDelaySeconds: 10
-#            periodSeconds: 5
-#            successThreshold: 1
-#            timeoutSeconds: 3
-          ports:
-            - containerPort: 33060
-              name: mysql
-              protocol: TCP
-            - containerPort: 63790
-              name: redis
-              protocol: TCP
-            - containerPort: 54320
-              name: postgresql
-              protocol: TCP
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - /bin/ps aux | grep -v grep | grep magnus
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - /bin/ps aux | grep -v grep | grep magnus
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
           resources:
             limits:
               cpu: "1"
