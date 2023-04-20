@@ -1,34 +1,21 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: core
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: core
+  name: celery
   namespace: jms
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: core
+      app: celery
   template:
     metadata:
       labels:
-        app: core
+        app: celery
     spec:
       containers:
-        - name: core
+        - name: celery
           env:
             - name: SECRET_KEY
               value: 0imoXuphwWKE6b5JuJrJTNjvD9uGhw4sRrbW6TXddPOiX8bmnw
@@ -55,13 +42,13 @@ spec:
             - name: REDIS_PASSWORD
               value: "123456"
           image: jumpserver/core:v2.28.10
-          tty: true
           args:
             - start
-            - web
+            - task
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
+          tty: true
 #          livenessProbe:
 #            failureThreshold: 5
 #            initialDelaySeconds: 30
@@ -71,28 +58,30 @@ spec:
 #              port: 8080
 #            timeoutSeconds: 3
 #          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/bash
+#                - "-c"
+#                - /opt/jumpserver/utils/check_celery.sh
 #            failureThreshold: 5
 #            initialDelaySeconds: 10
 #            periodSeconds: 5
 #            successThreshold: 1
-#            httpGet:
-#              port: 8080
-#              path: /api/health/
 #            timeoutSeconds: 3
           ports:
             - containerPort: 8080
-              name: core-8080
+              name: celery-8080
               protocol: TCP
             - containerPort: 8070
-              name: core-8070
+              name: celery-8070
               protocol: TCP
-#          resources:
-#            limits:
-#              cpu: "1"
-#              memory: 2Gi
-#            requests:
-#              cpu: "0.5"
-#              memory: 1Gi
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
           volumeMounts:
             - mountPath: /opt/jumpserver/data
               name: core
@@ -114,18 +103,18 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: core
+  name: celery
   namespace: jms
 spec:
   ports:
-    - name: core-8080
+    - name: celery-8080
       protocol: TCP
       port: 8080
       targetPort: 8080
-    - name: core-8070
+    - name: celery-8070
       protocol: TCP
       port: 8070
       targetPort: 8070
   type: ClusterIP
   selector:
-    app: core
+    app: celery
