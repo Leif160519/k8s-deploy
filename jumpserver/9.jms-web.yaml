@@ -24,6 +24,8 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 80
+  selector:
+    app: web
 ---
 apiVersion: apps/v1
 kind: Deployment
