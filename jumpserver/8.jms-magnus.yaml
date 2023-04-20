@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: magnus-data
+  name: magnus
   namespace: jms
 spec:
   resources:
@@ -52,34 +52,34 @@ spec:
         - name: magnus
           env:
             - name: CORE_HOST
-              value: http://core.jms.svc:8080
+              value: http://core:8080
             - name: BOOTSTRAP_TOKEN
               value: X3uaAUpf6x83QMcn
             - name: LOG_LEVEL
-              value: ERROR
+              value: "ERROR"
           image: jumpserver/magnus:v2.28.10
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            tcpSocket:
-              port: 33060
-            timeoutSeconds: 3
-          readinessProbe:
-            exec:
-              command:
-                - /bin/sh
-                - "-c"
-                - /bin/ps aux | grep -v grep | grep magnus
-            failureThreshold: 5
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 3
+#          livenessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 30
+#            periodSeconds: 5
+#            successThreshold: 1
+#            tcpSocket:
+#              port: 33060
+#            timeoutSeconds: 3
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/sh
+#                - "-c"
+#                - /bin/ps aux | grep -v grep | grep magnus
+#            failureThreshold: 5
+#            initialDelaySeconds: 10
+#            periodSeconds: 5
+#            successThreshold: 1
+#            timeoutSeconds: 3
           ports:
             - containerPort: 33060
               name: mysql
@@ -99,14 +99,14 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /opt/magnus/data
-              name: magnus-data
+              name: magnus
               subPath: data
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: magnus-data
+        - name: magnus
           persistentVolumeClaim:
-            claimName: magnus-data
+            claimName: magnus
         - hostPath:
             path: /etc/localtime
             type: ""

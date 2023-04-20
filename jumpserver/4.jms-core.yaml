@@ -15,7 +15,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: core
+  name: core-celery-web
   namespace: jms
 spec:
   replicas: 1
@@ -39,7 +39,7 @@ spec:
             - name: LOG_LEVEL
               value: "ERROR"
             - name: DB_HOST
-              value: mysql.jms.svc
+              value: mysql
             - name: DB_PORT
               value: "3306"
             - name: DB_USER
@@ -49,48 +49,50 @@ spec:
             - name: DB_NAME
               value: jumpserver
             - name: REDIS_HOST
-              value: redis.jms.svc
+              value: redis
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_PASSWORD
               value: "123456"
           image: jumpserver/core:v2.28.10
           tty: true
-          command: ["/bin/bash","-c","/opt/jumpserver/entrypoint.sh","start","web"]
+          args:
+            - start
+            - web
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            tcpSocket:
-              port: 8080
-            timeoutSeconds: 3
-          readinessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            httpGet:
-              port: 8080
-              path: /api/health/
-            timeoutSeconds: 3
+#          livenessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 30
+#            periodSeconds: 5
+#            successThreshold: 1
+#            tcpSocket:
+#              port: 8080
+#            timeoutSeconds: 3
+#          readinessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 10
+#            periodSeconds: 5
+#            successThreshold: 1
+#            httpGet:
+#              port: 8080
+#              path: /api/health/
+#            timeoutSeconds: 3
           ports:
             - containerPort: 8080
-              name: core-1
+              name: core-8080
               protocol: TCP
             - containerPort: 8070
-              name: core-2
+              name: core-8070
               protocol: TCP
           resources:
             limits:
               cpu: "1"
-              memory: 1Gi
+              memory: 2Gi
             requests:
               cpu: "0.5"
-              memory: 512Mi
+              memory: 1Gi
           volumeMounts:
             - mountPath: /opt/jumpserver/data
               name: core
@@ -111,7 +113,7 @@ spec:
             - name: LOG_LEVEL
               value: "ERROR"
             - name: DB_HOST
-              value: mysql.jms.svc
+              value: mysql
             - name: DB_PORT
               value: "3306"
             - name: DB_USER
@@ -119,52 +121,54 @@ spec:
             - name: DB_PASSWORD
               value: "123456"
             - name: DB_NAME
-              jumpserver: jumpserver
+              value: jumpserver
             - name: REDIS_HOST
-              value: redis.jms.svc
+              value: redis
             - name: REDIS_PORT
-              value: "8080"
+              value: "6379"
             - name: REDIS_PASSWORD
               value: "123456"
           image: jumpserver/core:v2.28.10
-          command: ["/bin/bash","-c","/opt/jumpserver/entrypoint.sh","start","task"]
+          args:
+            - start
+            - task
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
           tty: true
-          livenessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            tcpSocket:
-              port: 8080
-            timeoutSeconds: 3
-          readinessProbe:
-            exec:
-              command:
-                - /bin/bash
-                - "-c"
-                - /opt/jumpserver/utils/check_celery.sh
-            failureThreshold: 5
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 3
+#          livenessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 30
+#            periodSeconds: 5
+#            successThreshold: 1
+#            tcpSocket:
+#              port: 8080
+#            timeoutSeconds: 3
+#          readinessProbe:
+#            exec:
+#              command:
+#                - /bin/bash
+#                - "-c"
+#                - /opt/jumpserver/utils/check_celery.sh
+#            failureThreshold: 5
+#            initialDelaySeconds: 10
+#            periodSeconds: 5
+#            successThreshold: 1
+#            timeoutSeconds: 3
           ports:
             - containerPort: 8080
-              name: celery-1
+              name: celery-8080
               protocol: TCP
             - containerPort: 8070
-              name: celery-2
+              name: celery-8070
               protocol: TCP
           resources:
             limits:
               cpu: "1"
-              memory: 1Gi
+              memory: 2Gi
             requests:
               cpu: "0.5"
-              memory: 512Mi
+              memory: 1Gi
           volumeMounts:
             - mountPath: /opt/jumpserver/data
               name: core
@@ -182,3 +186,41 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: core
+  namespace: jms
+spec:
+  ports:
+    - name: core-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: core-8070
+      protocol: TCP
+      port: 8070
+      targetPort: 8070
+  type: ClusterIP
+  selector:
+    app: core
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: celery
+  namespace: jms
+spec:
+  ports:
+    - name: celery-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - name: celery-8070
+      protocol: TCP
+      port: 8070
+      targetPort: 8070
+  type: ClusterIP
+  selector:
+    app: celery

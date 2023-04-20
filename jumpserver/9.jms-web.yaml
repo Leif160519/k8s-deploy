@@ -44,11 +44,11 @@ spec:
         - name: web
           env:
             - name: CORE_HOST
-              value: http://core.jms.svc:8080
+              value: http://core:8080
             - name: BOOTSTRAP_TOKEN
               value: X3uaAUpf6x83QMcn
             - name: LOG_LEVEL
-              value: ERROR
+              value: "ERROR"
           image: jumpserver/web:v2.28.10
           securityContext:
             runAsUser: 0

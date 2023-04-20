@@ -146,3 +146,18 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  namespace: jms
+spec:
+  selector:
+    app: redis
+  type: ClusterIP
+  ports:
+    - name: redis
+      port: 6379
+      protocol: TCP
+      targetPort: 6379

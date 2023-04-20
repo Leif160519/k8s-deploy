@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: lion-data
+  name: lion
   namespace: jms
 spec:
   resources:
@@ -31,32 +31,32 @@ spec:
         - name: lion
           env:
             - name: CORE_HOST
-              value: http://core.jms.svc:8080
+              value: http://core:8080
             - name: BOOTSTRAP_TOKEN
               value: X3uaAUpf6x83QMcn
             - name: LOG_LEVEL
-              value: ERROR
+              value: "ERROR"
           image: jumpserver/lion:v2.28.10
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            tcpSocket:
-              port: 8081
-            timeoutSeconds: 3
-          readinessProbe:
-            httpGet:
-              port: 8081
-              path: /lion/health/
-            failureThreshold: 5
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            timeoutSeconds: 3
+#          livenessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 30
+#            periodSeconds: 5
+#            successThreshold: 1
+#            tcpSocket:
+#              port: 8081
+#            timeoutSeconds: 3
+#          readinessProbe:
+#            httpGet:
+#              port: 8081
+#              path: /lion/health/
+#            failureThreshold: 5
+#            initialDelaySeconds: 10
+#            periodSeconds: 5
+#            successThreshold: 1
+#            timeoutSeconds: 3
           resources:
             limits:
               cpu: "1"
@@ -66,15 +66,30 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /opt/lion/data
-              name: lion-data
+              name: lion
               subPath: data
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: lion-data
+        - name: lion
           persistentVolumeClaim:
-            claimName: lion-data
+            claimName: lion
         - hostPath:
             path: /etc/localtime
             type: ""
           name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lion
+  namespace: jms
+spec:
+  ports:
+    - name: lion
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+  type: ClusterIP
+  selector:
+    app: lion

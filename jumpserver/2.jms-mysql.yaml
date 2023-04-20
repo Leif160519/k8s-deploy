@@ -123,3 +123,18 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: jms
+spec:
+  selector:
+    app: mysql
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
