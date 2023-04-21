@@ -1,0 +1,7 @@
+upstream koko{
+    server koko.jms.svc:2222;
+}
+server {
+    listen 2222;
+    proxy_pass koko;
+}

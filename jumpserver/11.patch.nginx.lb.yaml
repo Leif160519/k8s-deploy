@@ -1,0 +1,6 @@
+spec:
+  ports:
+  - name: jms-koko
+    port: 2222
+    protocol: TCP
+    targetPort: 2222
