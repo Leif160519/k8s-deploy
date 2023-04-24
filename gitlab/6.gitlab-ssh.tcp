@@ -1,0 +1,7 @@
+upstream gitlab-ssh{
+    server gitlab.gitlab.svc:22;
+}
+server {
+    listen 22;
+    proxy_pass gitlab-ssh;
+}

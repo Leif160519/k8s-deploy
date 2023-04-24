@@ -5,6 +5,7 @@ data:
     port 6379
     daemonize no
     protected-mode no
+    requirepass 123456
 
     dir /data
     logfile redis.log
