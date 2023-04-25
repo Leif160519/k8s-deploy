@@ -11,3 +11,5 @@ mountOptions:
   - hard                                                  ## 指定为硬挂载方式
   - nfsvers=4                                             ## 指定NFS版本,这个需要根据NFS Server版本号设置
 reclaimPolicy: Retain
+parameters:
+  fsType: xfs
