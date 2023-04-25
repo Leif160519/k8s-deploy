@@ -17,6 +17,8 @@ metadata:
 provisioner: csi.moosefs.com
 allowVolumeExpansion: true
 reclaimPolicy: Retain
+parameters:
+  fsType: xfs
 ---
 
 apiVersion: v1
