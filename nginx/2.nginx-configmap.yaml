@@ -12,9 +12,9 @@ data:
       worker_connections 51200;
       multi_accept on;
     }
-        stream {
-        include vhost/tcp/*.tcp;
-        }
+    stream {
+    include vhost/tcp/*.tcp;
+    }
     http {
       include mime.types;
       default_type application/octet-stream;
