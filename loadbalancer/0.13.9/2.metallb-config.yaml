@@ -7,3 +7,12 @@ spec:
   addresses:
 #  - 192.168.31.120/26
   - 192.168.31.61-192.168.31.69
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: l2advertisement
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - first-pool
