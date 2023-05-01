@@ -62,23 +62,23 @@ spec:
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
-          livenessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 30
-            periodSeconds: 5
-            successThreshold: 1
-            tcpSocket:
-              port: 8080
-            timeoutSeconds: 3
-          readinessProbe:
-            failureThreshold: 5
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            successThreshold: 1
-            httpGet:
-              port: 8080
-              path: /api/health/
-            timeoutSeconds: 3
+#          livenessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 60
+#            periodSeconds: 30
+#            successThreshold: 1
+#            tcpSocket:
+#              port: 8080
+#            timeoutSeconds: 5
+#          readinessProbe:
+#            failureThreshold: 5
+#            initialDelaySeconds: 60
+#            periodSeconds: 30
+#            successThreshold: 1
+#            httpGet:
+#              port: 8080
+#              path: /api/health/
+#            timeoutSeconds: 5
           ports:
             - containerPort: 8080
               name: core-8080
