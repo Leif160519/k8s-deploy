@@ -3,7 +3,9 @@
 ```
 kubectl apply -f 1.namespace.yaml
 kubectl apply -f 2.postgresql.yaml
-kubectl apply -f 3.sonarqube.yaml
+kubectl apply -f 3.pvc-mfs.yaml
+kubectl apply -f 4.service-nodeport.yaml
+kubectl apply -f 5.deployment.yaml
 ```
 2.查找到sonarqube对应的pv
 ```
