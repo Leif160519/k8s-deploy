@@ -1,17 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: nexus3
-  namespace: devops
-spec:
-  resources:
-    requests:
-      storage: 5Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -76,18 +63,4 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nexus3
-  namespace: devops
-spec:
-  selector:
-    app: nexus3
-  type: NodePort
-  ports:
-    - name: web
-      port: 8081
-      protocol: TCP
-      targetPort: 8081
+
