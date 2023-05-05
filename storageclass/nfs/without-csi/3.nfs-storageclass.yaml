@@ -7,10 +7,9 @@ metadata:
 provisioner: nfs-client                                   ## 动态卷分配者名称，必须和上面创建的"provisioner"变量中设置的Name一致
 parameters:
   archiveOnDelete: "true"                                 ## 设置为"false"时删除PVC不会保留数据,"true"则保留数据
+  fsType: xfs
 mountOptions:
   - hard                                                  ## 指定为硬挂载方式
   - nfsvers=4                                             ## 指定NFS版本,这个需要根据NFS Server版本号设置
 reclaimPolicy: Retain
 allowVolumeExpansion: true
-parameters:
-  fsType: xfs

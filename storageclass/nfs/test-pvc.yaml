@@ -5,7 +5,7 @@ metadata:
 spec:
   storageClassName: nfs-storage    ## 需要与上面创建的storageclass的名称一致
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: 1Mi
