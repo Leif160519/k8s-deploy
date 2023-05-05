@@ -24,7 +24,7 @@ spec:
             value: "1000"
           - name: BACKUPPC_WEB_USER
             value: backuppc
-          - name: BACKUPPC_WEB_PASSWORD
+          - name: BACKUPPC_WEB_PASSWD
             value: backuppc
           - name: USE_SSL
             value: "false"
