@@ -9,7 +9,7 @@ metadata:
 spec:
   selector:
     app: backuppc
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: web
       port: 8080
