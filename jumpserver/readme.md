@@ -4,7 +4,7 @@ kubectl apply -f 1.namespace.yaml
 ·
 ·
 ·
-kubectl apply -f 10.jms-web.yaml
+kubectl apply -f 9.jms-web.yaml
 ```
 注意：core部署时需要初始化数据库，时间大概为5分钟，故去掉了健康检查
 
