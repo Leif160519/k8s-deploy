@@ -1,5 +1,6 @@
 ## jumpserver安装
 ```
+kubectl apply -f 0.pvc-mfs.yaml
 kubectl apply -f 1.namespace.yaml
 ·
 ·
