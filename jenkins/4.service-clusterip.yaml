@@ -1,0 +1,21 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+  namespace: devops
+  labels:
+    app: jenkins
+spec:
+  selector:
+    app: jenkins
+  type: ClusterIP
+  ports:
+    - port: 8080
+      name: web
+      targetPort: 5000
+      protocol: TCP
+    - name: agent
+      port: 50000
+      targetPort: 5000
+      protocol: TCP
