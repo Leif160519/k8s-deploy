@@ -1,17 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: lion
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 5Mi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -67,14 +54,14 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /opt/lion/data
-              name: lion
-              subPath: data
+              name: jms
+              subPath: lion/data
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: lion
+        - name: jms
           persistentVolumeClaim:
-            claimName: lion
+            claimName: jms
         - hostPath:
             path: /etc/localtime
             type: ""

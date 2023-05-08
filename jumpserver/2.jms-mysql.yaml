@@ -32,19 +32,6 @@ metadata:
   name: mysql-conf
   namespace: jms
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: mysql-data
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -101,17 +88,17 @@ spec:
               memory: 1Gi
           volumeMounts:
             - mountPath: /var/lib/mysql
-              name: mysql-data
-              subPath: data
+              name: jms
+              subPath: mysql/data
             - mountPath: /etc/mysql/my.cnf
               name: mysql-conf
               subPath: my.cnf
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: mysql-data
+        - name: jms
           persistentVolumeClaim:
-            claimName: mysql-data
+            claimName: jms
         - name: mysql-conf
           configMap:
             defaultMode: 420

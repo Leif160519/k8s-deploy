@@ -1,17 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: core
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 10Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -88,17 +75,17 @@ spec:
               protocol: TCP
           volumeMounts:
             - mountPath: /opt/jumpserver/data
-              name: core
-              subPath: data
+              name: jms
+              subPath: core/data
             - mountPath: /opt/jumpserver/logs
-              name: core
-              subPath: logs
+              name: jms
+              subPath: core/logs
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: core
+        - name: jms
           persistentVolumeClaim:
-            claimName: core
+            claimName: jms
         - hostPath:
             path: /etc/localtime
             type: ""

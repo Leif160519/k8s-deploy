@@ -34,9 +34,13 @@ spec:
         - :9001
         env:
         - name: MINIO_ROOT_USER
-          value: "admin"
+          value: "minio"
         - name: MINIO_ROOT_PASSWORD
-          value: "admin"
+          value: "mnio-123"
+        - name: MINIO_SERVER_URL
+          value: "http://console.github.icu"
+        - name: MINIO_BROWSER_REDIRECT_URL
+          value: "http://minio.github.icu"
         ports:
         - name: console
           containerPort: 9000

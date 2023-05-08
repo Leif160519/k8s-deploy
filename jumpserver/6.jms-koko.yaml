@@ -1,18 +1,5 @@
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: koko
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 20Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
-apiVersion: v1
 kind: Service
 metadata:
   name: koko
@@ -94,14 +81,14 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /opt/koko/data
-              name: koko
-              subPath: data
+              name: jms
+              subPath: koko/data
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: koko
+        - name: jms
           persistentVolumeClaim:
-            claimName: koko
+            claimName: jms
         - hostPath:
             path: /etc/localtime
             type: ""

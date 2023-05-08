@@ -1,17 +1,4 @@
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: magnus
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 5Mi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -72,14 +59,14 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /opt/magnus/data
-              name: magnus
-              subPath: data
+              name: jms
+              subPath: magnus/data
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: magnus
+        - name: jms
           persistentVolumeClaim:
-            claimName: magnus
+            claimName: jms
         - hostPath:
             path: /etc/localtime
             type: ""

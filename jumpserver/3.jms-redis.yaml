@@ -57,19 +57,6 @@ metadata:
   name: redis-conf
   namespace: jms
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: redis-data
-  namespace: jms
-spec:
-  resources:
-    requests:
-      storage: 1Gi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -126,17 +113,17 @@ spec:
               memory: 512Mi
           volumeMounts:
             - mountPath: /data
-              name: redis-data
-              subPath: data
+              name: jms
+              subPath: redis/data
             - mountPath: /etc/redis/redis.conf
               name: redis-conf
               subPath: redis.conf
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: redis-data
+        - name: jms
           persistentVolumeClaim:
-            claimName: redis-data
+            claimName: jms
         - name: redis-conf
           configMap:
             defaultMode: 420

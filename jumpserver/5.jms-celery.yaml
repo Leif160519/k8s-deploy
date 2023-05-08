@@ -80,17 +80,17 @@ spec:
               memory: 1Gi
           volumeMounts:
             - mountPath: /opt/jumpserver/data
-              name: core
-              subPath: data
+              name: jms
+              subPath: core/data
             - mountPath: /opt/jumpserver/logs
-              name: core
-              subPath: logs
+              name: jms
+              subPath: core/logs
             - mountPath: /etc/localtime
               name: localtime
       volumes:
-        - name: core
+        - name: jms
           persistentVolumeClaim:
-            claimName: core
+            claimName: jms
         - hostPath:
             path: /etc/localtime
             type: ""
