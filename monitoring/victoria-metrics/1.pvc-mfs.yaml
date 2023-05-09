@@ -1,0 +1,14 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: victoria
+  namespace: monitoring
+spec:
+  resources:
+    requests:
+      storage: 50Gi
+  accessModes:
+    - ReadWriteMany
+  storageClassName: moosefs-storage
+

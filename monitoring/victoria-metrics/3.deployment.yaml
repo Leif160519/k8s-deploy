@@ -1,0 +1,63 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: victoria
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: victoria
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: victoria
+    spec:
+      containers:
+        - name: victoria
+          image: victoriametrics/victoria-metrics:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8428
+            timeoutSeconds: 3
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 8428
+              name: web
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8428
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+            - mountPath: /victoria-metrics-data
+              name: victoria
+              subPath: victoria-metrics-data
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ""
+        - name: victoria
+          persistentVolumeClaim:
+            claimName: victoria
