@@ -55,4 +55,6 @@ Backup completed with status: PartiallyFailed. You may check for more informatio
 ```
 
 # 参考
-https://blog.mafeifan.com/DevOps/K8s/k8s-%E5%9F%BA%E7%A1%80-%E4%BD%BF%E7%94%A8Velero%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4.html#%E5%A4%87%E4%BB%BD%E5%8E%9F%E7%90%86%E5%92%8C%E6%B5%81%E7%A8%8B%E5%9B%BE
+[k8s-基础-使用Velero备份恢复集群][0]
+
+[0]: https://blog.mafeifan.com/DevOps/K8s/k8s-%E5%9F%BA%E7%A1%80-%E4%BD%BF%E7%94%A8Velero%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4.html
