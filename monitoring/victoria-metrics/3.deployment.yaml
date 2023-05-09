@@ -18,6 +18,9 @@ spec:
         - name: victoria
           image: victoriametrics/victoria-metrics:latest
           imagePullPolicy: IfNotPresent
+          args:
+            - -retentionPeriod=1
+            - -vmalert.proxyURL=http://prometheus.monitoring.svc:9090
           livenessProbe:
             failureThreshold: 5
             initialDelaySeconds: 30
