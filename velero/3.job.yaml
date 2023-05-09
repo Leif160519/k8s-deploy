@@ -13,8 +13,6 @@ spec:
     spec:
       restartPolicy: OnFailure
       volumes:
-      - name: config
-        emptyDir: {}
       containers:
       - name: mc
         image: minio/mc:latest
@@ -22,7 +20,6 @@ spec:
         command:
         - /bin/sh
         - -c
-        - "mc --config-dir=/config config host add velero http://minio:9000 minio minio123 && mc --config-dir=/config mb -p velero/velero"
+        - mc alias set velero http://minio.velero.svc:9000 minioadmin minioadmin
+        - mc admin info velero
         volumeMounts:
-        - name: config
-          mountPath: "/config"

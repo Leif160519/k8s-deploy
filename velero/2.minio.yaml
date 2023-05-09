@@ -18,39 +18,30 @@ spec:
         component: minio
     spec:
       volumes:
-      - name: storage
-        emptyDir: {}
-      - name: config
+      - name: data
         emptyDir: {}
       containers:
       - name: minio
         image: minio/minio:latest
         imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -c
         args:
-        - server
-        - /storage
-        - --config-dir=/config
-        - --console-address
-        - :9001
-        env:
-        - name: MINIO_ROOT_USER
-          value: "minio"
-        - name: MINIO_ROOT_PASSWORD
-          value: "mnio-123"
-        - name: MINIO_SERVER_URL
-          value: "http://console.github.icu"
-        - name: MINIO_BROWSER_REDIRECT_URL
-          value: "http://minio.github.icu"
+        - minio server /data --console-address :9001
+#        env:
+#        - name: MINIO_ROOT_USER
+#          value: "minio"
+#        - name: MINIO_ROOT_PASSWORD
+#          value: "mnio-123"
         ports:
         - name: console
           containerPort: 9000
         - name: web
           containerPort: 9001
         volumeMounts:
-        - name: storage
-          mountPath: "/storage"
-        - name: config
-          mountPath: "/config"
+        - name: data
+          mountPath: "/data"
 ---
 apiVersion: v1
 kind: Service
