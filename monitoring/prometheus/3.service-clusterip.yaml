@@ -1,0 +1,18 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus
+  namespace: monitoring
+  labels:
+    app: prometheus
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: prometheus
+  type: ClusterIP
+  ports:
+    - name: web
+      protocol: TCP
+      port: 9090
+      targetPort: 9090

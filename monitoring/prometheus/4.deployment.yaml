@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheus
+  name: prometheus
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus:latest
+        args:
+        - --storage.tsdb.path=/var/lib/prometheus
+        - --storage.tsdb.retention.time=1d
+        - --storage.tsdb.retention.size=5GB
+#        - --web.config.file=/etc/prometheus/web.yml
+        - --web.console.libraries=/etc/prometheus/console_libraries
+        - --web.console.templates=/etc/prometheus/consoles
+        - --web.listen-address=0.0.0.0:9090
+        - --web.external-url=https://prometheus-k8s.github.icu
+        - --config.file=/etc/prometheus/prometheus.yml
+        ports:
+        - containerPort: 9090
+        securityContext:
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9090
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9090
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: prometheus
+          mountPath: /etc/prometheus/rules
+          subPath: prometheus/rules
+        - name: prometheus
+          mountPath: /var/lib/prometheus
+          subPath: prometheus/data
+        - name: prometheus-config
+          mountPath: /etc/prometheus/prometheus.yml
+          subPath: prometheus.yml
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: prometheus
+        persistentVolumeClaim:
+          claimName: prometheus
+      - name: prometheus-config
+        configMap:
+          name: prometheus-config
+          items:
+            - key: prometheus.yml
+              path: prometheus.yml
