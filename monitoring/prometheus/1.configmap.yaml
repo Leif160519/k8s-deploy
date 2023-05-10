@@ -47,27 +47,6 @@ data:
           - alertmanager.monitoring.svc:9093
           labels:
             env: kubernetes
-      - job_name: backuppc
-        metrics_path: /BackupPC_Admin
-        params:
-          action:
-          - metrics
-          format:
-          - prometheus
-        basic_auth:
-          username: backuppc
-          password: backuppc
-        static_configs:
-        - targets:
-          - backuppc.devops.svc:8080
-          labels:
-            env: kubernetes
-        metric_relabel_configs:
-        - source_labels:
-          - host
-          target_label: all
-        - action: labeldrop
-          regex: host
       - job_name: prometheus
         metrics_path: /metrics
         static_configs:
