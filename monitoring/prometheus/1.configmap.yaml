@@ -59,7 +59,7 @@ data:
           password: backuppc
         static_configs:
         - targets:
-          - backuppc.devops.svc:8088
+          - backuppc.devops.svc:8080
           labels:
             env: kubernetes
         metric_relabel_configs:
@@ -81,6 +81,28 @@ data:
           - victoria.monitoring.svc:8428
           labels:
             env: kubernetes
+      - job_name: node
+        static_configs:
+        - targets:
+          - 192.168.31.80:30000
+          labels:
+            all: k8s-master-02
+        - targets:
+          - 192.168.31.81:30000
+          labels:
+            all: k8s-master-01
+        - targets:
+          - 192.168.31.82:30000
+          labels:
+            all: k8s-node-01
+        - targets:
+          - 192.168.31.83:30000
+          labels:
+            all: k8s-node-02
+        - targets:
+          - 192.168.31.84:30000
+          labels:
+            all: k8s-node-03
       - job_name: kubernetes-cadvisor
         metrics_path: /metrics/cadvisor
         kubernetes_sd_configs:
