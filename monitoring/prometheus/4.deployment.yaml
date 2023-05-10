@@ -70,6 +70,9 @@ spec:
         - name: prometheus
           mountPath: /var/lib/prometheus
           subPath: prometheus/data
+        - name: prometheus
+          mountPath: /etc/prometheus/file_sd
+          subPath: prometheus/file_sd
         - name: prometheus-config
           mountPath: /etc/prometheus/prometheus.yml
           subPath: prometheus.yml
