@@ -81,10 +81,6 @@ data:
           - victoria.monitoring.svc:8428
           labels:
             env: kubernetes
-      - job_name: node
-        file_sd_configs:
-        - files:
-          - /etc/prometheus/file_sd/node.yml
       - job_name: kubernetes-cadvisor
         metrics_path: /metrics/cadvisor
         kubernetes_sd_configs:
