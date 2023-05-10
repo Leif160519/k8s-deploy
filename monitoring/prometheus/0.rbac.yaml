@@ -23,6 +23,7 @@ rules:
   - daemonsets
   - replicasets
   - services
+  - nodes
   verbs:
   - get
   - list
