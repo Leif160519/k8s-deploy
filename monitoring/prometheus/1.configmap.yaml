@@ -82,27 +82,9 @@ data:
           labels:
             env: kubernetes
       - job_name: node
-        static_configs:
-        - targets:
-          - 192.168.31.80:30000
-          labels:
-            all: k8s-master-02
-        - targets:
-          - 192.168.31.81:30000
-          labels:
-            all: k8s-master-01
-        - targets:
-          - 192.168.31.82:30000
-          labels:
-            all: k8s-node-01
-        - targets:
-          - 192.168.31.83:30000
-          labels:
-            all: k8s-node-02
-        - targets:
-          - 192.168.31.84:30000
-          labels:
-            all: k8s-node-03
+        file_sd_configs:
+        - files:
+          - /etc/prometheus/file_sd/node.yml
       - job_name: kubernetes-cadvisor
         metrics_path: /metrics/cadvisor
         kubernetes_sd_configs:
