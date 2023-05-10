@@ -21,6 +21,12 @@ spec:
           args:
             - -retentionPeriod=1
             - -vmalert.proxyURL=http://prometheus.monitoring.svc:9090
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 8428
+              name: web
+              protocol: TCP
           livenessProbe:
             failureThreshold: 5
             initialDelaySeconds: 30
@@ -29,12 +35,6 @@ spec:
             tcpSocket:
               port: 8428
             timeoutSeconds: 3
-          securityContext:
-            runAsUser: 0
-          ports:
-            - containerPort: 8428
-              name: web
-              protocol: TCP
           readinessProbe:
             failureThreshold: 5
             initialDelaySeconds: 10
