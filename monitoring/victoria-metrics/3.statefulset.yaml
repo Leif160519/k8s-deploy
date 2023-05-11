@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: victoria
   namespace: monitoring
@@ -20,7 +20,8 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - -retentionPeriod=1
-            - -vmalert.proxyURL=http://prometheus.monitoring.svc:9090
+            - -storageDataPath=/victoria-metrics-data
+            - -httpListenAddr=:8428
           securityContext:
             runAsUser: 0
           ports:
