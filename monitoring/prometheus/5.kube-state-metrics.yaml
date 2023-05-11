@@ -68,6 +68,10 @@ spec:
     port: 8080
     protocol: TCP
     targetPort: http-metrics
+  - name: telemetry
+    port: 8081
+    protocol: TCP
+    targetPort: telemetry
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -89,7 +93,29 @@ spec:
       - name: kube-state-metrics
         image: registry.cn-shenzhen.aliyuncs.com/starsl/kube-state-metrics:v2.3.0
         ports:
-        - name: http-metrics
-          containerPort: 8080
+        - containerPort: 8080
+          name: http-metrics
           protocol: TCP
-
+        - containerPort: 8081
+          name: telemetry
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /
+            port: 8081
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
