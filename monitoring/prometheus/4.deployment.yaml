@@ -66,17 +66,11 @@ spec:
         - name: localtime
           mountPath: /etc/localtime
         - name: prometheus-conf
-          mountPath: /etc/prometheus/rules
-          subPath: prometheus/rules
-        - name: prometheus-conf
-          mountPath: /etc/prometheus/file_sd
-          subPath: prometheus/file_sd
+          mountPath: /etc/prometheus
+          subPath: prometheus
         - name: prometheus-data
           mountPath: /var/lib/prometheus
           subPath: prometheus/data
-        - name: prometheus-config
-          mountPath: /etc/prometheus/prometheus.yml
-          subPath: prometheus.yml
       volumes:
       - name: localtime
         hostPath:
@@ -88,9 +82,3 @@ spec:
       - name: prometheus-data
         persistentVolumeClaim:
           claimName: prometheus-data
-      - name: prometheus-config
-        configMap:
-          name: prometheus-config
-          items:
-            - key: prometheus.yml
-              path: prometheus.yml
