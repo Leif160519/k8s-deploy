@@ -7,7 +7,7 @@ global:
     env: kubernetes
 
 remote_write:
-  - url: http://victoria.monitoring.svc:8428/api/v1/write
+  - url: http://victoria:8428/api/v1/write
 
 rule_files:
   - /etc/prometheus/rules/*.rules
@@ -16,19 +16,19 @@ alerting:
   alertmanagers:
   - static_configs:
     - targets:
-      - alertmanager.monitoring.svc:9093
+      - alertmanager:9093
 
 scrape_configs:
   - job_name: grafana
     static_configs:
     - targets:
-      - grafana.monitoring.svc:3000
+      - grafana:3000
       labels:
         env: kubernetes
   - job_name: prometheusalert
     static_configs:
     - targets:
-      - prometheusalert.monitoring.svc:8080
+      - prometheusalert:8080
       labels:
         env: kubernetes
   - job_name: jenkins
@@ -41,7 +41,7 @@ scrape_configs:
   - job_name: alertmanager
     static_configs:
     - targets:
-      - alertmanager.monitoring.svc:9093
+      - alertmanager:9093
       labels:
         env: kubernetes
   - job_name: backuppc
@@ -69,13 +69,13 @@ scrape_configs:
     metrics_path: /metrics
     static_configs:
     - targets:
-      - prometheus.monitoring.svc:9090
+      - prometheus:9090
       labels:
         env: kubernetes
   - job_name: victoria
     static_configs:
     - targets:
-      - victoria.monitoring.svc:8428
+      - victoria:8428
       labels:
         env: kubernetes
   - job_name: kubernetes-cadvisor
