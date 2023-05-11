@@ -13,6 +13,7 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - nodes/proxy
   - pods
   - endpoints
   - configmaps
@@ -28,6 +29,25 @@ rules:
   - get
   - list
   - watch
+- apiGroups:
+  - extensions
+  resources:
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  - nodes/metrics
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
