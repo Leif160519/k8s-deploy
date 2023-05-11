@@ -116,7 +116,7 @@ data:
         - source_labels: [__meta_kubernetes_service_name]
           action: replace
           target_label: k8s_sname
-      - job_name: kubernetes_nodes
+      - job_name: kubernetes-nodes
         kubernetes_sd_configs:
         - role: node
         relabel_configs:
