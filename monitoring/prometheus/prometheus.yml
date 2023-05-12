@@ -25,6 +25,12 @@ scrape_configs:
       - grafana:3000
       labels:
         env: kubernetes
+  - job_name: blackbox
+    static_configs:
+    - targets:
+      - blackbox-exporter:9115
+      labels:
+        env: kubernetes
   - job_name: prometheusalert
     static_configs:
     - targets:
