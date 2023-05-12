@@ -1,0 +1,23 @@
+apiVersion: v1
+data:
+  consul.hcl: |
+    log_level = "ERROR"
+    data_dir = "/var/lib/consul"
+    client_addr = "0.0.0.0"
+    ui_config{
+      enabled = true
+    }
+    server = true
+    bootstrap = true
+    acl = {
+      enabled = true
+      default_policy = "deny"
+      enable_token_persistence = true
+    }
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2023-05-12T06:51:32Z"
+  name: consul-config
+  namespace: monitoring
+  resourceVersion: "2477834"
+  uid: 24daa44c-66ee-49e1-b5f5-600a4624640d
