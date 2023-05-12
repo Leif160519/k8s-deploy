@@ -1,0 +1,64 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: flask-consul
+  namespace: monitoring
+  labels:
+    app: flask-consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-consul
+  template:
+    metadata:
+      labels:
+        app: flask-consul
+    spec:
+      initContainers:
+        - name: wait-for-consul
+          image: busybox
+          command:
+            - sh
+            - '-c'
+            - >-
+              for i in $(seq 1 60); do nc -z -w3 consul 8500 && exit 0 ||
+              sleep 5; done; exit 1
+          imagePullPolicy: IfNotPresent
+      containers:
+        - name: flask-consul
+          image: 'swr.cn-south-1.myhuaweicloud.com/starsl.cn/flask-consul:latest'
+          ports:
+            - name: http-2026
+              containerPort: 2026
+              protocol: TCP
+          env:
+            - name: admin_passwd
+              value: 'admin'
+            - name: consul_token
+              value: ca70b0e7-33d0-97ef-3875-750a8934a9ac
+            - name: consul_url
+              value: 'http://consul:8500/v1'
+            - name: log_level
+              value: INFO
+            - name: TZ
+              value: Asia/Shanghai
+          imagePullPolicy: Always
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: flask-consul
+  namespace: monitoring
+  labels:
+    app: flask-consul
+spec:
+  ports:
+    - name: http-2026
+      protocol: TCP
+      port: 2026
+      targetPort: 2026
+  selector:
+    app: flask-consul
+  type: ClusterIP

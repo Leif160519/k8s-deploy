@@ -1,0 +1,48 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: nginx-consul
+  namespace: monitoring
+  labels:
+    app: nginx-consul
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-consul
+  template:
+    metadata:
+      labels:
+        app: nginx-consul
+    spec:
+      containers:
+        - name: nginx-consul
+          image: 'swr.cn-south-1.myhuaweicloud.com/starsl.cn/nginx-consul:latest'
+          ports:
+            - name: http-1026
+              containerPort: 1026
+              protocol: TCP
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+          imagePullPolicy: Always
+      restartPolicy: Always
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: consulmanager
+  namespace: monitoring
+  labels:
+    service: consulmanager
+spec:
+  ports:
+    - name: nginx-consul
+      protocol: TCP
+      port: 1026
+      targetPort: 1026
+      nodePort: 31026
+  selector:
+    app: nginx-consul
+  type: NodePort
