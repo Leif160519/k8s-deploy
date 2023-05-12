@@ -1,17 +1,4 @@
 modules:
-  icmp:
-    prober: icmp
-
-  tcp_connect:
-    prober: tcp
-
-  ssh_banner:
-    prober: tcp
-    tcp:
-      query_response:
-      - expect: "^SSH-2.0-"
-      - send: "SSH-2.0-blackbox-ssh-check"
-
   http_2xx:
     prober: http
     http:
@@ -42,7 +29,7 @@ modules:
   http_4xx:
     prober: http
     http:
-      valid_status_codes: [400,401,403,404]
+      valid_status_codes: [401,403,404]
       preferred_ip_protocol: ip4
       ip_protocol_fallback: false
 
@@ -57,3 +44,16 @@ modules:
     prober: http
     http:
       method: POST
+
+  icmp:
+    prober: icmp
+
+  tcp_connect:
+    prober: tcp
+
+  ssh_banner:
+    prober: tcp
+    tcp:
+      query_response:
+      - expect: "^SSH-2.0-"
+      - send: "SSH-2.0-blackbox-ssh-check"
