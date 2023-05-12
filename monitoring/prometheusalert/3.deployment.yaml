@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheusalert
+  name: prometheusalert
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheusalert
+  template:
+    metadata:
+      labels:
+        app: prometheusalert
+    spec:
+      containers:
+      - name: prometheusalert
+        image: feiyu563/prometheus-alert:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: PA_LOGIN_USER
+          value: prometheusalert
+        - name: PA_LOGIN_PASSWORD
+          value: prometheusalert
+        - name: PA_OPEN_EMAIL
+          value: "1"
+        - name: PA_EMAIL_HOST
+          value: smtp.126.com
+        - name: PA_TITLE
+          value: Kubernetes-Alert
+        - name: PA_EMAIL_PORT
+          value: "465"
+        - name: PA_EMAIL_USER
+          value: yzluofei@126.com
+        - name: PA_EMAIL_PASSWORD
+          value: "1994LFwangyi"
+        - name: PA_EMAIL_TILE
+          value: Kubernetes-Alert
+        - name: PA_DEFAULT_EMAILS
+          value: yzluofei@126.com
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 1Gi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: prometheusalert
+          mountPath: /app/db
+          subPath: prometheusalert/db
+        - name: prometheusalert
+          mountPath: /app/logs
+          subPath: prometheusalert/logs
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: prometheusalert
+        persistentVolumeClaim:
+          claimName: prometheusalert
+
