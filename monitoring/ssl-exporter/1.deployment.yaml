@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ssl-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ssl-exporter
+  template:
+    metadata:
+      labels:
+        app: ssl-exporter
+      name: ssl-exporter
+    spec:
+      containers:
+      - image: ribbybibby/ssl-exporter:latest
+        imagePullPolicy: IfNotPresent
+        name: ssl-exporter
+        ports:
+        - containerPort: 9219
+          name: tcp
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /etc/ssl/certs
+          name: ssl-certs
+      initContainers:
+      - command:
+        - sh
+        - -c
+        - |
+          set -e
+          apk add --update ca-certificates
+          cp /var/run/secrets/kubernetes.io/serviceaccount/ca.crt /usr/local/share/ca-certificates/kube-ca.crt
+          update-ca-certificates
+          cp /etc/ssl/certs/* /ssl-certs
+        image: alpine
+        imagePullPolicy: Always
+        name: ca
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /ssl-certs
+          name: ssl-certs
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - emptyDir: {}
+        name: ssl-certs
