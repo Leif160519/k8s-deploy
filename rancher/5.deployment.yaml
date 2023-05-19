@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rancher
+  namespace: cattle-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rancher
+  template:
+    metadata:
+      labels:
+        app: rancher
+    spec:
+      serviceAccountName: rancher
+      containers:
+        - name: rancher
+          env:
+          - name: CATTLE_BOOTSTRAP_PASSWORD
+            value: admin
+          image: rancher/rancher:stable
+          securityContext:
+            runAsUser: 0
+            privileged: true
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /dashboard
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              port: 80
+              path: /dashboard
+            initialDelaySeconds: 60
+          volumeMounts:
+            - mountPath: /var/lib/rancher
+              name: rancher
+              subPath: rancher/data
+            - mountPath: /etc/rancher/ssl
+              name: rancher
+              subPath: rancher/ssl
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: rancher
+          persistentVolumeClaim:
+            claimName: rancher
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
