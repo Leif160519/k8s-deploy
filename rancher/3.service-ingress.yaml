@@ -1,0 +1,45 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rancher
+  namespace: cattle-system
+  labels:
+    app: rancher
+spec:
+  selector:
+    app: rancher
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: http
+      targetPort: 80
+      protocol: TCP
+    - name: https
+      port: 443
+      targetPort: 443
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: rancher
+  namespace: cattle-system
+  labels:
+    app: rancher
+spec:
+  rules:
+  - host: rancher.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: rancher
+            port:
+              number: 80
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - rancher.github.icu
+    secretName: rancher-tls
