@@ -28,6 +28,7 @@ metadata:
   labels:
     app: rancher
 spec:
+  ingressClassName: nginx
   rules:
   - host: rancher.github.icu
     http:
