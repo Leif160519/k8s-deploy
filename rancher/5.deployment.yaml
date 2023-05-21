@@ -20,7 +20,7 @@ spec:
           env:
           - name: CATTLE_BOOTSTRAP_PASSWORD
             value: admin
-          image: rancher/rancher:stable
+          image: rancher/rancher:latest
           securityContext:
             runAsUser: 0
             privileged: true
