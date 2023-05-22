@@ -53,7 +53,7 @@ spec:
               command:
                 - /bin/sh
                 - "-c"
-                - pg_isready -h localhost -U postgres 
+                - pg_isready -h localhost -U sonar -d sonar
             failureThreshold: 5
             initialDelaySeconds: 10
             periodSeconds: 5
