@@ -67,7 +67,7 @@ data:
             send_resolved: true
       - name: '@linux/email'
         email_configs:
-          - send_resolved: false
+          - send_resolved: true
             to: yzluofei@126.com
 kind: ConfigMap
 metadata:
