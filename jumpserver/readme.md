@@ -18,3 +18,8 @@ kubectl apply -f 9.jms-web.yaml
 kubectl apply -f 10.jms-token.yaml
 kubectl get sa -n jms | grep admin-user
 kubectl describe secrets admin-user-token-xxx
+
+## jms_all
+若不想逐个部署jumpserver的各个组件，可以使用jms_all文件夹里的配置文件，使用jms_all镜像进行统一部署
+
+注意：jms_all的最后一个版本为v2.28.7，且已经停止维护

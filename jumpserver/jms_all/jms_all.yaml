@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jumpserver
+  name: jumpserver
+  namespace: jms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jumpserver
+  template:
+    metadata:
+      labels:
+        app: jumpserver
+    spec:
+      containers:
+      - env:
+        - name: SECRET_KEY
+          value: zyi0sBiTbCPKl65XLcONSSaxiuQpb6e6JD3RRNfyJuLbGwh9v6
+        - name: BOOTSTRAP_TOKEN
+          value: BEGjCbG7lH1wmSi9
+        - name: DB_HOST
+          value: mysql
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          value: jms_user
+        - name: DB_PASSWORD
+          value: 123456
+        - name: DB_NAME
+          value: jumpserver
+        - name: REDIS_HOST
+          value: redis
+        - name: REDIS_PORT
+          value: "6379"
+        - name: REDIS_PASSWORD
+          value: 123456
+        image: jumpserver/jms_all:latest
+        imagePullPolicy: IfNotPresent
+        name: jumpserver
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        - containerPort: 2222
+          name: ssh
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /opt/jumpserver
+          name: jumpserver
+          subPath: jumpserver
+      restartPolicy: Always
+      volumes:
+      - name: jumpserver
+        persistentVolumeClaim:
+          claimName: jms
