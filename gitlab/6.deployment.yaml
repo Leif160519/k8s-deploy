@@ -19,6 +19,7 @@ spec:
       containers:
       - name: gitlab
         image: gitlab/gitlab-ce:latest
+        imagePullPolicy: IfNotPresent
         ports:
           - containerPort: 80
             name: http
@@ -29,6 +30,13 @@ spec:
           - containerPort: 22
             name: ssh
             protocol: TCP
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "1"
+            memory: 2Gi
 #        livenessProbe:
 #          httpGet:
 #            path: /
