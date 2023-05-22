@@ -40,6 +40,9 @@ spec:
         image: jumpserver/jms_all:latest
         imagePullPolicy: IfNotPresent
         name: jumpserver
+        securityContext:
+          privileged: true
+          runAsUser: 0
         ports:
         - containerPort: 80
           name: http
