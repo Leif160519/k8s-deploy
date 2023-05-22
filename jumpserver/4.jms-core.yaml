@@ -49,6 +49,13 @@ spec:
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
 #          livenessProbe:
 #            failureThreshold: 5
 #            initialDelaySeconds: 60
