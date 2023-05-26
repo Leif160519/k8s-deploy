@@ -38,6 +38,26 @@ metadata:
 data:
   allow-snippet-annotations: 'true'
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/component: controller
+  name: ingress-nginx-tcp
+  namespace: ingress-nginx
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/component: controller
+  name: ingress-nginx-udp
+  namespace: ingress-nginx
+---
 # Source: ingress-nginx/templates/clusterrole.yaml
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -51,7 +71,7 @@ metadata:
   name: ingress-nginx
 rules:
   - apiGroups:
-      - ''
+      - ""
     resources:
       - configmaps
       - endpoints
@@ -63,20 +83,22 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - nodes
     verbs:
       - get
   - apiGroups:
-      - ''
+      - ""
     resources:
       - services
     verbs:
       - get
       - list
+      - update
       - watch
   - apiGroups:
+      - extensions
       - networking.k8s.io
     resources:
       - ingresses
@@ -85,13 +107,14 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - events
     verbs:
       - create
       - patch
   - apiGroups:
+      - extensions
       - networking.k8s.io
     resources:
       - ingresses/status
@@ -141,13 +164,13 @@ metadata:
   namespace: ingress-nginx
 rules:
   - apiGroups:
-      - ''
+      - ""
     resources:
       - namespaces
     verbs:
       - get
   - apiGroups:
-      - ''
+      - ""
     resources:
       - configmaps
       - pods
@@ -158,14 +181,16 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
+      - ""
     resources:
       - services
     verbs:
       - get
       - list
+      - update
       - watch
   - apiGroups:
+      - extensions
       - networking.k8s.io
     resources:
       - ingresses
@@ -174,6 +199,7 @@ rules:
       - list
       - watch
   - apiGroups:
+      - extensions
       - networking.k8s.io
     resources:
       - ingresses/status
@@ -188,22 +214,30 @@ rules:
       - list
       - watch
   - apiGroups:
-      - ''
-    resources:
-      - configmaps
+      - ""
     resourceNames:
       - ingress-controller-leader
+    resources:
+      - configmaps
     verbs:
       - get
       - update
   - apiGroups:
-      - ''
+      - ""
     resources:
       - configmaps
     verbs:
       - create
   - apiGroups:
-      - ''
+      - ""
+    resources:
+      - endpoints
+    verbs:
+      - create
+      - get
+      - update
+  - apiGroups:
+      - ""
     resources:
       - events
     verbs:
@@ -276,7 +310,7 @@ metadata:
   name: ingress-nginx-controller
   namespace: ingress-nginx
 spec:
-  type: NodePort
+  type: LoadBalancer
   externalTrafficPolicy: Local
   ipFamilyPolicy: SingleStack
   ipFamilies:
