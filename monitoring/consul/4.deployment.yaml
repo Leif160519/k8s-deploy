@@ -19,9 +19,6 @@ spec:
       - name: consul
         image: consul:1.14.5
         imagePullPolicy: IfNotPresent
-        args:
-        - agent
-        - -config-dir=/etc/consul.d/consul.hcl
         ports:
         - containerPort: 8500
         - containerPort: 8300
@@ -39,7 +36,6 @@ spec:
             memory: 1Gi
         securityContext:
           privileged: true
-          runAsUser: 0
         livenessProbe:
           failureThreshold: 5
           initialDelaySeconds: 30
@@ -60,10 +56,10 @@ spec:
         - name: localtime
           mountPath: /etc/localtime
         - name: consul
-          mountPath: /var/lib/consul
+          mountPath: /consul/data
           subPath: consul/data
         - name: consul-config
-          mountPath: /etc/consul.d/consul.hcl
+          mountPath: /consul/config/consul.hcl
           subPath: consul.hcl
       volumes:
       - name: localtime

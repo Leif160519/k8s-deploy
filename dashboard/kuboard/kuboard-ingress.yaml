@@ -5,7 +5,7 @@ metadata:
   name: kuboard
   namespace: kuboard
   labels:
-    app: kuboard
+    k8s.kuboard.cn/name: kuboard-v3
 spec:
   ingressClassName: nginx
   rules:
@@ -14,10 +14,24 @@ spec:
       paths:
       - backend:
           service:
-            name: kuboard
+            name: kuboard-v3
             port:
-              number: 8500
+              number: 80
         path: /
+        pathType: Prefix
+      - backend:
+          service:
+            name: kuboard-v3
+            port:
+              number: 80
+        path: /k8s-ws
+        pathType: Prefix
+      - backend:
+          service:
+            name: kuboard-v3
+            port:
+              number: 80
+        path: /k8s-proxy
         pathType: Prefix
   tls:
   - hosts:

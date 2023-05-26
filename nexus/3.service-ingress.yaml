@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: nexus
+  name: nexus3
   namespace: devops
   labels:
-    app: nexus
+    app: nexus3
 spec:
   ingressClassName: nginx
   rules:
@@ -14,7 +14,7 @@ spec:
       paths:
       - backend:
           service:
-            name: nexus
+            name: nexus3
             port:
               number: 80
         path: /
