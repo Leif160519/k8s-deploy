@@ -252,6 +252,10 @@ spec:
       port: 443
       targetPort: webhook
       appProtocol: https
+    - name: https-metrics
+      port: 10254
+      targetPort: 10254
+      protocol: TCP
   selector:
     app.kubernetes.io/name: ingress-nginx
     app.kubernetes.io/instance: ingress-nginx
