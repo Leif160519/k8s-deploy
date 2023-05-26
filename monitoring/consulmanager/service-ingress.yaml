@@ -2,24 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jenkins
-  namespace: devops
+  name: consulmanager
+  namespace: monitoring
   labels:
-    app: jenkins
+    app: consulmanager
 spec:
   ingressClassName: nginx
   rules:
-  - host: jenkins.github.icu
+  - host: consulmanager.github.icu
     http:
       paths:
       - backend:
           service:
-            name: jenkins
+            name: consulmanager
             port:
-              number: 80
+              number: 1026
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - jenkins.github.icu
+    - consulmanager.github.icu
     secretName: github-tls

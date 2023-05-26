@@ -43,4 +43,4 @@ spec:
   tls:
   - hosts:
     - rancher.github.icu
-    secretName: tls-rancher-ingress
+    secretName: github-tls

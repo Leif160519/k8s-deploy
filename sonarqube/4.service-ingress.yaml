@@ -2,24 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jenkins
-  namespace: devops
+  name: sonarqube
+  namespace: sonarqube
   labels:
-    app: jenkins
+    app: sonarqube
 spec:
   ingressClassName: nginx
   rules:
-  - host: jenkins.github.icu
+  - host: sonarqube.github.icu
     http:
       paths:
       - backend:
           service:
-            name: jenkins
+            name: sonarqube
             port:
               number: 80
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - jenkins.github.icu
+    - sonarqube.github.icu
     secretName: github-tls

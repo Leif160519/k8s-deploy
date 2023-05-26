@@ -2,24 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jenkins
-  namespace: devops
+  name: grafana
+  namespace: monitoring
   labels:
-    app: jenkins
+    app: grafana
 spec:
   ingressClassName: nginx
   rules:
-  - host: jenkins.github.icu
+  - host: grafana.github.icu
     http:
       paths:
       - backend:
           service:
-            name: jenkins
+            name: grafana
             port:
-              number: 80
+              number: 3000
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - jenkins.github.icu
+    - grafana.github.icu
     secretName: github-tls

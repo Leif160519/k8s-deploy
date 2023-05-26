@@ -2,24 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jenkins
-  namespace: devops
+  name: kuboard
+  namespace: kuboard
   labels:
-    app: jenkins
+    app: kuboard
 spec:
   ingressClassName: nginx
   rules:
-  - host: jenkins.github.icu
+  - host: kuboard.github.icu
     http:
       paths:
       - backend:
           service:
-            name: jenkins
+            name: kuboard
             port:
-              number: 80
+              number: 8500
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - jenkins.github.icu
+    - kuboard.github.icu
     secretName: github-tls

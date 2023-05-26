@@ -2,24 +2,24 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: jenkins
-  namespace: devops
+  name: prometheus
+  namespace: monitoring
   labels:
-    app: jenkins
+    app: prometheus
 spec:
   ingressClassName: nginx
   rules:
-  - host: jenkins.github.icu
+  - host: prometheus.github.icu
     http:
       paths:
       - backend:
           service:
-            name: jenkins
+            name: prometheus
             port:
-              number: 80
+              number: 9090
         path: /
         pathType: Prefix
   tls:
   - hosts:
-    - jenkins.github.icu
+    - prometheus.github.icu
     secretName: github-tls
