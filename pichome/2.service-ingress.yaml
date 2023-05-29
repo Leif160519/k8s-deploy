@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pichome
+  namespace: devops
+  labels:
+    app: pichome
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: pichome.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: pichome
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - pichome.github.icu
+    secretName: github-tls
