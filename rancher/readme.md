@@ -5,5 +5,11 @@
 - 4.将rancher域名的dns解析指向上面分配的ip地址
 - 5.浏览器直接访问rancher的域名即可
 
+# 重置密码
+```
+kubectl exec -it -n cattle-system rancher-xxx -- bash
+reset-password
+```
+
 # 参考
 https://ranchermanager.docs.rancher.com/zh/v2.6/getting-started/installation-and-upgrade/resources/add-tls-secrets
