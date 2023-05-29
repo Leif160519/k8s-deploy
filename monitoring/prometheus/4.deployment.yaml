@@ -30,7 +30,7 @@ spec:
         - --web.listen-address=0.0.0.0:9090
         - --web.enable-admin-api
         - --web.enable-lifecycle
-        - --web.external-url=https://prometheus-k8s.github.icu
+        - --web.external-url=https://prometheus.github.icu
         - --config.file=/etc/prometheus/prometheus.yml
         ports:
         - containerPort: 9090

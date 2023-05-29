@@ -55,6 +55,15 @@ spec:
         - name: grafana
           mountPath: /var/lib/grafana
           subPath: grafana/data
+        - name: grafana
+          mountPath: /etc/grafana/provisioning
+          subPath: grafana/provisioning
+        - name: grafana
+          mountPath: /var/log/grafana
+          subPath: grafana/logs
+        - name: grafana-config
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
       volumes:
       - name: localtime
         hostPath:
@@ -63,3 +72,9 @@ spec:
       - name: grafana
         persistentVolumeClaim:
           claimName: grafana
+      - name: grafana-config
+        configMap:
+          name: grafana-config
+          items:
+            - key: grafana.ini
+              path: grafana.ini

@@ -25,7 +25,7 @@ spec:
         - --data.retention=120h
         - --web.route-prefix=/
         - --web.listen-address=0.0.0.0:9093
-        - --web.external-url=https://alertmanager-k8s.github.icu
+        - --web.external-url=https://alertmanager.github.icu
         - --cluster.peer-timeout=15s
         - --cluster.reconnect-interval=10s
         - --cluster.listen-address=0.0.0.0:9094
