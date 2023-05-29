@@ -13,7 +13,7 @@ global:
   smtp_require_tls: false
 
 templates:
-  - /etc/prometheus/conf.d/email.tmpl
+  - /etc/alertmanager/email.tmpl
 
 inhibit_rules:
   - source_match_re: # 严重抑制警告
@@ -49,19 +49,12 @@ route:
   repeat_interval: 24h
   receiver: 'peanut'
   routes:
-  - receiver: "@linux/feishu"
-    match_re: { channels: "(.*)?@linux/feishu([:/;].*)?" }
-    continue: true
   - receiver: "@linux/email"
     match_re: { channels: "(.*)?@linux/email([:/;].*)?"}
     continue: true
 
 receivers:
   - name: 'peanut'
-  - name: '@linux/feishu'  # feishu非P0告警
-    webhook_configs:
-      - url: 'http://prometheusalert.monitoring.svc:8080/prometheusalert?type=fs&tpl=prometheus-peanut'
-        send_resolved: true
   - name: '@linux/email'
     email_configs:
       - send_resolved: true

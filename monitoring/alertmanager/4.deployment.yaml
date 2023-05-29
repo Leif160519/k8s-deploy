@@ -66,23 +66,20 @@ spec:
         volumeMounts:
         - name: localtime
           mountPath: /etc/localtime
-        - name: alertmanager
+        - name: alertmanager-data
           mountPath: /var/lib/alertmanager
           subPath: alertmanager/data
-        - name: alertmanager-config
-          mountPath: /etc/alertmanager/alertmanager.yml
-          subPath: alertmanager.yml
+        - name: alertmanager-conf
+          mountPath: /etc/alertmanager
+          subPath: alertmanager
       volumes:
       - name: localtime
         hostPath:
           path: /etc/localtime
           type: ""
-      - name: alertmanager
+      - name: alertmanager-conf
         persistentVolumeClaim:
-          claimName: alertmanager
-      - name: alertmanager-config
-        configMap:
-          name: alertmanager-config
-          items:
-            - key: alertmanager.yml
-              path: alertmanager.yml
+          claimName: alertmanager-conf
+      - name: alertmanager-data
+        persistentVolumeClaim:
+          claimName: alertmanager-data
