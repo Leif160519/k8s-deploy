@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: onlyoffice
+  namespace: devops
+  labels:
+    app: onlyoffice
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: onlyoffice.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: onlyoffice
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - onlyoffice.github.icu
+    secretName: github-tls
