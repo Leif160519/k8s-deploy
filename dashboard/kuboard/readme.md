@@ -42,7 +42,7 @@ Kuboard123
 
 # 若是双master节点，kube-etcd会启动两个，而且有一个daemonset会反复重启
 ```
-kubectl edit daemonsete -n kuboard kube-etcd
+kubectl edit daemonsets -n kuboard kuboard-etcd
 ```
 
 在container平级部分添加以下内容，指定kuboard-etcd运行在某一台master节点上
