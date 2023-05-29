@@ -6,9 +6,9 @@
 global:
   resolve_timeout: 5m
   smtp_smarthost: 'smtp.126.com:465'
-  smtp_from: 'yzluofei@126.com'
-  smtp_auth_username: 'yzluofei@126.com'
-  smtp_auth_password: '1994LFwangyi'
+  smtp_from: 'example@126.com'
+  smtp_auth_username: 'example@126.com'
+  smtp_auth_password: 'email-password'
   smtp_hello: 'kubernetes-alert'
   smtp_require_tls: false
 
@@ -65,4 +65,4 @@ receivers:
   - name: '@linux/email'
     email_configs:
       - send_resolved: true
-        to: yzluofei@126.com
+        to: example@126.com
