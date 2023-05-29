@@ -16,7 +16,7 @@ spec:
           service:
             name: nexus3
             port:
-              number: 80
+              number: 8081
         path: /
         pathType: Prefix
   tls:
