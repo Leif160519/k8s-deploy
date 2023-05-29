@@ -49,13 +49,13 @@ route:
   repeat_interval: 24h
   receiver: 'peanut'
   routes:
-  - receiver: "@linux/email"
-    match_re: { channels: "(.*)?@linux/email([:/;].*)?"}
+  - receiver: "email"
+    match_re: { level: "(.*)?P([0-3].*)?" }
     continue: true
 
 receivers:
   - name: 'peanut'
-  - name: '@linux/email'
+  - name: 'email'
     email_configs:
       - send_resolved: true
         to: example@126.com
