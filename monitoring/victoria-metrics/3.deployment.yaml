@@ -1,6 +1,6 @@
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: victoria
   namespace: monitoring
@@ -57,6 +57,14 @@ spec:
             - mountPath: /victoria-metrics-data
               name: victoria
               subPath: victoria-metrics-data
+      initContainers:
+      - name: delete-lock-file
+        image: busybox
+        command: [find, /victoria-metrics-data, -type , f , -name , flock.lock , -delete]
+        volumeMounts:
+          - name: victoria
+            mountPath: /victoria-metrics-data
+            subPath: victoria-metrics-data
       volumes:
         - name: localtime
           hostPath:
