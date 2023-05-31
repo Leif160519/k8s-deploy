@@ -4,6 +4,8 @@ kind: Ingress
 metadata:
   name: nexus3
   namespace: devops
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "1024m"
   labels:
     app: nexus3
 spec:
