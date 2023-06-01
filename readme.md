@@ -8,6 +8,19 @@
 docker login docker.example.com
 ```
 - 2.登录完成后，会生成认证文件`/root/.docker/config.json`
+```
+{
+	"auths": {
+		"docker.example.com": {
+			"auth": "YWRtaW46YWRtaW4="
+		}
+	}
+}
+```
+其中auth后面的内容可以手动生成
+```
+echo -n "admin:admin" | base64 # admin:admin为nexus的用户名和密码
+```
 
 - 3.在每个命名空间下，创建用于认证docker私有仓库的secret
 ```
