@@ -1,3 +1,7 @@
+# 注意
+- 脚本或者yaml中的带有github.icu字样的域名为个人内网使用的域名，使用过程中清根据实际情况自行更换
+
+
 # 若使用了私有docker镜像仓库，请执行以下操作
 - 1. 在master节点上登录私有仓库,输入用户名和密码，如果是nexus搭建的，那就是nexus的用户名和密码
 ```
@@ -50,6 +54,7 @@ kubectl create secret tls example-tls --key ${TLS_PATH_KEY} --cert ${TLS_PATH_CR
 
 - 4.ingress控制器会自动更新证书并reload
 
-# 初始化命名空间的脚本：`init_namespace.sh`
+# 整合
+- 1.初始化命名空间的脚本：`init_namespace.sh`
 
-# 更新ingress域名证书的脚本：`update_ingress_ssl.sh`
+- 2.更新ingress域名证书的脚本：`update_ingress_ssl.sh`

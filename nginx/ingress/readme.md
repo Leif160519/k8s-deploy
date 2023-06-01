@@ -1,5 +1,5 @@
 ## 如果想让ingress转发四层tcp请求
-1.在ingress的svc里面打上对应端口号的补丁，以jumpserver举例：
+- 1.在ingress的svc里面打上对应端口号的补丁，以jumpserver举例：
 vim jms-koko.yaml
 ```
 spec:
@@ -10,17 +10,17 @@ spec:
     targetPort: 2222
 ```
 
-2.给ingress的svc打补丁
+- 2.给ingress的svc打补丁
 ```
 kubectl patch svc ingress-nginx-controller -n ingress-nginx --patch-file=jms-koko.yaml
 ```
 
-3.检查ingress svc，是不是多了2222端口
+- 3.检查ingress svc，是不是多了2222端口
 ```
 kubectl get svc -n ingress-nginx
 ```
 
-4.在ingress的configmap里面添加对应的端口号信息
+- 4.在ingress的configmap里面添加对应的端口号信息
 ```
 kubectl edit configmap ingress-nginx-tcp -n ingress-nginx
 ```
