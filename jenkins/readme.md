@@ -31,7 +31,7 @@ USER jenkins
 
 3.开始构建新镜像
 ```
-docker build . -t docker.github.icu/jenkins:2.356
+docker build . -t docker.github.icu/jenkins:2.356-jdk8
 ```
 
 4.登录私有仓库
@@ -41,10 +41,10 @@ docker login docker.github.icu
 
 5.上传私有镜像
 ```
-docker push docker.github.icu/jenkins:2.356
+docker push docker.github.icu/jenkins:2.356-jdk8
 ```
 
-6.修改`5.deployment.yaml`中的镜像地址为`docker.github.icu/jenkins:2.356`
+6.修改`5.deployment.yaml`中的镜像地址为`docker.github.icu/jenkins:2.356-jdk8`
 
 7.部署jenkins
 ```
