@@ -22,7 +22,7 @@ spec:
         - --log.level=info
         - --collector.mountstats
         - --collector.processes
-        - --no-collector.hwmon
+#        - --no-collector.hwmon
         - --no-collector.infiniband
         - --no-collector.zfs
         - --web.listen-address=0.0.0.0:9100
