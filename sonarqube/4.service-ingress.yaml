@@ -16,7 +16,7 @@ spec:
           service:
             name: sonarqube
             port:
-              number: 80
+              number: 9000
         path: /
         pathType: Prefix
   tls:
