@@ -71,3 +71,28 @@ kubectl create secret tls example-tls --key ${TLS_PATH_KEY} --cert ${TLS_PATH_CR
 - 1.初始化命名空间的脚本：`init_namespace.sh`
 
 - 2.更新ingress域名证书的脚本：`update_ingress_ssl.sh`
+
+# 启用历史版本
+在deployment中添加`annotations`和`revisionHistoryLimit`字段
+```
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busybox
+  namespace: default
+  annotations:
+    kubernetes.io/change-cause: "2023-06-08 00:00:00"
+spec:
+  revisionHistoryLimit: 10
+  replicas: 1
+  selector:
+    matchLabels:
+      app: busybox
+···
+```
+当deployment内容有需要改动的时候，请同步修改change-cause后面的时间戳（或者其他内容，光修改change-cause只会有一个历史版本）
+之后使用如下命令查看历史版本
+```
+kubectl rollout history deployment busybox
+```
