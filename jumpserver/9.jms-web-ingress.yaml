@@ -4,9 +4,10 @@ kind: Ingress
 metadata:
   name: web
   namespace: jms
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "1024M"
   labels:
     app: web
-    nginx.ingress.kubernetes.io/proxy-body-size: "1024M"
 spec:
   ingressClassName: nginx
   rules:
