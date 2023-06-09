@@ -6,6 +6,7 @@ metadata:
   namespace: jms
   labels:
     app: web
+    nginx.ingress.kubernetes.io/proxy-body-size: "1024M"
 spec:
   ingressClassName: nginx
   rules:
