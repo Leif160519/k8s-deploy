@@ -68,9 +68,11 @@ kubectl create secret tls example-tls --key ${TLS_PATH_KEY} --cert ${TLS_PATH_CR
 - 4.ingress控制器会自动更新证书并reload
 
 # 整合
-- 1.初始化命名空间的脚本：`init_namespace.sh`
+- 1.初始化命名空间的脚本：`script/init_namespace.sh`
 
-- 2.更新ingress域名证书的脚本：`update_ingress_ssl.sh`
+- 2.更新ingress域名证书的脚本：`script/update_ingress_ssl.sh`
+
+- 3.自动拉取镜像并上传到nexus私有docker仓库：`script/docker-proxy.sh`
 
 # 启用历史版本
 在deployment中添加`annotations`和`revisionHistoryLimit`字段
