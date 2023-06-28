@@ -31,6 +31,12 @@ kubectl apply -f 10.jms-token.yaml
 kubectl get sa -n jms | grep admin-user
 kubectl create token admin-user -n jms（执行完会自动输出token）
 ```
+或者不用套用yaml，直接手动创建
+```
+kubectl create serviceaccount admin-user -n jms
+kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=jms:admin-user
+kubectl create token admin-user -n jms（执行完会自动输出token）
+```
 注意：
 - 1.创建serviceaccount的角色权限必须为cluster-admin，否则访问某些资源会没有权限
 - 2.创建token的命令可以重复执行，每次执行会生成不同的token，且旧token不会过期，可以用如下命令验证：
