@@ -64,6 +64,27 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6IjBhd042NVgwaVJsZllLYW8yZnV3WjZiUXFXekhraE9SSWRnODlf
 
 - 3.将上述token填写到jumperver的资产管理->统用户->创建系统用户，类型选择kubernetes，将token填写进去，之后将k8s应用与系统用户绑定即可
 
+- 4.也可以执行以下命令
+```
+kubectl get secret $(kubectl -n devops get secret | grep kuboard-user | awk 'NR==1{print $1}') -n devops -o go-template='{{.data.token}}' |base64 -d
+```
+
+注意：只要确保kuboard-user(或者其他)这个serviceaccount有类型为`service-account-token`的secret即可
+```
+$ kubectl get serviceaccount -n devops
+NAME                              SECRETS   AGE
+default                           1         132d
+kuboard-user                      1         132d
+kuboard-viewer                    1         132d
+nfs-subdir-external-provisioner   1         132d
+
+$ kubectl get secret -n devops | grep service-account-token
+default-token-fxncv                                     kubernetes.io/service-account-token   3      132d
+kuboard-user-token-2vtg8                                kubernetes.io/service-account-token   3      132d
+kuboard-viewer-token-vk26r                              kubernetes.io/service-account-token   3      132d
+nfs-subdir-external-provisioner-token-8jj84             kubernetes.io/service-account-token   3      132d
+```
+
 ## jms_all
 若不想逐个部署jumpserver的各个组件，可以使用jms_all文件夹里的配置文件，使用jms_all镜像进行统一部署
 
