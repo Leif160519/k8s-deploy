@@ -15,13 +15,31 @@ kubectl apply -f 9.jms-web.yaml
 - 3.刷新nginx配置
 
 ## 创建jumpserver访问k8s集群的访问token
+### 方法一：k8s版本低于2.24,自动生成token
 ```
 kubectl apply -f 10.jms-token.yaml
 kubectl get sa -n jms | grep admin-user
-kubectl describe secrets admin-user-token-xxx
+kubectl describe secrets admin-user-token-xxx -n jms | grep token
+或者
+kubectl get secret $(kubectl -n jms get secret | grep admin-user | awk 'NR==1{print $1}') -n jms -o go-template='{{.data.token}}' |base64 -d
 ```
 
-注意：若版本为1.24以上，则创建serviceaccount资源的时候，集群不会自动创建对应的secret token，则我们需要找其他的token，例如
+### 方法二：k8s版本高于2.24，手动生成token
+集群版本为1.24以上，则创建serviceaccount资源的时候，集群不会自动创建对应的secret token,这时需要手动创建token
+```
+kubectl apply -f 10.jms-token.yaml
+kubectl get sa -n jms | grep admin-user
+kubectl create token admin-user -n jms（执行完会自动输出token）
+```
+注意：
+- 1.创建serviceaccount的角色权限必须为cluster-admin，否则访问某些资源会没有权限
+- 2.创建token的命令可以重复执行，每次执行会生成不同的token，且旧token不会过期，可以用如下命令验证：
+```
+kubectl get node --server=https://xxx.8443 --token=xxx
+```
+
+## 方法三：使用其他命名空间下的token
+- 1.查找类型为`service-account-token`类型的`secret`
 ```
 $ kubectl get secrets -A | grep service-account-token
 cattle-fleet-system                      fleet-controller-bootstrap-token                           kubernetes.io/service-account-token   3      33d
@@ -30,31 +48,11 @@ cattle-impersonation-system              cattle-impersonation-u-mo773yttt4-token
 cattle-system                            git-webhook-api-service-token-wgbhq                        kubernetes.io/service-account-token   3      33d
 cluster-fleet-local-local-1a3d67d0a899   request-7f27k-c04ad872-c513-40fc-b4a3-da418489ce5e-token   kubernetes.io/service-account-token   3      33d
 ```
-- 1.我们选用第一个token(以rancher的secret为例--确保选择的token对应的serviceaccount的角色权限是cluster-admin，否则权限不足无法登录集群):
+- 2.我们选用第一个token(以rancher的secret为例--确保选择的token对应的serviceaccount的角色权限是cluster-admin，否则权限不足无法登录集群):
 ```
-$ kubectl get secret fleet-controller-bootstrap-token -n cattle-fleet-system -o  yaml
+$ kubectl get secret fleet-controller-bootstrap-token -n cattle-fleet-system -o  yaml | grep token
 
-apiVersion: v1
-data:
-  ca.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR3RENDQXFpZ0F3SUJBZ0lVUGJDd2dYbWZkVWtHa2xZdEJBNHFJVnZzQU40d0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNRMDR4RURBT0JnTlZCQWdUQjBKbGFXcHBibWN4RURBT0JnTlZCQWNUQjBKbAphV3BwYm1jeEREQUtCZ05WQkFvVEEyczRjekVQTUEwR0ExVUVDeE1HVTNsemRHVnRNUk13RVFZRFZRUURFd3ByCmRXSmxjbTVsZEdWek1DQVhEVEl6TURReU9EQTBNakV3TUZvWUR6SXhNak13TkRBME1EUXlNVEF3V2pCbE1Rc3cKQ1FZRFZRUUdFd0pEVGpFUU1BNEdBMVVFQ0JNSFFtVnBhbWx1WnpFUU1BNEdBMVVFQnhNSFFtVnBhbWx1WnpFTQpNQW9HQTFVRUNoTURhemh6TVE4d0RRWURWUVFMRXdaVGVYTjBaVzB4RXpBUkJnTlZCQU1UQ210MVltVnlibVYwClpYTXdnZ0VpTUEwR0NTcUdTSWIzRFFFQkFRVUFBNElCRHdBd2dnRUtBb0lCQVFEWG5RaTZmaGNseG54ZmdvSzIKb3dEcDZ0Z1c4YjVhb0M0cTk5WWdEUWVuZlVzc1luUWs4VGR5VFJoVUl4NW55MmJsYTRFOVBXak9qd0N2dnRGbwpJOG5abXA2U2tUQ0NGQ3BRNkp3U3YvSkZtaFJwZUpYVWdZbHNWUkQ2UFlDaWgwajZjR3FnUnE2bk1wQURDdksyCld5em1vOTRnRzd2aWFIZGpJdVFwK25uZTBtUzU1L01adXNSNC9CVzVPUkVqMmJQSmRPV1lQQytMTlZIMWVPZWEKcVZSOHQ1MmdtZmZlRzc4eU9zSWZDWFI2eVRnQUJHR0lrNlhUWGE3Q0tIMkEvbHZKS1JIK1RtT0dTNFN6ZiswNgpaTUg2MllweDB6R2V5cUVzZWljTUhXVlpBM1NEZlJVT3RiUzE3QTdMZkVkNlNqZEZPbG5pdlo0aER4N0FMcmRPCmtFeVRBZ01CQUFHalpqQmtNQTRHQTFVZER3RUIvd1FFQXdJQkJqQVNCZ05WSFJNQkFmOEVDREFHQVFIL0FnRUMKTUIwR0ExVWREZ1FXQkJSVXJwSzlxMXNBNXlQaTRONkFYN0M3d1dtWGZ6QWZCZ05WSFNNRUdEQVdnQlJVcnBLOQpxMXNBNXlQaTRONkFYN0M3d1dtWGZ6QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFBdmRWUXpDUXZZOTZ2OURrCjNDcXZGak5ESXpqaCtkTXhncE1LSWRGaUc5ZkwvZG9zM2RpVTlCZkNKU25xRmRWMTNzb1NXdjZBSEd1ZlBnQjQKTFhwOTVCRUQ5OTMzSyt0dzVpN2JibmQwMzFKbjNHeWJ3QnA0aU9YTWV0Q1I0ZkpOUkNXbmduRksvWjhpc1QybQovdUVqUzNxZHdBdkVjK2JYdFNxSWtoNXFmc3BmcmlISjNBT0c3eGVRaVNpb2U5ODF5KzgyeWhZR1F0WG1EL0E2CkMwSU1LZGRrYTlzRlhlRmdvOEZnYVlla3lVZUdnZGRzTDE4OHZVcmsyY3hyUEJMY0VPeEZ1aEp5blpZbjVyZXIKREpublFDYkFwTjQ3T3BTV3AwR0pwSUhDM1ZLYi8reEVrTHovTlYrQVhwZTNVNERjeDEvempCVnQrUEdudEducgoxeThWTmc9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg==
-  namespace: Y2F0dGxlLWZsZWV0LXN5c3RlbQ==
   token: ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbXRwWkNJNklqQmhkMDQyTlZnd2FWSnNabGxMWVc4eVpuVjNXalppVVhGWGVraHJhRTlTU1dSbk9EbGZWVTlQWVRnaWZRLmV5SnBjM01pT2lKcmRXSmxjbTVsZEdWekwzTmxjblpwWTJWaFkyTnZkVzUwSWl3aWEzVmlaWEp1WlhSbGN5NXBieTl6WlhKMmFXTmxZV05qYjNWdWRDOXVZVzFsYzNCaFkyVWlPaUpqWVhSMGJHVXRabXhsWlhRdGMzbHpkR1Z0SWl3aWEzVmlaWEp1WlhSbGN5NXBieTl6WlhKMmFXTmxZV05qYjNWdWRDOXpaV055WlhRdWJtRnRaU0k2SW1ac1pXVjBMV052Ym5SeWIyeHNaWEl0WW05dmRITjBjbUZ3TFhSdmEyVnVJaXdpYTNWaVpYSnVaWFJsY3k1cGJ5OXpaWEoyYVdObFlXTmpiM1Z1ZEM5elpYSjJhV05sTFdGalkyOTFiblF1Ym1GdFpTSTZJbVpzWldWMExXTnZiblJ5YjJ4c1pYSXRZbTl2ZEhOMGNtRndJaXdpYTNWaVpYSnVaWFJsY3k1cGJ5OXpaWEoyYVdObFlXTmpiM1Z1ZEM5elpYSjJhV05sTFdGalkyOTFiblF1ZFdsa0lqb2lNbUZsWTJReU9XTXRZVGc0T1MwME5XWm1MV0k0TVRNdE9EQXpZbVV6TWpobE5qa3lJaXdpYzNWaUlqb2ljM2x6ZEdWdE9uTmxjblpwWTJWaFkyTnZkVzUwT21OaGRIUnNaUzFtYkdWbGRDMXplWE4wWlcwNlpteGxaWFF0WTI5dWRISnZiR3hsY2kxaWIyOTBjM1J5WVhBaWZRLlR1RmJob0JKcFY4RVRUd1czTndzbmFBdVpQSjdISTlRSmNNX2tiWkFuRnRxYTVxX0x3VzJxNFNtc3NhQmlPSUNSUFd2STJRaFFwaXNNRGJMaXF5c1ZkaFFTekFjUG93UHdWQ0lwTm5YeHZyVUZSV2xkZTBPWmF5cUhqb29YcFRzVm1YenNDSThnWWYwbFN4Vi1RUHJkdzdaOUtnNnZBeXJELXpiRXRCUWh1T3NBa1lXMmlENGV5RlJiMmk2Yk9WV2NMSVd4SUlFM0lMR0ZQX2pweDN2ZmpTNEhlb0UyME5mVzBKWVBqR0tuTmZ1aHZMdWtaMVdtdHc2ak9yckoyaHJDQVhqcmxRbHJYa2VQYUxPMmp3a1BGVURlOFNCUEQ4V05CZEZndU1wcng4cTN0SmFiLV9saVo5TDVBVGxZNmhoaW9lTmtEdWpWUkdoX05JVWkwUXBCUQ==
-kind: Secret
-metadata:
-  annotations:
-    kubernetes.io/service-account.name: fleet-controller-bootstrap
-    kubernetes.io/service-account.uid: 2aecd29c-a889-45ff-b813-803be328e692
-  creationTimestamp: "2023-05-21T01:47:05Z"
-  name: fleet-controller-bootstrap-token
-  namespace: cattle-fleet-system
-  ownerReferences:
-  - apiVersion: v1
-    kind: ServiceAccount
-    name: fleet-controller-bootstrap
-    uid: 2aecd29c-a889-45ff-b813-803be328e692
-  resourceVersion: "4365478"
-  uid: 83137e23-bcff-4136-ade7-944cf1e4684e
-type: kubernetes.io/service-account-token
 ```
 
 - 2.将token后面的内容用base64解码即可获得可以登陆k8s集群的token了
@@ -64,28 +62,13 @@ $ echo "ZXlKaGJHY2lPaUpTVXpJMU5pSXNJbXRwWkNJNklqQmhkMDQyTlZnd2FWSnNabGxMWVc4eVpu
 eyJhbGciOiJSUzI1NiIsImtpZCI6IjBhd042NVgwaVJsZllLYW8yZnV3WjZiUXFXekhraE9SSWRnODlfVU9PYTgifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJjYXR0bGUtZmxlZXQtc3lzdGVtIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZWNyZXQubmFtZSI6ImZsZWV0LWNvbnRyb2xsZXItYm9vdHN0cmFwLXRva2VuIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImZsZWV0LWNvbnRyb2xsZXItYm9vdHN0cmFwIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQudWlkIjoiMmFlY2QyOWMtYTg4OS00NWZmLWI4MTMtODAzYmUzMjhlNjkyIiwic3ViIjoic3lzdGVtOnNlcnZpY2VhY2NvdW50OmNhdHRsZS1mbGVldC1zeXN0ZW06ZmxlZXQtY29udHJvbGxlci1ib290c3RyYXAifQ.TuFbhoBJpV8ETTwW3NwsnaAuZPJ7HI9QJcM_kbZAnFtqa5q_LwW2q4SmssaBiOICRPWvI2QhQpisMDbLiqysVdhQSzAcPowPwVCIpNnXxvrUFRWlde0OZayqHjooXpTsVmXzsCI8gYf0lSxV-QPrdw7Z9Kg6vAyrD-zbEtBQhuOsAkYW2iD4eyFRb2i6bOVWcLIWxIIE3ILGFP_jpx3vfjS4HeoE20NfW0JYPjGKnNfuhvLukZ1Wmtw6jOrrJ2hrCAXjrlQlrXkePaLO2jwkPFUDe8SBPD8WNBdFguMprx8q3tJab-_liZ9L5ATlY6hhioeNkDujVRGh_NIUi0QpBQ
 ```
 
-- 3.将上述token填写到jumperver的资产管理->统用户->创建系统用户，类型选择kubernetes，将token填写进去，之后将k8s应用与系统用户绑定即可
-
-- 4.也可以执行以下命令
+或者直接用以下命令获得token：
 ```
-kubectl get secret $(kubectl -n devops get secret | grep kuboard-user | awk 'NR==1{print $1}') -n devops -o go-template='{{.data.token}}' |base64 -d
+kubectl describe secret fleet-controller-bootstrap-token -n cattle-fleet-system  | grep token
 ```
 
-注意：只要确保kuboard-user(或者其他)这个serviceaccount有类型为`service-account-token`的secret,且绑定的角色为`cluster-admin`即可
-```
-$ kubectl get serviceaccount -n devops
-NAME                              SECRETS   AGE
-default                           1         132d
-kuboard-user                      1         132d
-kuboard-viewer                    1         132d
-nfs-subdir-external-provisioner   1         132d
-
-$ kubectl get secret -n devops | grep service-account-token
-default-token-fxncv                                     kubernetes.io/service-account-token   3      132d
-kuboard-user-token-2vtg8                                kubernetes.io/service-account-token   3      132d
-kuboard-viewer-token-vk26r                              kubernetes.io/service-account-token   3      132d
-nfs-subdir-external-provisioner-token-8jj84             kubernetes.io/service-account-token   3      132d
-```
+## token的使用
+将上述token填写到jumperver的资产管理->统用户->创建系统用户，类型选择kubernetes，将token填写进去，之后将k8s应用与系统用户绑定即可
 
 ## jms_all
 若不想逐个部署jumpserver的各个组件，可以使用jms_all文件夹里的配置文件，使用jms_all镜像进行统一部署
