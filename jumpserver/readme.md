@@ -30,7 +30,7 @@ cattle-impersonation-system              cattle-impersonation-u-mo773yttt4-token
 cattle-system                            git-webhook-api-service-token-wgbhq                        kubernetes.io/service-account-token   3      33d
 cluster-fleet-local-local-1a3d67d0a899   request-7f27k-c04ad872-c513-40fc-b4a3-da418489ce5e-token   kubernetes.io/service-account-token   3      33d
 ```
-- 1.我们选用第一个token(以rancher的secret为例):
+- 1.我们选用第一个token(以rancher的secret为例--确保选择的token对应的serviceaccount的角色权限是cluster-admin，否则权限不足无法登录集群):
 ```
 $ kubectl get secret fleet-controller-bootstrap-token -n cattle-fleet-system -o  yaml
 
@@ -71,7 +71,7 @@ eyJhbGciOiJSUzI1NiIsImtpZCI6IjBhd042NVgwaVJsZllLYW8yZnV3WjZiUXFXekhraE9SSWRnODlf
 kubectl get secret $(kubectl -n devops get secret | grep kuboard-user | awk 'NR==1{print $1}') -n devops -o go-template='{{.data.token}}' |base64 -d
 ```
 
-注意：只要确保kuboard-user(或者其他)这个serviceaccount有类型为`service-account-token`的secret即可
+注意：只要确保kuboard-user(或者其他)这个serviceaccount有类型为`service-account-token`的secret,且绑定的角色为`cluster-admin`即可
 ```
 $ kubectl get serviceaccount -n devops
 NAME                              SECRETS   AGE
