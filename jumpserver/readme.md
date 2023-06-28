@@ -15,9 +15,11 @@ kubectl apply -f 9.jms-web.yaml
 - 3.刷新nginx配置
 
 ## 创建jumpserver访问k8s集群的访问token
+```
 kubectl apply -f 10.jms-token.yaml
 kubectl get sa -n jms | grep admin-user
 kubectl describe secrets admin-user-token-xxx
+```
 
 注意：若版本为1.24以上，则创建serviceaccount资源的时候，集群不会自动创建对应的secret token，则我们需要找其他的token，例如
 ```
