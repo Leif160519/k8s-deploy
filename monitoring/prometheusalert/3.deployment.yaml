@@ -79,6 +79,9 @@ spec:
         - name: prometheusalert
           mountPath: /app/logs
           subPath: prometheusalert/logs
+        - name: prometheusalert
+          mountPath: /app/conf
+          subPath: prometheusalert/conf
       volumes:
       - name: localtime
         hostPath:
