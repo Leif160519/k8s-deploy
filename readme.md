@@ -52,7 +52,7 @@ kubectl create secret tls example-tls --key ${TLS_PATH_KEY} --cert ${TLS_PATH_CR
 # 若ingress使用的证书到期了，如何更新证书
 - 1.查找出使用某域名的ns,域名为example.com
 ```
-kubectl get ing -A |grep example |awk '{print $1}'|uniq |xargs 
+kubectl get ing -A |grep example |awk '{print $1}'|uniq |xargs
 ```
 
 - 2.删除这些命名空间下的证书secret
