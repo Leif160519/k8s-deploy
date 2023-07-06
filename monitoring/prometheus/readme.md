@@ -1,5 +1,18 @@
 ## 使用方法
-先将prometheus.yml复制到pvc的prometheus目录中，之后执行yaml
+```
+kubectl apply -f 1.rbac.yaml
+kubectl apply -f 2.configmap.yaml
+kubectl apply -f 3.pvc.yaml
+kubectl apply -f 4.service-clusterip.yaml
+kubectl apply -f 5.service-clusterip.yaml
+kubectl apply -f 6.deployment.yaml
+```
+
+## 更新配置
+```
+kubectl edit configmap prometheus-config -n monitoring
+```
+> 更新后configmap-reload容器会自动重载prometheus配置,延迟大概在2分钟以内
 
 ## 如果prometheus中配置的victoria地址为域名，非svc写法，则不需要rbac，否则需要创建rbac并且重新创建prometheus pod
 
