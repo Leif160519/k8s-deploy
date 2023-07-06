@@ -56,8 +56,18 @@ spec:
         - name: localtime
           mountPath: /etc/localtime
         - name: blackbox-config
-          mountPath: /etc/blackbox-exporter/blackbox-exporter.yml
-          subPath: blackbox-exporter.yml
+          mountPath: /etc/blackbox-exporter
+      - name: configmap-reload
+        image: jimmidyson/configmap-reload:v0.9.0
+        imagePullPolicy: IfNotPresent
+        args:
+          - --volume-dir=/etc/blackbox-exporter
+          - --webhook-url=http://localhost:9115/-/reload
+        volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: blackbox-config
+            mountPath: /etc/blackbox-exporter
       volumes:
       - name: localtime
         hostPath:
@@ -66,6 +76,4 @@ spec:
       - name: blackbox-config
         configMap:
           name: blackbox-config
-          items:
-            - key: blackbox-exporter.yml
-              path: blackbox-exporter.yml
+          defaultMode: 420
