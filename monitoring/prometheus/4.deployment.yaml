@@ -48,37 +48,53 @@ spec:
           runAsUser: 0
         livenessProbe:
           failureThreshold: 5
+          httpGet:
+            path: /-/healthy
+            port: 9090
+            scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 5
           successThreshold: 1
-          tcpSocket:
-            port: 9090
           timeoutSeconds: 3
         readinessProbe:
           failureThreshold: 5
+          httpGet:
+            path: /-/ready
+            port: 9090
+            scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 5
           successThreshold: 1
-          tcpSocket:
-            port: 9090
           timeoutSeconds: 3
         volumeMounts:
         - name: localtime
           mountPath: /etc/localtime
-        - name: prometheus-conf
+        - name: prometheus-config
           mountPath: /etc/prometheus
           subPath: prometheus
         - name: prometheus-data
           mountPath: /var/lib/prometheus
           subPath: prometheus/data
+      - name: configmap-reload
+        image: jimmidyson/configmap-reload:v0.9.0
+        imagePullPolicy: IfNotPresent
+        args:
+          - --volume-dir=/etc/config
+          - --webhook-url=http://localhost:9090/-/reload
+        volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: prometheus-config
+            mountPath: /etc/config
       volumes:
       - name: localtime
         hostPath:
           path: /etc/localtime
           type: ""
-      - name: prometheus-conf
-        persistentVolumeClaim:
-          claimName: prometheus-conf
+      - name: prometheus-config
+        configMap:
+          defaultMode: 420
+          name: prometheus-configig
       - name: prometheus-data
         persistentVolumeClaim:
           claimName: prometheus-data

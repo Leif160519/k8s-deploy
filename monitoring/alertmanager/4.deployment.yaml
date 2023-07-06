@@ -49,19 +49,23 @@ spec:
           runAsUser: 0
         livenessProbe:
           failureThreshold: 5
+          httpGet:
+            path: /-/healthy
+            port: 9093
+            scheme: HTTP
           initialDelaySeconds: 30
           periodSeconds: 5
           successThreshold: 1
-          tcpSocket:
-            port: 9093
           timeoutSeconds: 3
         readinessProbe:
           failureThreshold: 5
+          httpGet:
+            path: /-/ready
+            port: 9093
+            scheme: HTTP
           initialDelaySeconds: 10
           periodSeconds: 5
           successThreshold: 1
-          tcpSocket:
-            port: 9093
           timeoutSeconds: 3
         volumeMounts:
         - name: localtime
@@ -69,17 +73,28 @@ spec:
         - name: alertmanager-data
           mountPath: /var/lib/alertmanager
           subPath: alertmanager/data
-        - name: alertmanager-conf
+        - name: alertmanager-config
           mountPath: /etc/alertmanager
-          subPath: alertmanager
+      - name: configmap-reload
+        image: jimmidyson/configmap-reload:v0.9.0
+        imagePullPolicy: IfNotPresent
+        args:
+          - --volume-dir=/etc/alertmanager
+          - --webhook-url=http://localhost:9093/-/reload
+        volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: alertmanager-config
+            mountPath: /etc/alertmanager
       volumes:
       - name: localtime
         hostPath:
           path: /etc/localtime
           type: ""
-      - name: alertmanager-conf
-        persistentVolumeClaim:
-          claimName: alertmanager-conf
+      - name: alertmanager-config
+        configMap:
+          name: alertmanager-config
+          defaultMode: 420
       - name: alertmanager-data
         persistentVolumeClaim:
           claimName: alertmanager-data

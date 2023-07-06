@@ -11,16 +11,3 @@ spec:
   accessModes:
     - ReadWriteMany
   storageClassName: moosefs-storage
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: alertmanager-conf
-  namespace: monitoring
-spec:
-  resources:
-    requests:
-      storage: 10Mi
-  accessModes:
-    - ReadWriteMany
-  storageClassName: moosefs-storage

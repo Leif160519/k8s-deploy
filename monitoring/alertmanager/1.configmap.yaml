@@ -8,15 +8,6 @@ data:
     # 信息告警( info ):P2
     global:
       resolve_timeout: 5m
-      smtp_smarthost: 'smtp.126.com:465'
-      smtp_from: 'yzluofei@126.com'
-      smtp_auth_username: 'yzluofei@126.com'
-      smtp_auth_password: '1994LFwangyi'
-      smtp_hello: 'kubernetes-alert'
-      smtp_require_tls: false
-
-    templates:
-      - /etc/prometheus/conf.d/email.tmpl
 
     inhibit_rules:
       - source_match_re: # 严重抑制警告
@@ -52,23 +43,16 @@ data:
       repeat_interval: 24h
       receiver: 'peanut'
       routes:
-      - receiver: "@linux/feishu"
-        match_re: { channels: "(.*)?@linux/feishu([:/;].*)?" }
-        continue: true
-      - receiver: "@linux/email"
-        match_re: { channels: "(.*)?@linux/email([:/;].*)?"}
+      - receiver: "webhook"
+        match_re: { level: "(.*)?P([0-3].*)?" }
         continue: true
 
     receivers:
       - name: 'peanut'
-      - name: '@linux/feishu'  # feishu非P0告警
+      - name: 'webhook'
         webhook_configs:
-          - url: 'http://prometheusalert.monitoring.svc:8080/prometheusalert?type=fs&tpl=prometheus-peanut'
+          - url: 'https://prometheusalert.github.icu/prometheusalert?type=fs&tpl=prometheus-peanut&fsurl=https://open.feishu.cn/open-apis/bot/v2/hook/1339ac66-774c-4dcd-9c28-6949e68f999e'
             send_resolved: true
-      - name: '@linux/email'
-        email_configs:
-          - send_resolved: true
-            to: yzluofei@126.com
 kind: ConfigMap
 metadata:
   name: alertmanager-config
