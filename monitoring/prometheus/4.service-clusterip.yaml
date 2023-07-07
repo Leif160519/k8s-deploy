@@ -16,3 +16,7 @@ spec:
       protocol: TCP
       port: 9090
       targetPort: 9090
+    - name: configmap-reload
+      protocol: TCP
+      port: 9533
+      targetPort: 9533

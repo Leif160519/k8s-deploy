@@ -78,8 +78,33 @@ spec:
         image: jimmidyson/configmap-reload:v0.9.0
         imagePullPolicy: IfNotPresent
         args:
-          - --volume-dir=/etc/prometheus
-          - --webhook-url=http://localhost:9090/-/reload
+          - -volume-dir=/etc/prometheus
+          - -webhook-url=http://localhost:9090/-/reload
+          - -webhook-method=POST
+          - -webhook-retries=1
+          - -webhook-status-code=200
+          - -web.listen-address=:9533
+          - -web.telemetry-path=/metrics
+        ports:
+        - containerPort: 9533
+          name: http
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9533
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9533
+          timeoutSeconds: 3
         volumeMounts:
           - name: localtime
             mountPath: /etc/localtime
