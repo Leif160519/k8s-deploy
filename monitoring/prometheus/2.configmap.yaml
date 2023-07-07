@@ -861,7 +861,7 @@ data:
         metrics_path: /probe
         consul_sd_configs:
           - server: 'consul:8500'
-            token: 'ca70b0e7-33d0-97ef-3875-750a8934a9ac'
+            token: 'a87d22ab-09c6-d25f-b490-86f0823bc209'
             services: ['blackbox_exporter']
         relabel_configs:
           - source_labels: ["__meta_consul_service_metadata_instance"]
