@@ -1,4 +1,8 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: blackbox-config
+  namespace: monitoring
 data:
   blackbox-exporter.yml: |
     modules:
@@ -60,7 +64,3 @@ data:
           query_response:
           - expect: "^SSH-2.0-"
           - send: "SSH-2.0-blackbox-ssh-check"
-kind: ConfigMap
-metadata:
-  name: blackbox-config
-  namespace: monitoring
