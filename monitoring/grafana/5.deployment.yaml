@@ -74,6 +74,9 @@ spec:
         - containerPort: 8081
           name: render
           protocol: TCP
+        securityContext:
+          privileged: true
+          runAsUser: 0
         livenessProbe:
           failureThreshold: 5
           initialDelaySeconds: 30
