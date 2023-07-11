@@ -67,6 +67,29 @@ spec:
         - name: grafana-config
           mountPath: /etc/grafana/ldap.toml
           subPath: ldap.toml
+      - name: render
+        image: grafana/grafana-image-renderer:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+          name: render
+          protocol: TCP
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8081
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8081
+          timeoutSeconds: 3
       volumes:
       - name: localtime
         hostPath:
