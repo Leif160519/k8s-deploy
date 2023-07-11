@@ -72,7 +72,7 @@ data:
     [external_image_storage.azure_blob]
     [external_image_storage.local]
     [rendering]
-    server_url = http://render:8081/render
+    server_url = http://grafana:8081/render
     callback_url = http://grafana:3000/
     [panels]
     [plugins]
