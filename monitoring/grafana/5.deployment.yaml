@@ -64,6 +64,9 @@ spec:
         - name: grafana-config
           mountPath: /etc/grafana/grafana.ini
           subPath: grafana.ini
+        - name: grafana-config
+          mountPath: /etc/grafana/ldap.toml
+          subPath: ldap.toml
       volumes:
       - name: localtime
         hostPath:
@@ -78,3 +81,5 @@ spec:
           items:
             - key: grafana.ini
               path: grafana.ini
+            - key: ldap.toml
+              path: ldap.toml
