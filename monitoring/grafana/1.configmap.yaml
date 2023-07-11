@@ -26,6 +26,9 @@ data:
     [users]
     [auth]
     [auth.anonymous]
+    enabled = true
+    org_name = github.icu
+    org_role = Viewer
     [auth.github]
     [auth.gitlab]
     [auth.google]
@@ -110,7 +113,7 @@ data:
     [caching.redis]
     [caching.memcached]
     [feature_highlights]
-    enabled = false
+    enabled = true
   ldap.toml: |
     [[servers]]
     host = "ad.github.icu"
