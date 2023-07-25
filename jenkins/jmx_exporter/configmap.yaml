@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jmx-conf
+  namespace: devops
+data:
+  jmx.yml: |
+    ---
+    startDelaySeconds: 0
+    ssl: false
+    lowercaseOutputLabelNames: true
+    lowercaseOutputName: true
+    roles:
+      - pattern: ".*"

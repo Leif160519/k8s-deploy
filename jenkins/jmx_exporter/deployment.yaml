@@ -27,12 +27,13 @@ spec:
               -Duser.timezone=Asia/Shanghai
               -Dfile.encoding=UTF-8
               -Djava.awt.headless=true
+              -javaagent:/opt/jmx_exporter/jmx_exporter.jar=9999:/opt/jmx_exporter/jmx.yml
           - name: JENKINS_OPTS
             value: |
               --prefix=/
               --sessionTimeout=1440
               --sessionEviction=1440
-          image: jenkins/jenkins:2.415
+          image: docker.github.icu/jenkins:2.415-jmx_0.19.0
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
@@ -42,6 +43,9 @@ spec:
               protocol: TCP
             - containerPort: 50000
               name: agent
+              protocol: TCP
+            - containerPort: 9999
+              name: jmx
               protocol: TCP
           resources:
             limits:
@@ -68,6 +72,11 @@ spec:
               subPath: jenkins-home
             - mountPath: /etc/localtime
               name: localtime
+            - mountPath: /opt/jmx_exporter/jmx.yml
+              name: jmx-conf
+              subPath: jmx.yml
+      imagePullSecrets:
+        - name: registry-auth
       volumes:
         - name: jenkins-volume
           persistentVolumeClaim:
@@ -76,3 +85,6 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+        - name: jmx-conf
+          configMap:
+            name: jmx-conf
