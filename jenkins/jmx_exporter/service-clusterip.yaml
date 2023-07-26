@@ -4,6 +4,9 @@ kind: Service
 metadata:
   name: jenkins
   namespace: devops
+  annotations:
+    prometheus.io/jvm: "true"
+    prometheus.io/port: "9999"
   labels:
     app: jenkins
 spec:
