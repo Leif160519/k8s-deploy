@@ -1,0 +1,62 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mozilla-send
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mozilla-send
+  template:
+    metadata:
+      labels:
+        app: mozilla-send
+    spec:
+      containers:
+        - name: mozilla-send
+          env:
+            - name: REDIS_HOST
+              value: redis.github.icu
+            - name: ANON_MAX_FILE_SIZE
+              value: "5368709120"
+            - name: ANON_MAX_EXPIRE_SECONDS
+              value: "604800"
+            - name: NODE_ENV
+              value: production
+          image: mozilla/send:v3.0.22
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1443
+              name: web
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 0.5Gi
+            requests:
+              cpu: "0.25"
+              memory: 0.25Gi
+          livenessProbe:
+            httpGet:
+              port: 1443
+              path: /
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            httpGet:
+              port: 1443
+              path: /
+            initialDelaySeconds: 60
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
