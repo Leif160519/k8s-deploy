@@ -17,5 +17,5 @@ spec:
       protocol: TCP
     - name: agent
       port: 50000
-      targetPort: 5000
+      targetPort: 50000
       protocol: TCP
