@@ -15,3 +15,7 @@ spec:
       name: web
       targetPort: 1443
       protocol: TCP
+    - port: 6379
+      name: redis
+      targetPort: 6379
+      protocol: TCP
