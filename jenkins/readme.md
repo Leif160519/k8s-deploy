@@ -50,3 +50,17 @@ docker push docker.example.com/jenkins:2.356-jdk8
 ```
 kubectl apply -f 5.deployment.yaml
 ```
+
+## 生成k8s访问凭据token，使之可以操作集群
+```
+kubectl create serviceaccount admin-user -n default
+kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=default:admin-user
+kubectl create token admin-user -n jms（执行完会自动输出token）
+```
+
+注意：
+- 1.创建serviceaccount的角色权限必须为cluster-admin，否则访问某些资源会没有权限
+- 2.创建token的命令可以重复执行，每次执行会生成不同的token，且旧token不会过期，可以用如下命令验证：
+```
+kubectl get node --server=https://xxx.8443 --token=xxx --insecure-skip-tls-verify
+```
