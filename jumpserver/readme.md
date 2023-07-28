@@ -41,7 +41,7 @@ kubectl create token admin-user -n jms（执行完会自动输出token）
 - 1.创建serviceaccount的角色权限必须为cluster-admin，否则访问某些资源会没有权限
 - 2.创建token的命令可以重复执行，每次执行会生成不同的token，且旧token不会过期，可以用如下命令验证：
 ```
-kubectl get node --server=https://xxx.8443 --token=xxx
+kubectl get node --server=https://xxx.8443 --token=xxx --insecure-skip-tls-verify
 ```
 
 ## 方法三：使用其他命名空间下的token
