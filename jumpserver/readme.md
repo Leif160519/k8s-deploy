@@ -25,21 +25,21 @@ kubectl get secret $(kubectl -n jms get secret | grep admin-user | awk 'NR==1{pr
 ```
 
 ### 方法二：k8s版本高于2.24，手动生成token
-集群版本为1.24以上，则创建serviceaccount资源的时候，集群不会自动创建对应的secret token,这时需要手动创建token
+集群版本为1.24以上，则创建serviceaccount资源的时候，集群不会自动创建对应的secret token,这时需要手动创建token,并设置过期时间（实例为1年）
 ```
 kubectl apply -f 10.jms-token.yaml
 kubectl get sa -n jms | grep admin-user
-kubectl create token admin-user -n jms（执行完会自动输出token）
+kubectl create token admin-user -n jms --duration 8760h（执行完会自动输出token）
 ```
 或者不用套用yaml，直接手动创建
 ```
 kubectl create serviceaccount admin-user -n jms
 kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=jms:admin-user
-kubectl create token admin-user -n jms（执行完会自动输出token）
+kubectl create token admin-user -n jms --duration 8760h（执行完会自动输出token）
 ```
 注意：
 - 1.创建serviceaccount的角色权限必须为cluster-admin，否则访问某些资源会没有权限
-- 2.创建token的命令可以重复执行，每次执行会生成不同的token，且旧token不会过期，可以用如下命令验证：
+- 2.创建token的命令可以重复执行，每次执行会生成不同的token，不指定过期时间的情况下，每次创建的token过一段时间会过期失效，token有效性可以用如下命令验证：
 ```
 kubectl get node --server=https://xxx.8443 --token=xxx --insecure-skip-tls-verify
 ```
