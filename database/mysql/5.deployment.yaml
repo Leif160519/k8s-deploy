@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+  namespace: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "123456"
+          image: mysql:5.7.28
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - /usr/bin/mysql -h127.0.0.1 -P3306 -uroot -p123456 -e 'SHOW DATABASES;create database if not exists jumpserver;'
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 0.5Gi
+            requests:
+              cpu: "0.5"
+              memory: 0.25Gi
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mysql
+              subPath: mysql/data
+            - mountPath: /etc/mysql/my.cnf
+              name: mysql-conf
+              subPath: my.cnf
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: mysql
+          persistentVolumeClaim:
+            claimName: mysql
+        - name: mysql-conf
+          configMap:
+            defaultMode: 420
+            name: mysql-conf
+            items:
+              - key: my.cnf
+                path: my.cnf
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

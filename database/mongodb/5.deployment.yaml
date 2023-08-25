@@ -1,0 +1,59 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongodb
+  namespace: mongodb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - command:
+        - mongod
+        - -f
+        - /etc/mongod.conf
+        - --bind_ip_all
+        image: mongo:5.0.3
+        imagePullPolicy: IfNotPresent
+        name: mongo
+        ports:
+        - containerPort: 27017
+          protocol: TCP
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: 100m
+            memory: 2Gi
+        volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: mongodb-conf
+            mountPath: /etc/mongod.conf/mongod.conf
+            subPath: mongod.conf
+          - name: mongodb
+            mountPath: /var/lib/mongodb
+            subPath: mongodb/data
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ""
+        - name: mongodb-conf
+          configMap:
+            defaultMode: 420
+            name: mongodb-conf
+            items:
+            - key: mongod.conf
+              path: mongod.conf
+        - name: mongodb
+          persistentVolumeClaim:
+            claimName: mongodb

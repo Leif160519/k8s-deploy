@@ -1,0 +1,79 @@
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis
+  namespace: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          image: redis:6.2.3
+          args:
+            - redis-server
+            - /etc/redis/redis.conf
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 6379
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - /usr/local/bin/redis-cli -h 127.0.0.1 -p 6379 -a 123456 info Replication
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 6379
+              name: redis
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /data
+              name: redis
+              subPath: redis/data
+            - mountPath: /etc/redis/redis.conf
+              name: redis-conf
+              subPath: redis.conf
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: redis
+          persistentVolumeClaim:
+            claimName: redis
+        - name: redis-conf
+          configMap:
+            defaultMode: 420
+            name: redis-conf
+            items:
+              - key: redis.conf
+                path: redis.conf
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
