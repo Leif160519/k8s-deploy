@@ -47,4 +47,7 @@ data:
     client-output-buffer-limit normal 0 0 0
     client-output-buffer-limit replica 512mb 128mb 60
     client-output-buffer-limit pubsub 32mb 8mb 60
-
+kind: ConfigMap
+metadata:
+  name: redis-conf
+  namespace: database

@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: redis
-  namespace: redis
+  namespace: database
 spec:
   replicas: 1
   selector:

@@ -11,4 +11,4 @@ data:
 kind: ConfigMap
 metadata:
   name: mongodb-conf
-  namespace: mongodb
+  namespace: database

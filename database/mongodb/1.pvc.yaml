@@ -2,8 +2,8 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redis
-  namespace: redis
+  name: mongodb
+  namespace: database
 spec:
   resources:
     requests:
