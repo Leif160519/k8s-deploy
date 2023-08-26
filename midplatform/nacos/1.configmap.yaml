@@ -2,10 +2,10 @@ apiVersion: v1
 data:
   mysql.db.host: mysql.github.icu
   mysql.db.name: nacos_config
-  mysql.param: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
   mysql.password: nacos
   mysql.port: "3306"
   mysql.user: nacos_user
+  mysql.param: characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useSSL=false&allowPublicKeyRetrieval=true
 kind: ConfigMap
 metadata:
   name: nacos-conf

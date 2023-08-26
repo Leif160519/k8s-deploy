@@ -9,7 +9,7 @@ spec:
       app.kubernetes.io/instance: nacos
       app.kubernetes.io/name: nacos
   replicas: 3
-  serviceName: nacos
+  serviceName: nacos-hs
   template:
     metadata:
       labels:
@@ -25,7 +25,7 @@ spec:
         - name: PREFER_HOST_MODE
           value: hostname
         - name: SERVICE_NAME
-          value: nacos
+          value: nacos-hs
         - name: DOMAIN_NAME
           value: cluster.local
         - name: POD_NAMESPACE
@@ -35,6 +35,8 @@ spec:
               fieldPath: metadata.namespace
         - name: SPRING_DATASOURCE_PLATFORM
           value: mysql
+        - name: MYSQL_DATABASE_NUM
+          value: "1"
         - name: MYSQL_SERVICE_HOST
           valueFrom:
             configMapKeyRef:
