@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: database
+  name: redis
   namespace: database
 spec:
   resources:
