@@ -9,6 +9,6 @@ spec:
     requests:
       storage: 50Gi
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce
   storageClassName: moosefs-storage
 

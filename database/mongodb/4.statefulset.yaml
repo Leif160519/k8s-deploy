@@ -5,15 +5,29 @@ metadata:
   name: mongodb
   namespace: database
 spec:
+  podManagementPolicy: Parallel
   replicas: 1
   selector:
     matchLabels:
-      name: mongodb
+      app: mongodb
+  serviceName: mongodb
   template:
     metadata:
       labels:
         app: mongodb
     spec:
+      nodeSelector:
+        kubernetes.io/hostname: k8s-node-01
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - mongodb
+            topologyKey: kubernetes.io/hostname
       containers:
       - command:
         - mongod
@@ -22,26 +36,29 @@ spec:
         - --bind_ip_all
         image: mongo:5.0.3
         imagePullPolicy: IfNotPresent
-        name: mongo
+        name: mongodb
         ports:
         - containerPort: 27017
           protocol: TCP
         resources:
           limits:
-            cpu: "2"
-            memory: 4Gi
+            cpu: 2000m
+            memory: 1Gi
           requests:
             cpu: 100m
-            memory: 2Gi
+            memory: 0.5Gi
         volumeMounts:
           - name: localtime
             mountPath: /etc/localtime
           - name: mongodb-conf
-            mountPath: /etc/mongod.conf/mongod.conf
+            mountPath: /etc/mongod.conf
             subPath: mongod.conf
           - name: mongodb
             mountPath: /var/lib/mongodb
             subPath: mongodb/data
+          - name: mongodb
+            mountPath: /var/log/mongodb
+            subPath: mongodb/logs
       volumes:
         - name: localtime
           hostPath:

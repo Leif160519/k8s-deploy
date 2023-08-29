@@ -3,6 +3,8 @@ apiVersion: v1
 data:
   mongod.conf: |-
     dbpath=/var/lib/mongodb
+    logpath=/var/log/mongodb/mongodb.log
+    pidfilepath=/var/run/mongodb/mongodb.pid
     directoryperdb=true
     logappend=true
     bind_ip=0.0.0.0

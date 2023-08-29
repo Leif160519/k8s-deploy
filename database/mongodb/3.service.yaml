@@ -4,7 +4,10 @@ kind: Service
 metadata:
   name: mongodb
   namespace: database
+  labels:
+    app: mongodb
 spec:
+  sessionAffinity: ClientIP
   selector:
     app: mongodb
   type: ClusterIP
