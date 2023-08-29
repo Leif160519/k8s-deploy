@@ -28,6 +28,20 @@ spec:
                 values:
                 - mongodb
             topologyKey: kubernetes.io/hostname
+      initContainers:
+      - name: init-mkdir
+        image: busybox
+        command:
+        - /bin/sh
+        - -c
+        - |
+          mkdir -p /var/lib/mongodb
+        volumeMounts:
+          - name: localtime
+            mountPath: /etc/localtime
+          - name: mongodb
+            mountPath: /var/lib/mongodb
+            subPath: mongodb/data
       containers:
       - command:
         - mongod
@@ -56,9 +70,6 @@ spec:
           - name: mongodb
             mountPath: /var/lib/mongodb
             subPath: mongodb/data
-          - name: mongodb
-            mountPath: /var/log/mongodb
-            subPath: mongodb/logs
       volumes:
         - name: localtime
           hostPath:
