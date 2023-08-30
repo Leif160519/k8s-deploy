@@ -13,7 +13,7 @@ kubectl apply -f 1.secret.yaml
 kubectl -f 2.configmap.yaml -f 3.service.yaml -f 4.statefulset.yaml
 ```
 
-## 运行报错
+## 修改mongodb镜像版本到5.0以上之后运行报错(image: mongo/5.0.3)
 ```
     State:          Waiting
       Reason:       CrashLoopBackOff
