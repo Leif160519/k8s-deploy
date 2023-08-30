@@ -46,6 +46,7 @@ spec:
         ports:
         - containerPort: 27017
           protocol: TCP
+          name: mongodb
         resources:
           limits:
             cpu: 2000m

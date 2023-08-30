@@ -29,6 +29,126 @@ kubectl -f 2.configmap.yaml -f 3.service.yaml -f 4.statefulset.yaml
 
 > 如何判断cpu支不支持AVX指令集:`lscpu | grep -i avx`
 
+## 副本集集群搭建方法(保证mongodb几个节点网络互通)
+- 1.选择即将作为主节点的pod，登录
+```
+kubectl exec -it mongodb-0 -n database -- bash
+```
+
+- 2.登录mongodb
+```
+mongo --host 127.0.0.1
+```
+
+- 3.定义集群信息
+```
+config = {
+     '_id': 'single',
+     'members': [
+          {
+               '_id': 0,
+               'host':'mongodb-0.mongodb.database.svc:27017'
+          },
+          {
+               '_id': 1,
+               'host':'mongodb-1.mongodb.database.svc:27017'
+          },
+          {
+               '_id': 2,
+               'host':'mongodb-2.mongodb.database.svc:27017'
+          }
+     ]
+}
+```
+> 0为主节点
+
+- 4.集群初始化
+```
+#初始化
+rs.initiate(config)
+
+#查看状态
+rs.status()
+```
+
+> 若初始化失败，可以强制初始化`rs.reconfig(config, {force: true})`
+
+## 创建用户并设置角色
+```
+
+use admin
+
+#创建root用户
+db.createUser(
+  {
+    user: "root",
+    pwd: "123456",
+    roles: [
+       { role: "root", db: "admin" }]
+  }
+)
+```
+
+## 创建库
+```
+#可以use一个不存在的库，创建账号
+use test_db
+
+#创建用户并指定库
+db.createUser(
+  {
+    user: "test",
+    pwd: "test"
+    roles: [
+       { role: "readWrite", db: "test_db" }]
+  }
+ )
+```
+
+## 集群扩充
+### 方法一（集群有数据或无数据情况）
+```
+#加入从节点
+rs.add("mongodb-3.mongodb.database.svc:27017")
+
+#加入仲裁节点(可选操作)
+rs.addArb("10.2.112.147:27017")
+
+#查看集群状态
+rs.status()
+```
+
+> 仲裁节点不存储数据，只存储集群状态信息，针对集群异常情况，切换主节点，仅适用于副本集模式，仲裁节点非集群必须
+
+### 方法二(集群无数据情况)
+```
+#重新定义集群配置
+config = {
+     '_id': 'single',
+     'members': [
+          {
+               '_id': 0,
+               'host':'mongodb-0.mongodb.database.svc:27017'
+          },
+          {
+               '_id': 1,
+               'host':'mongodb-1.mongodb.database.svc:27017'
+          },
+          {
+               '_id': 2,
+               'host':'mongodb-2.mongodb.database.svc:27017'
+          }
+          {
+               '_id': 3,
+               'host':'mongodb-3.mongodb.database.svc:27017'
+          }
+
+     ]
+}
+# 初始化或强制初始化
+rs.initiate(config) 或 rs.reconfig(config, {force: true})
+```
+
 ## 若只想部署一个节点，并且需要运行在指定集群节点上，
 在`spec.template.spec`下添加以下内容
 ···

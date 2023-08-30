@@ -7,12 +7,11 @@ metadata:
   labels:
     app: mongodb
 spec:
-  sessionAffinity: ClientIP
-  selector:
-    app: mongodb
-  type: ClusterIP
   ports:
     - name: mongodb
       port: 27017
       protocol: TCP
       targetPort: 27017
+  selector:
+    app: mongodb
+  type: ClusterIP
