@@ -1,6 +1,6 @@
 ## 参数说明
 - 1.configmap中`replSetName`指的是集群的id名称，可自定义
-- 2.configmap中`keyFile`指的是集群内部加密通信的文件路径，非集群模式(单节点)可不指定
+- 2.configmap中`keyFile`指的是集群内部加密通信的文件路径，非集群模式(单节点)可不指定,若集群模式未指定keufile，后期想加keyfile，则需要重新加入集群，有数据丢失风险
 
 ## 准备工作
 ```
