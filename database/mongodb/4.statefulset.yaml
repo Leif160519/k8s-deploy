@@ -36,19 +36,26 @@ spec:
         - -c
         - |
           mkdir -p /var/lib/mongodb
+          mkdir -p /var/log/mongodb
         volumeMounts:
           - name: localtime
             mountPath: /etc/localtime
-          - name: mongodb
+          - name: data
             mountPath: /var/lib/mongodb
             subPath: mongodb/data
+          - name: data
+            mountPath: /var/log/mongodb
+            subPath: mongodb/log
       containers:
       - command:
         - mongod
         - -f
         - /etc/mongod.conf
         - --bind_ip_all
-        image: mongo:5.0.3
+        - --logpath
+        - /var/log/mongodb/mongodb.log
+        - --verbose
+        image: mongo:4.4.9
         imagePullPolicy: IfNotPresent
         name: mongodb
         ports:
@@ -67,9 +74,15 @@ spec:
           - name: mongodb-conf
             mountPath: /etc/mongod.conf
             subPath: mongod.conf
-          - name: mongodb
+          - name: data
             mountPath: /var/lib/mongodb
             subPath: mongodb/data
+          - name: data
+            mountPath: /var/log/mongodb
+            subPath: mongodb/log
+          - name: mongodb-keyfile
+            mountPath: /etc/mongodb-keyfile
+            subPath: mongodb-keyfile
       volumes:
         - name: localtime
           hostPath:
@@ -82,6 +95,20 @@ spec:
             items:
             - key: mongod.conf
               path: mongod.conf
-        - name: mongodb
-          persistentVolumeClaim:
-            claimName: mongodb
+        - name: mongodb-keyfile
+          secret:
+            secretName: mongodb-keyfile
+            defaultMode: 0600
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50Gi
+      storageClassName: moosefs-storage
+      volumeMode: Filesystem
