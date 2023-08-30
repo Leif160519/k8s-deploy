@@ -6,7 +6,7 @@ metadata:
   namespace: database
 spec:
   podManagementPolicy: Parallel
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: mongodb
@@ -16,18 +16,6 @@ spec:
       labels:
         app: mongodb
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: k8s-node-01
-      affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - mongodb
-            topologyKey: kubernetes.io/hostname
       initContainers:
       - name: init-mkdir
         image: busybox

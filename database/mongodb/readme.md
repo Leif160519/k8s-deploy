@@ -29,5 +29,22 @@ kubectl -f 2.configmap.yaml -f 3.service.yaml -f 4.statefulset.yaml
 
 > 如何判断cpu支不支持AVX指令集:`lscpu | grep -i avx`
 
+## 若只想部署一个节点，并且需要运行在指定集群节点上，
+在`spec.template.spec`下添加以下内容
+···
+nodeSelector:
+  kubernetes.io/hostname: k8s-node-01
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+    - labelSelector:
+        matchExpressions:
+        - key: app
+          operator: In
+          values:
+          - mongodb
+      topologyKey: kubernetes.io/hostname
+···
+
 
 [1]: https://www.guojiangbo.com/2021/10/04/docker%E5%AE%89%E8%A3%85mongodb%EF%BC%8C%E9%80%80%E5%87%BA%E4%BB%A3%E7%A0%81132/
