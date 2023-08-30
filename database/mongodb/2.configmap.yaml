@@ -7,6 +7,10 @@ data:
       directoryPerDB: true
       journal:
         enabled: true
+    processManagement:
+      fork: false
+      pidFilePath: /var/run/mongodb.pid
+      timeZoneInfo: /usr/share/zoneinfo
     systemLog:
       destination: file
       logAppend: true

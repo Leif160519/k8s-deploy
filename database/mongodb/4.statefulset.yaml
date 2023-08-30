@@ -40,9 +40,6 @@ spec:
         - -f
         - /etc/mongod.conf
         - --bind_ip_all
-        - --logpath
-        - /var/log/mongodb/mongodb.log
-        - --verbose
         image: mongo:4.4.9
         imagePullPolicy: IfNotPresent
         name: mongodb
