@@ -1,3 +1,7 @@
+## 参数说明
+- 1.configmap中`replSetName`指的是集群的id名称，可自定义
+- 2.configmap中`keyFile`指的是集群内部加密通信的文件路径，非集群模式(单节点)可不指定
+
 ## 准备工作
 ```
 openssl rand -base64 753 > mongodb-keyfile
@@ -151,7 +155,7 @@ rs.initiate(config) 或 rs.reconfig(config, {force: true})
 
 ## 若只想部署一个节点，并且需要运行在指定集群节点上，
 在`spec.template.spec`下添加以下内容
-···
+```
 nodeSelector:
   kubernetes.io/hostname: k8s-node-01
 affinity:
@@ -164,7 +168,7 @@ affinity:
           values:
           - mongodb
       topologyKey: kubernetes.io/hostname
-···
+```
 
 
 [1]: https://www.guojiangbo.com/2021/10/04/docker%E5%AE%89%E8%A3%85mongodb%EF%BC%8C%E9%80%80%E5%87%BA%E4%BB%A3%E7%A0%81132/
