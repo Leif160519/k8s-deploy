@@ -1,0 +1,40 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portainer
+  namespace: devops
+spec:
+  selector:
+    matchLabels:
+      app: portainer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: portainer
+    spec:
+      serviceAccountName: portainer
+      containers:
+      - name: portainer
+        image: portainer/portainer:latest
+        volumeMounts:
+        - mountPath: /data
+          name: portainer
+          subPath: portainer/data
+        - mountPath: /var/run/docker.sock
+          name: docker-sock
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+      volumes:
+      - name: portainer
+        persistentVolumeClaim:
+          claimName: portainer
+      - name: docker-sock
+        hostPath:
+          path: /var/run/docker.sock
