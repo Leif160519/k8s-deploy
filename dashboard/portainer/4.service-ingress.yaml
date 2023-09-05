@@ -23,7 +23,7 @@ spec:
             port:
               number: 9000
         path: /
-        pathType: Prefix
+        pathType: ImplementationSpecific
   tls:
   - hosts:
     - portainer.github.icu
