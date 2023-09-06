@@ -5,6 +5,15 @@ metadata:
   namespace: portainer
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: portainer-cr-clusteradmin
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   name: portainer-crb-clusteradmin
@@ -12,7 +21,7 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cluster-admin
+  name: portainer-cr-clusteradmin
 subjects:
 - kind: ServiceAccount
   name: portainer-sa-clusteradmin
