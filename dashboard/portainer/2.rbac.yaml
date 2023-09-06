@@ -1,31 +1,19 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: portainer
-  namespace: devops
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: portainer
-rules:
-  - apiGroups:
-      - '*'
-    resources:
-      - '*'
-    verbs:
-      - '*'
----
+  name: portainer-sa-clusteradmin
+  namespace: portainer
+--
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: portainer
-  namespace: devops
+  name: portainer-crb-clusteradmin
+  namespace: portainer
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: portainer
+  name: cluster-admin
 subjects:
 - kind: ServiceAccount
-  name: portainer
-  namespace: devops
+  name: portainer-sa-clusteradmin
+  namespace: portainer

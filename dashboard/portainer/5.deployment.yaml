@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: portainer
-  namespace: devops
+  namespace: portainer
 spec:
   selector:
     matchLabels:
@@ -14,11 +14,13 @@ spec:
       labels:
         app: portainer
     spec:
-      serviceAccountName: portainer
+      serviceAccountName: portainer-sa-clusteradmin
       containers:
       - name: portainer
-        image: portainer/portainer:latest
+        image: portainer/portainer-ce:latest
         volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
         - mountPath: /data
           name: portainer
           subPath: portainer/data
@@ -32,6 +34,10 @@ spec:
             cpu: 200m
             memory: 500Mi
       volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
       - name: portainer
         persistentVolumeClaim:
           claimName: portainer
