@@ -41,7 +41,7 @@ spec:
               value: "6379"
             - name: REDIS_PASSWORD
               value: "123456"
-          image: jumpserver/core:v2.28.15
+          image: jumpserver/core:v2.28.20
           tty: true
           args:
             - start
