@@ -2,7 +2,7 @@ apiVersion: v1
 data:
   consul.hcl: |
     log_level = "ERROR"
-    data_dir = "/var/lib/consul"
+    data_dir = "/consul/data"
     client_addr = "0.0.0.0"
     ui_config{
       enabled = true
@@ -16,8 +16,5 @@ data:
     }
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2023-05-12T06:51:32Z"
   name: consul-config
   namespace: monitoring
-  resourceVersion: "2477834"
-  uid: 24daa44c-66ee-49e1-b5f5-600a4624640d
