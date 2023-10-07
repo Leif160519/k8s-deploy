@@ -36,7 +36,7 @@ spec:
             - name: admin_passwd
               value: 'admin123'
             - name: consul_token
-              value: a87d22ab-09c6-d25f-b490-86f0823bc209
+              value: 9ce1358e-da13-4b7b-b79e-7f7b16408d47
             - name: consul_url
               value: 'http://consul:8500/v1'
             - name: log_level
