@@ -3,7 +3,9 @@ https://github.com/starsliao/ConsulManager/blob/main/docs/Consul%E9%83%A8%E7%BD%
 
 # ~~token获取~~
 ```
-<del>consul acl bootstrap|grep SecretID</del>
+~~
+consul acl bootstrap | grep SecretID
+~~
 ```
 > 参照configmap内容，此命令不需要了，而且执行也不会生成新的token
 
