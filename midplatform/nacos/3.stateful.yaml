@@ -108,6 +108,8 @@ spec:
           successThreshold: 1
           timeoutSeconds: 10
         volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
         - mountPath: /home/nacos/plugins/peer-finder
           name: data
           subPath: nacos/plugins/peer-finder
@@ -117,6 +119,11 @@ spec:
         - mountPath: /home/nacos/logs
           name: data
           subPath: nacos/logs
+      volumes:
+        - name: localtime
+          hostpath:
+            path: /etc/localtime
+            type: ""
       initContainers:
       - image: nacos/nacos-peer-finder-plugin:1.1
         imagePullPolicy: IfNotPresent

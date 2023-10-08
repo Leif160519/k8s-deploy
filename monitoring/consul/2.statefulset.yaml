@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   labels:
     app: consul
@@ -10,6 +10,7 @@ spec:
   selector:
     matchLabels:
       app: consul
+  serviceName: consul
   template:
     metadata:
       labels:
@@ -55,7 +56,7 @@ spec:
         volumeMounts:
         - name: localtime
           mountPath: /etc/localtime
-        - name: consul
+        - name: data
           mountPath: /consul/data
           subPath: consul/data
         - name: consul-config
@@ -66,12 +67,22 @@ spec:
         hostPath:
           path: /etc/localtime
           type: ""
-      - name: consul
-        persistentVolumeClaim:
-          claimName: consul
       - name: consul-config
         configMap:
           name: consul-config
           items:
             - key: consul.hcl
               path: consul.hcl
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: moosefs-storage
+        volumeMode: Filesystem
