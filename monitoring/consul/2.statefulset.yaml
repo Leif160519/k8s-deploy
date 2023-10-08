@@ -20,6 +20,8 @@ spec:
       - name: consul
         image: consul:1.14.5
         imagePullPolicy: IfNotPresent
+        args:
+          - agent
         ports:
         - containerPort: 8500
         - containerPort: 8300
