@@ -20,7 +20,7 @@ consul kv import --http-addr=https://consul.github.icu -token=xxx @consul_kv_bac
 - 同样在statefulset模式部署下，若删除consul底层数据，然后用consul snapshot的方式恢复，则会保留kv数据，缺丢失service数据，虽然能在consul中看到service内容，但是consulmanager里却不显示
 ```
 # 备份
-consul snapshot save --http-addr=https://consul.github.icu --token=xxxxx consul_backup.snap
+consul snapshot save --http-addr=https://consul.github.icu --token=xxxxx --stale consul_backup.snap
 
 # 查看备份信息
 consul snapshot inspect consul_backup.snap
