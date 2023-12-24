@@ -55,6 +55,14 @@ spec:
               subPath: nexus-data
             - mountPath: /etc/localtime
               name: localtime
+      initContainers:
+      - name: delete-wal-file
+        image: busybox
+        command: [find , /nexus-data/db/config , -type , f , -name , '*.wal' , -delete]
+        volumeMounts:
+          - name: nexus3
+            mountPath: /nexus-data
+            subPath: nexus-data
       volumes:
         - name: nexus3
           persistentVolumeClaim:
