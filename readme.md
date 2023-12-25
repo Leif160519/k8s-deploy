@@ -98,3 +98,62 @@ spec:
 ```
 kubectl rollout history deployment busybox
 ```
+
+# 删除ns之后卡住，一直显示Terminating
+以命名空间为`test`为例
+1.执行以下命令
+```
+kubectl proxy
+
+Starting to server on 127.0.0.1:8001
+```
+
+2.另开一个终端,创建临时json文件
+```
+kubectl get ns test -o json > test.json
+```
+
+3.编辑test.json文件，从finalizers字段中，删除`kubernetes`值，并保存文件
+```
+vim test.json
+
+···
+    "spec": {
+        "finalizers": [
+            "kubernetes" //删除之
+        ]
+    }
+···
+```
+
+4.执行以下命令，更新命名空间
+```
+curl -k -H "Content-Type: application/json" -X PUT --data-binary @test.json http://127.0.0.1:8001/api/v1/namespaces/test/finalize
+```
+> 其中，test根据实际情况进行替换对应的命名空间名称
+
+5.输出一大串json及代表成功，否则即为失败，根据json内容进行排查
+
+6.根据上述步骤，生成批量处理脚本
+```
+# kubectl proxy
+
+# 另开一个终端
+# 输出所有有问题的ns
+kubectl get ns | grep -vi active | grep -i termi | awk '{print "kubectl get ns "$1 " -o json > /root/"$1".json"}'  | bash
+
+# 修改json文件
+
+# 更新命名空间
+kubectl get ns | grep -vi active | grep -i termi | awk '{print "curl -k -H \"Content-Type: application/json\" -X PUT --data-binary @"$1".json http://127.0.0.1:8001/api/v1/namespaces/"$1"/finalize"  }'  | bash
+```
+
+> 若`spec`下没有上述`finalizers`字段内容，则删除`metadata`下`finzlizers`如下内容后执行curl命令即可
+
+```
+···
+        "finalizers": [                                  //删除之
+            "controller.cattle.io/namespace-auth"        //删除之
+        ],                                               //删除之
+···
+```
