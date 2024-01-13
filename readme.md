@@ -157,3 +157,40 @@ kubectl get ns | grep -vi active | grep -i termi | awk '{print "curl -k -H \"Con
         ],                                               //删除之
 ···
 ```
+
+# 执行创建secret时报错
+```
+kubectl create secret tls github-tls --key STAR.github.icu.key --cert STAR.github.icu.pem -n devops
+error: failed to create secret Internal error occurred: failed calling webhook "rancher.cattle.io.secrets": failed to call webhook: Post "https://rancher-webhook.cattle-system.svc:443/v1/webhook/mutation/secrets?timeout=10s": service "rancher-webhook" not found
+```
+
+可能是rbac的问题
+```
+$ kubectl get mutatingwebhookconfigurations
+NAME                             WEBHOOKS   AGE
+mutating-webhook-configuration   8          238d
+rancher.cattle.io                5          237d
+
+$ kubectl get validatingwebhookconfigurations
+NAME                               WEBHOOKS   AGE
+ingress-nginx-admission            1          238d
+metallb-webhook-configuration      7          257d
+rancher.cattle.io                  13         237d
+validating-webhook-configuration   11         238d
+```
+查看发现有两个准入控制器，都是以前安装组件时遗留的控制器
+
+删除即可
+```
+$ kubectl delete mutatingwebhookconfigurations rancher.cattle.io
+mutatingwebhookconfiguration.admissionregistration.k8s.io "rancher.cattle.io" deleted
+
+$ kubectl delete validatingwebhookconfigurations rancher.cattle.io
+validatingwebhookconfiguration.admissionregistration.k8s.io "rancher.cattle.io" deleted
+```
+
+重新创建secert
+```
+$ kubectl create secret tls github-tls --key STAR.github.icu.key --cert STAR.github.icu.pem -n devops
+secret/github-tls created
+```
