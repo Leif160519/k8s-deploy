@@ -160,7 +160,7 @@ kubectl get ns | grep -vi active | grep -i termi | awk '{print "curl -k -H \"Con
 
 # 执行创建secret时报错
 ```
-kubectl create secret tls github-tls --key STAR.github.icu.key --cert STAR.github.icu.pem -n devops
+$ kubectl create secret tls github-tls --key STAR.github.icu.key --cert STAR.github.icu.pem -n devops
 error: failed to create secret Internal error occurred: failed calling webhook "rancher.cattle.io.secrets": failed to call webhook: Post "https://rancher-webhook.cattle-system.svc:443/v1/webhook/mutation/secrets?timeout=10s": service "rancher-webhook" not found
 ```
 
