@@ -56,16 +56,9 @@ spec:
             - mountPath: /etc/localtime
               name: localtime
       initContainers:
-      - name: delete-wal-file
+      - name: delete-wal-lock-file
         image: busybox
-        command: [find , /nexus-data/db/config , -type , f , -name , '*.wal' , -delete]
-        volumeMounts:
-          - name: nexus3
-            mountPath: /nexus-data
-            subPath: nexus-data
-      - name: delete-lock-file
-        image: busybox
-        command: [find , /nexus-data/, -type , f , -name , '*.lock', -delete]
+        command: [find , /nexus-data/db/config , -type , f , -name , '*.wal' , -o , -name , '*.lock', -o , -name , 'lock' , -delete]
         volumeMounts:
           - name: nexus3
             mountPath: /nexus-data
