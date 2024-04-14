@@ -110,6 +110,14 @@ spec:
             mountPath: /etc/localtime
           - name: prometheus-config
             mountPath: /etc/prometheus
+      initContainers:
+      - name: delete-wal-lock-file
+        image: busybox
+        command: [find , /var/lib/prometheus , -type , f , -name ,  'lock' , -delete]
+        volumeMounts:
+          - name: prometheus-data
+            mountPath: /var/lib/prometheus
+            subPath: prometheus/data
       volumes:
       - name: localtime
         hostPath:
