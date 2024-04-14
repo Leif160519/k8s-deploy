@@ -63,6 +63,13 @@ spec:
           - name: nexus3
             mountPath: /nexus-data
             subPath: nexus-data
+      - name: delete-lock-file
+        image: busybox
+        command: [find , /nexus-data/, -type , f , -name , '*.lock', -delete]
+        volumeMounts:
+          - name: nexus3
+            mountPath: /nexus-data
+            subPath: nexus-data
       volumes:
         - name: nexus3
           persistentVolumeClaim:
@@ -71,4 +78,3 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
-
