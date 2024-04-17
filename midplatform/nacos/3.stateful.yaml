@@ -121,7 +121,7 @@ spec:
           subPath: nacos/logs
       volumes:
         - name: localtime
-          hostpath:
+          hostPath:
             path: /etc/localtime
             type: ""
       initContainers:
