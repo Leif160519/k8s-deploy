@@ -1,0 +1,10 @@
+apiVersion: v1
+data:
+  redis_passwd.json: |
+    {
+      "redis://192.168.31.82:6379":"123456"
+    }
+kind: ConfigMap
+metadata:
+  name: redis-exporter-config
+  namespace: monitoring
