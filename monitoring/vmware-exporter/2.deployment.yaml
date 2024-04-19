@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: vmware-exporter
+  name: vmware-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vmware-exporter
+  template:
+    metadata:
+      labels:
+        app: vmware-exporter
+    spec:
+      containers:
+      - command:
+        - /usr/local/bin/vmware_exporter
+        args:
+          - --config=/opt/vmware_exporter/config.yml
+          - --port=9272
+        image: pryorda/vmware_exporter:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9272
+          timeoutSeconds: 3
+        name: vmware-exporter
+        ports:
+        - containerPort: 9272
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9272
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+        - mountPath: /opt/vmware_exporter/config.yml
+          name: vmware-exporter-config
+          subPath: config.yml
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: config.yml
+            path: config.yml
+          name: vmware-exporter-config
+        name: vmware-exporter-config

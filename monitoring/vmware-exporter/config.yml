@@ -1,0 +1,15 @@
+default:
+  vsphere_host: "192.168.31.200"
+  vsphere_user: "public"
+  vsphere_password: "123456"
+  ignore_ssl: True
+  specs_size: 5000
+  fetch_custom_attributes: False
+  fetch_tags: False
+  fetch_alarms: True
+  collect_only:
+      vms: True
+      vmguests: True
+      datastores: True
+      hosts: True
+      snapshots: True

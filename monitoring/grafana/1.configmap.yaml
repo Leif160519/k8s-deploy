@@ -123,7 +123,7 @@ data:
     ssl_skip_verify = false
 
     bind_dn = "cn=public,ou=peanut,dc=github,dc=icu"
-    bind_password = 'China-123'
+    bind_password = '123456'
 
     search_filter = "(sAMAccountName=%s)"
 
