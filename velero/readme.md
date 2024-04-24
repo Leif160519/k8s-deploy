@@ -55,6 +55,67 @@ Backup completed with status: PartiallyFailed. You may check for more informatio
 之后去minio的velero bucket中查看是否有数据即可
 ```
 
+# 更多命令
+
+## 查看备份位置
+```
+$ velero get backup-locations
+
+NAME      PROVIDER   BUCKET/PREFIX   PHASE       LAST VALIDATED                  ACCESS MODE   DEFAULT
+default   aws        finley007       Available   2022-03-10 22:23:28 +0800 CST   ReadWrite     true
+```
+
+## 查看已有恢复
+```
+velero get restores
+```
+
+## 查看 velero 插件
+```
+velero get plugins
+```
+
+## 删除 velero 备份
+```
+velero backup delete nginx-backup
+```
+
+## 持久卷备份
+```
+velero backup create nginx-backup-volume --snapshot-volumes --include-namespaces nginx-example
+```
+
+## 持久卷恢复
+```
+velero restore create --from-backup nginx-backup-volume --restore-volumes
+```
+
+## 创建集群所有namespaces备份，但排除 velero,metallb-system 命名空间
+```
+velero backup create all-ns-backup --snapshot-volumes=false --exclude-namespaces velero,metallb-system
+```
+
+## 周期性定时备份
+### 每日3点进行备份
+```
+$ velero schedule create <SCHEDULE NAME> --schedule "0 3 * * *"
+```
+
+### 每日3点进行备份，备份保留48小时，默认保留30天
+```
+$ velero schedule create <SCHEDULE NAME> --schedule "0 3 * * *" --ttl 48
+```
+
+### 每6小时进行一次备份
+```
+$ velero create schedule <SCHEDULE NAME> --schedule="@every 6h"
+```
+
+### 每日对 web namespace 进行一次备份
+```
+$ velero create schedule <SCHEDULE NAME> --schedule="@every 24h" --include-namespaces web
+```
+
 # 参考
 [k8s-基础-使用Velero备份恢复集群][0]
 
