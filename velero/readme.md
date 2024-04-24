@@ -103,7 +103,7 @@ $ velero schedule create <SCHEDULE NAME> --schedule "0 3 * * *"
 
 ### 每日3点进行备份，备份保留48小时，默认保留30天
 ```
-$ velero schedule create <SCHEDULE NAME> --schedule "0 3 * * *" --ttl 48
+$ velero schedule create <SCHEDULE NAME> --schedule "0 3 * * *" --ttl 48h
 ```
 
 ### 每6小时进行一次备份
