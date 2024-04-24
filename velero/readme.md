@@ -16,16 +16,16 @@ ln -svf velero-v1.10.3-linux-amd64.tar.gz/velero /usr/bin/velero
 kubectl apply -f 1.namespace -f 2.minio.yaml
 ```
 
-## 3.创建好bucket和secret id和key
+## 3.创建好velero的bucket和用户的secret id和key
 
-## 4.修改credentials-velero文件内容的id和key
+## 4.修改`credentials-velero`文件内容的id和key
 
 # 安装velero
 ```
 ./install.sh
 ```
 
-注意：若minio用的是集群外的，请修改`s3url=`后面的minio console的地址
+注意：若minio用的是集群外的，请修改`s3url=`后面的minio console的地址,另外确保`credentials-velero`文件的路径根据实际情况进行调整
 
 # 卸载velero
 ```
@@ -34,14 +34,15 @@ velero uninstall 按y确认
 
 # 查看velero状态
 ```
-kubectl get pod -n velero 看velero的pod是否为Running状态
+# 看velero的pod是否为Running状态
+kubectl get pod -n velero
 NAME                      READY   STATUS    RESTARTS   AGE
 velero-6c94b8f799-7bc5j   1/1     Running   0          13m
 
-velero get backup-locations 看PHASE是否为Available状态，否则会备份失败
+# 看PHASE是否为Available状态，否则会备份失败
+velero get backup-locations
 NAME      PROVIDER   BUCKET/PREFIX   PHASE       LAST VALIDATED                  ACCESS MODE   DEFAULT
 default   aws        velero          Available   2023-05-09 17:06:16 +0800 CST   ReadWrite     true
-
 ```
 
 # 备份devops下的jenkins
