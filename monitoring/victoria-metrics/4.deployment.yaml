@@ -20,7 +20,7 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             - -retentionPeriod=1
-            - -storageDataPath=/victoria-metrics-data
+            - -storageDataPath=/var/lib/victoria-metrics-data
             - -httpListenAddr=:8428
             - -vmalert.proxyURL=http://prometheus:9090
           securityContext:
@@ -55,16 +55,16 @@ spec:
           volumeMounts:
             - mountPath: /etc/localtime
               name: localtime
-            - mountPath: /victoria-metrics-data
+            - mountPath: /var/lib/victoria-metrics-data
               name: victoria
               subPath: victoria-metrics-data
       initContainers:
       - name: delete-lock-file
         image: busybox
-        command: [find, /victoria-metrics-data, -type , f , -name , flock.lock , -delete]
+        command: [find, /var/lib/victoria-metrics-data, -type , f , -name , flock.lock , -delete]
         volumeMounts:
           - name: victoria
-            mountPath: /victoria-metrics-data
+            mountPath: /var/lib/victoria-metrics-data
             subPath: victoria-metrics-data
       volumes:
         - name: localtime
