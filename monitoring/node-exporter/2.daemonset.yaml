@@ -19,6 +19,7 @@ spec:
       - name: node-exporter
         image: prom/node-exporter:latest
         args:
+        - --collector.textfile.directory=/var/log/prometheus/
         - --log.level=info
         - --collector.mountstats
         - --collector.processes
@@ -40,6 +41,10 @@ spec:
         - name: sys
           mountPath: /host/sys
           readOnly: true
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: log
+          mountPath: /var/log/prometheus
       volumes:
       - name: proc
         hostPath:
@@ -47,3 +52,11 @@ spec:
       - name: sys
         hostPath:
           path: /sys
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: log
+        hostPath:
+          path: /var/log/prometheus
+          type: ""
