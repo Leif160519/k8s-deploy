@@ -33,13 +33,13 @@ spec:
         - name: PA_EMAIL_PORT
           value: "465"
         - name: PA_EMAIL_USER
-          value: yzluofei@126.com
+          value: example@126.com
         - name: PA_EMAIL_PASSWORD
-          value: "1994LFwangyi"
+          value: "123456"
         - name: PA_EMAIL_TILE
           value: Kubernetes-Alert
         - name: PA_DEFAULT_EMAILS
-          value: yzluofei@126.com
+          value: example@126.com
         ports:
         - containerPort: 8080
           name: http
