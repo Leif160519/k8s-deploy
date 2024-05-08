@@ -5,10 +5,10 @@ minioadmin
 # 准备工作
 ## 1.下载velero二进制文件
 ```
-https://github.com/vmware-tanzu/velero/releases/download/v1.10.3/velero-v1.10.3-linux-amd64.tar.gz
-tar -zxvf velero-v1.10.3-linux-amd64.tar.gz
-cd velero-v1.10.3-linux-amd64
-ln -svf velero-v1.10.3-linux-amd64.tar.gz/velero /usr/bin/velero
+https://github.com/vmware-tanzu/velero/releases/download/v1.12.1/velero-v1.12.1-linux-amd64.tar.gz
+tar -zxvf velero-v1.12.1-linux-amd64.tar.gz
+cd velero-v1.12.1-linux-amd64
+ln -svf velero-v1.12.1-linux-amd64.tar.gz/velero /usr/bin/velero
 ```
 
 ## 2.安装minio
@@ -24,6 +24,8 @@ kubectl apply -f 1.namespace -f 2.minio.yaml
 ```
 ./install.sh
 ```
+
+> 这里minio的地址我用的是外部的，避免集群问题导致minio不可用，无法恢复数据
 
 注意：若minio用的是集群外的，请修改`s3url=`后面的minio console的地址,另外确保`credentials-velero`文件的路径根据实际情况进行调整
 
@@ -118,5 +120,7 @@ $ velero create schedule <SCHEDULE NAME> --schedule="@every 24h" --include-names
 
 # 参考
 [k8s-基础-使用Velero备份恢复集群][0]
+[11、Velero + minio（备份容灾）][1]
 
 [0]: https://blog.mafeifan.com/DevOps/K8s/k8s-%E5%9F%BA%E7%A1%80-%E4%BD%BF%E7%94%A8Velero%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4.html
+[1]: https://blog.csdn.net/weixin_44797299/article/details/136007213
