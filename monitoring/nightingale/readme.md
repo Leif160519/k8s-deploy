@@ -8,7 +8,13 @@ mysql -h mysql.github.icu -u root -p < initsql/a-n9e.sql
 
 ### 2.创建configmap
 ```
-kubectl create configmap -n monitoring nightingale-config --from-file etc-nightingale/config.toml --from-file etc-nightingale/metrics.yaml --from-file etc-nightingale/script/notify.bak.py --from-file etc-nightingale/script/notify_feishu.py --from-file etc-nightingale/script/notify.py --from-file etc-nightingale/script/rule_converter.py
+kubectl create configmap -n monitoring nightingale-config \
+    --from-file etc-nightingale/config.toml \
+    --from-file etc-nightingale/metrics.yaml \
+    --from-file etc-nightingale/script/notify.bak.py \
+    --from-file etc-nightingale/script/notify_feishu.py \
+    --from-file etc-nightingale/script/notify.py \
+    --from-file etc-nightingale/script/rule_converter.py
 ```
 
 ## 部署
