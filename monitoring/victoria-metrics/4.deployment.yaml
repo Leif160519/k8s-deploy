@@ -23,6 +23,7 @@ spec:
             - -storageDataPath=/var/lib/victoria-metrics-data
             - -httpListenAddr=:8428
             - -vmalert.proxyURL=http://prometheus:9090
+            - -loggerTimezone=Asia/Shanghai
           securityContext:
             runAsUser: 0
           ports:
