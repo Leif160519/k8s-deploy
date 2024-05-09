@@ -1,0 +1,25 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nightingale
+  namespace: monitoring
+  labels:
+    app: nightingale
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nightingale.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: nightingale
+            port:
+              number: 17000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - nightingale.github.icu
+    secretName: github-tls

@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nightingale
+  name: nightingale
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nightingale
+  template:
+    metadata:
+      labels:
+        app: nightingale
+    spec:
+#      serviceAccountName: nightingale
+      containers:
+      - name: nightingale
+        env:
+          - name: GIN_MODE
+            value: release
+          - name: TZ
+            value: Asia/Shanghai
+        image: flashcatcloud/nightingale:latest
+        imagePullPolicy: IfNotPresent
+        args:
+        - sh
+        - -c
+        - "/app/n9e"
+        ports:
+        - containerPort: 17000
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 1Gi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 17000
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 17000
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: nightingale-config
+          mountPath: /app/etc
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: nightingale-config
+        configMap:
+          defaultMode: 420
+          name: nightingale-config
+          items:
+          - key: config.toml
+            path: config.toml
+          - key: metrics.yaml
+            path: metrics.yaml
+          - key: notify.bak.py
+            path: script/notify.bak.py
+          - key: notify_feishu.py
+            path: script/notify_feishu.py
+          - key: notify.py
+            path: script/notify.py
+          - key: rule_converter.py
+            path: script/rule_converter.py
