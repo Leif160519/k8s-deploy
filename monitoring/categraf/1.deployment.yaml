@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: categraf
+  name: categraf
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: categraf
+  template:
+    metadata:
+      labels:
+        app: categraf
+    spec:
+      containers:
+      - name: categraf
+        env:
+          - name: HOST_PROC
+            value: /hostfs/proc
+          - name: HOST_SYS
+            value: /hostfs/sys
+          - name: HOST_MOUNT_PREFIX
+            value: /hostfs
+          - name: WAIT_HOSTS
+            value: nightingale:17000, nightingale:20090
+          - name: TZ
+            value: Asia/Shanghai
+        image: flashcatcloud/categraf:latest
+        imagePullPolicy: IfNotPresent
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 1Gi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: hostfs
+          mountPath: /hostfs
+        - name: categraf-config
+          mountPath: /etc/categraf/conf
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: hostfs
+        hostPath:
+          path: /
+          type: ""
+      - name: categraf-config
+        configMap:
+          defaultMode: 420
+          name: categraf-config
+          items:
+          - key: config.toml
+            path: config.toml
+          - key: cpu.toml
+            path: input.cpu/cpu.toml
+          - key: disk.toml
+            path: input.disk/disk.toml
+          - key: diskio.toml
+            path: input.diskio/diskio.toml
+          - key: kernel.toml
+            path: input.kernel/kernel.toml
+          - key: mem.toml
+            path: input.mem/mem.toml
+          - key: net.toml
+            path: input.net/net.toml
+          - key: netstat.toml
+            path: input.netstat/netstat.toml
+          - key: processes.toml
+            path: input.processes/processes.toml
+          - key: prometheus.toml
+            path: input.prometheus/prometheus.toml
+          - key: system.toml
+            path: input.system/system.toml
