@@ -58,7 +58,7 @@ spec:
           type: ""
       - name: categraf-config
         configMap:
-          defaultMode: 420
+          defaultMode: 0420
           name: categraf-config
           items:
           - key: config.toml
@@ -83,3 +83,5 @@ spec:
             path: input.prometheus/prometheus.toml
           - key: system.toml
             path: input.system/system.toml
+          - key: vsphere.toml
+            path: input.vsphere/vsphere.toml
