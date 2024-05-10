@@ -16,3 +16,7 @@ spec:
       protocol: TCP
       port: 17000
       targetPort: 17000
+    - name: ibex
+      protocol: TCP
+      port: 20090
+      targetPort: 20090
