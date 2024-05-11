@@ -36,3 +36,8 @@ kubectl apply -f .
           - key: vsphere.toml
             path: input.vsphere/vsphere.toml
 ```
+
+## 参考
+[Categraf采集器安装、配置采集VSphere指标][1]
+
+[1]: https://unixsre.com/posts/n9e-monitor-vsphere/#categraf%E9%87%87%E9%9B%86%E5%99%A8%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE%E9%87%87%E9%9B%86vsphere%E6%8C%87%E6%A0%87
