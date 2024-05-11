@@ -28,8 +28,6 @@ spec:
               fieldRef:
                 apiVersion: v1
                 fieldPath: status.hostIP
-          - name: WAIT_HOSTS
-            value: nightingale:17000, nightingale:20090
           - name: TZ
             value: Asia/Shanghai
         image: flashcatcloud/categraf:latest
@@ -51,13 +49,6 @@ spec:
           mountPath: /etc/categraf/conf
         - name: input-config
           mountPath: /etc/categraf/conf/input.vsphere
-#      initContainers:
-#        - name: create-input-dir
-#          image: busybox
-#          command: [mkdir, /etc/categraf/input.vsphere, -p]
-#          volumeMounts:
-#            - name: categraf-config
-#              mountPath: /etc/categraf/conf
       volumes:
       - name: localtime
         hostPath:
