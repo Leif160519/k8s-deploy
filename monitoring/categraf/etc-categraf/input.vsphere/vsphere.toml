@@ -1,11 +1,11 @@
 [[instances]]
-  labels = { instance="192.168.11.111", clustername="Datacenter" }
+  labels = { instance="192.168.31.200", clustername="Datecenter" }
   ##  vCenter URLs to be monitored. These three lines must be uncommented
   ## and edited for the plugin to work.
   ## FQDN URLs to be monitored. These three lines must be uncommented
-  vcenter = "https://vcenter.unixsre.com/sdk"
-  username = "administrator@vcenter.unixsre.com"
-  password = "111111119@abcdef"
+  vcenter = "https://vcenter.github.icu/sdk"
+  username = "administrator@vsphere.local"
+  password = "123456"
 
   ## VMs
   ## Typical VM metrics (if omitted or empty, all metrics are collected)
