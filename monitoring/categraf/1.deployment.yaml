@@ -47,8 +47,14 @@ spec:
           mountPath: /etc/localtime
         - name: categraf-config
           mountPath: /etc/categraf/conf
-        - name: input-config
+        - name: categraf-vsphere
           mountPath: /etc/categraf/conf/input.vsphere
+        - name: categraf-aliyun
+          mountPath: /etc/categraf/conf/input.aliyun
+        - name: categraf-prometheus
+          mountPath: /etc/categraf/conf/input.prometheus
+        - name: categraf-processes
+          mountPath: /etc/categraf/conf/input.processes
       volumes:
       - name: localtime
         hostPath:
@@ -58,13 +64,19 @@ spec:
         configMap:
           defaultMode: 420
           name: categraf-config
-          items:
-          - key: config.toml
-            path: config.toml
-      - name: input-config
+      - name: categraf-vsphere
         configMap:
           defaultMode: 420
-          name: input-config
-          items:
-          - key: vsphere.toml
-            path: vsphere.toml
+          name: categraf-vsphere
+      - name: categraf-aliyun
+        configMap:
+          defaultMode: 420
+          name: categraf-aliyun
+      - name: categraf-prometheus
+        configMap:
+          defaultMode: 420
+          name: categraf-prometheus
+      - name: categraf-processes
+        configMap:
+          defaultMode: 420
+          name: categraf-processes

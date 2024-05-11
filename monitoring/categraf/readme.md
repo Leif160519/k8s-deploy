@@ -4,8 +4,18 @@
 kubectl create configmap -n monitoring categraf-config \
     --from-file etc-categraf/config.toml
 
-kubectl create configmap -n monitoring input-config \
+kubectl create configmap -n monitoring categraf-vsphere \
     --from-file etc-categraf/input.vsphere/vsphere.toml
+
+kubectl create configmap -n monitoring categraf-aliyun \
+    --from-file etc-categraf/input.aliyun/aliyun.toml
+
+kubectl create configmap -n monitoring categraf-prometheus \
+    --from-file etc-categraf/input.prometheus/prometheus.toml
+
+
+kubectl create configmap -n monitoring categraf-processes \
+    --from-file etc-categraf/input.processes/processes.toml
 ```
 
 ## 部署
