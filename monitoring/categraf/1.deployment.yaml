@@ -18,12 +18,16 @@ spec:
       containers:
       - name: categraf
         env:
-          - name: HOST_PROC
-            value: /hostfs/proc
-          - name: HOST_SYS
-            value: /hostfs/sys
-          - name: HOST_MOUNT_PREFIX
-            value: /hostfs
+          - name: HOSTENAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: spec.nodeName
+          - name: HOSTIP
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: status.hostIP
           - name: WAIT_HOSTS
             value: nightingale:17000, nightingale:20090
           - name: TZ
@@ -43,45 +47,33 @@ spec:
         volumeMounts:
         - name: localtime
           mountPath: /etc/localtime
-        - name: hostfs
-          mountPath: /hostfs
         - name: categraf-config
           mountPath: /etc/categraf/conf
+        - name: input-config
+          mountPath: /etc/categraf/conf/input.vsphere
+#      initContainers:
+#        - name: create-input-dir
+#          image: busybox
+#          command: [mkdir, /etc/categraf/input.vsphere, -p]
+#          volumeMounts:
+#            - name: categraf-config
+#              mountPath: /etc/categraf/conf
       volumes:
       - name: localtime
         hostPath:
           path: /etc/localtime
           type: ""
-      - name: hostfs
-        hostPath:
-          path: /
-          type: ""
       - name: categraf-config
         configMap:
-          defaultMode: 0420
+          defaultMode: 420
           name: categraf-config
           items:
           - key: config.toml
             path: config.toml
-          - key: cpu.toml
-            path: input.cpu/cpu.toml
-          - key: disk.toml
-            path: input.disk/disk.toml
-          - key: diskio.toml
-            path: input.diskio/diskio.toml
-          - key: kernel.toml
-            path: input.kernel/kernel.toml
-          - key: mem.toml
-            path: input.mem/mem.toml
-          - key: net.toml
-            path: input.net/net.toml
-          - key: netstat.toml
-            path: input.netstat/netstat.toml
-          - key: processes.toml
-            path: input.processes/processes.toml
-          - key: prometheus.toml
-            path: input.prometheus/prometheus.toml
-          - key: system.toml
-            path: input.system/system.toml
+      - name: input-config
+        configMap:
+          defaultMode: 420
+          name: input-config
+          items:
           - key: vsphere.toml
-            path: input.vsphere/vsphere.toml
+            path: vsphere.toml
