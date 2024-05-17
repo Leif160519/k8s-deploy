@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-hs
+  namespace: midplatform
+spec:
+  ports:
+  - name: server
+    port: 2888
+    protocol: TCP
+    targetPort: 2888
+  - name: leader-election
+    port: 3888
+    protocol: TCP
+    targetPort: 3888
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: zookeeper
+    app.kubernetes.io/name: zookeeper
+  type: ClusterIP
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-cs
+  namespace: midplatform
+spec:
+  ports:
+  - name: client
+    port: 2181
+    protocol: TCP
+    targetPort: 2181
+  selector:
+    app.kubernetes.io/instance: zookeeper
+    app.kubernetes.io/name: zookeeper
+  type: ClusterIP
