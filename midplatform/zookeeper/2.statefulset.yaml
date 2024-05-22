@@ -60,8 +60,8 @@ spec:
           timeoutSeconds: 10
         securityContext:
           privileged: true
-          runAsUser: 0
-          runAsGroup: 0
+          runAsUser: 1000
+          runAsGroup: 1000
         ports:
         - containerPort: 2181
           name: client
@@ -85,6 +85,17 @@ spec:
         - mountPath: /var/lib/zookeeper/datalog
           name: data
           subPath: zookeeper/datalog
+      initContainers:
+      - name: chmod-data-dir
+        image: busybox
+        command: [chmod ,'777', -R ,/var/lib/zookeeper/]
+        volumeMounts:
+          - name: data
+            mountPath: /var/lib/zookeeper/data
+            subPath: zookeeper/data
+          - name: data
+            mountPath: /var/lib/zookeeper/datalog
+            subPath: zookeeper/datalog
       volumes:
         - name: localtime
           hostPath:
