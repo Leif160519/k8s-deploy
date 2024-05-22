@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: kafka-exporter
+  name: kafka-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9308
+    protocol: TCP
+    targetPort: 9308
+  selector:
+    app: kafka-exporter
+  type: ClusterIP
