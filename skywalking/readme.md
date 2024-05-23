@@ -1,6 +1,6 @@
 ## 参考
-[k8s部署skywalking保姆级教程][1]
-[PrometheusAlert添加Skywalking告警][3]
+- [k8s部署skywalking保姆级教程][1]
+- [PrometheusAlert添加Skywalking告警][3]
 
 ## 注意
 configmap中webhook的配置参考：[wechat][2]
