@@ -16,7 +16,7 @@ spec:
       containers:
       - env:
         - name: ELASTICSEARCH_HOSTS
-          value: http://elasticsearch-hs:9002
+          value: http://elasticsearch-hs:9200
         image: kibana:7.17.5
         imagePullPolicy: IfNotPresent
         livenessProbe:
