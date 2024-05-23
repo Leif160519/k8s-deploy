@@ -60,7 +60,7 @@ spec:
                 fieldRef:
                   fieldPath: metadata.namespace
             - name: NACOS_SERVICE_NAME
-              value: nacos-hs
+              value: nacos-hs.midplatform
             - name: NACOS_NAMESPACE
               value: public
             - name: JAVA_TOOL_OPTIONS
