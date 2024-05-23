@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: elasticsearch
+  namespace: midplatform
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: elasticsearch
+      app.kubernetes.io/name: elasticsearch
+  replicas: 3
+  serviceName: elasticsearch-hs
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: elasticsearch
+        app.kubernetes.io/name: elasticsearch
+    spec:
+      initContainers:
+      containers:
+      - name: elasticsearch
+        env:
+        - name: node.name
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: discovery.seed_hosts
+          value: "elasticsearch-0.elasticsearch-hs,elasticsearch-1.elasticsearch-hs,elasticsearch-2.elasticsearch-hs"
+        - name: cluster.initial_master_nodes
+          value: elasticsearch-0
+        - name: ES_JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        image: elasticsearch:7.17.5
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          tcpSocket:
+            port: 9200
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: 9200
+          initialDelaySeconds: 10
+          timeoutSeconds: 10
+        securityContext:
+          privileged: true
+        ports:
+        - containerPort: 9200
+          name: http
+          protocol: TCP
+        - containerPort: 9300
+          name: transport
+          protocol: TCP
+        resources:
+          requests:
+            cpu: 500m
+            memory: 1Gi
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - mountPath: /usr/share/elasticsearch/data
+          name: data
+          subPath: elasticsearch/data
+      initContainers:
+      - name: chmod-data-dir
+        image: busybox
+        command: [chmod ,'777', -R ,/usr/share/elasticsearch/data]
+        volumeMounts:
+          - name: data
+            mountPath: /usr/share/elasticsearch/data
+            subPath: elasticsearch/data
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ""
+  volumeClaimTemplates:
+  - apiVersion: v1
+    kind: PersistentVolumeClaim
+    metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 50Gi
+      storageClassName: moosefs-storage
+      volumeMode: Filesystem

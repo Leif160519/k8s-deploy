@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-hs
+  namespace: midplatform
+spec:
+  ports:
+  - name: http
+    port: 9200
+    protocol: TCP
+    targetPort: 9200
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: elasticsearch
+    app.kubernetes.io/name: elasticsearch
+  type: ClusterIP
+  clusterIP: None
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-cs
+  namespace: midplatform
+spec:
+  ports:
+  - name: http
+    port: 9200
+    protocol: TCP
+    targetPort: 9200
+  selector:
+    app.kubernetes.io/instance: elasticsearch
+    app.kubernetes.io/name: elasticsearch
+  type: ClusterIP
