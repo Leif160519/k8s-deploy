@@ -16,7 +16,6 @@ spec:
         app.kubernetes.io/instance: zookeeper
         app.kubernetes.io/name: zookeeper
     spec:
-      initContainers:
       containers:
       - name: zookeeper
         command:
