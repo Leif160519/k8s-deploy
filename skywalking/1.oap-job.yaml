@@ -1,0 +1,40 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: skywalking-es-init
+  namespace: skywalking
+  labels:
+    app: skywalking-job
+spec:
+  template:
+    metadata:
+      name: skywalking-es-init
+      labels:
+        app: skywalking-job
+    spec:
+      serviceAccountName: skywalking-oap
+      restartPolicy: Never
+      initContainers:
+      - name: wait-for-elasticsearch
+        image: busybox:1.30
+        imagePullPolicy: IfNotPresent
+        command: ['sh', '-c', 'for i in $(seq 1 60); do nc -z -w3 elasticsearch-hs.midplatform 9200 && exit 0 || sleep 5; done; exit 1']
+      containers:
+      - name: oap
+        image: skywalking.docker.scarf.sh/apache/skywalking-oap-server:8.9.0
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: JAVA_OPTS
+          value: "-Xmx2g -Xms2g -Dmode=init"
+        - name: SW_STORAGE
+          value: elasticsearch
+        - name: SW_STORAGE_ES_CLUSTER_NODES
+          value: "elasticsearch-hs.midplatform:9200"
+        - name: SW_TELEMETRY
+          value: "prometheus"
+        - name: SW_PROMETHEUS_FETCHER_ACTIVE
+          value: "true"
+        - name: SW_OTEL_RECEIVER
+          value: "default"
+        - name: SW_OTEL_RECEIVER_ENABLED_OC_RULES
+          value: "oap"

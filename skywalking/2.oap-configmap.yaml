@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: skywalking-alert
+  namespace: skywalking
+data:
+  alarm-settings.yml: |
+    rules:
+      service_resp_time_rule:
+        metrics-name: service_resp_time  # 告警规则，也就是ui中的指标
+        op: ">"  # 大于 还有 < 、=
+        threshold: 50  # 阈值
+        period: 2  # 多久告警规则需要被检查一下
+        count: 2 # 超过阈值的次数达到
+        silence-period: 2 # 多久的一个周期，重复告警只告警一次，一般和period保持一致即可
+        message: 服务{name}响应时间大于50毫秒  # 告警信息
+      endpoint_avg_rule:
+        metrics-name: endpoint_avg
+        op: ">"
+        threshold: 3
+        period: 2
+        count: 1
+        message: 接口响应时间大于3毫秒
+    webhooks:
+      - https://hooks.slack.com/services/x/y/zssss

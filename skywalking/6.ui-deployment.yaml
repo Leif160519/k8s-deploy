@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skywalking-ui
+  namespace: skywalking
+  labels:
+    app: skywalking-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+        app: skywalking-ui
+  template:
+    metadata:
+      labels:
+        app: skywalking-ui
+    spec:
+      affinity:
+      containers:
+      - name: ui
+        image: skywalking.docker.scarf.sh/apache/skywalking-ui:8.9.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+          name: page
+        env:
+        - name: SW_OAP_ADDRESS
+          value: http://skywalking-oap:12800  #根据oap的svc一致

@@ -1,0 +1,92 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: skywalking-oap
+  name: skywalking-oap
+  namespace: skywalking
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skywalking-oap
+  template:
+    metadata:
+      labels:
+        app: skywalking-oap
+    spec:
+      serviceAccountName: skywalking-oap
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 1
+              podAffinityTerm:
+                topologyKey: kubernetes.io/hostname
+                labelSelector:
+                  matchLabels:
+                    app: "skywalking"
+      initContainers:
+        - name: wait-for-elasticsearch
+          image: busybox:1.30
+          imagePullPolicy: IfNotPresent
+          command: ['sh', '-c', 'for i in $(seq 1 60); do nc -z -w3 elasticsearch-hs.midplatform 9200 && exit 0 || sleep 5; done; exit 1']
+      containers:
+        - name: skywalking-oap
+          image: skywalking.docker.scarf.sh/apache/skywalking-oap-server:8.9.0
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /skywalking/config/alarm-settings.yml
+              name: skywalking-alert
+              subPath: alarm-settings.yml
+          livenessProbe:
+            tcpSocket:
+              port: 12800
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          readinessProbe:
+            tcpSocket:
+              port: 12800
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          ports:
+            - containerPort: 11800
+              name: grpc
+            - containerPort: 12800
+              name: rest
+          env:
+            - name: JAVA_OPTS
+              value: "-Dmode=no-init -Xmx2g -Xms2g"
+            - name: SW_CLUSTER
+              value: kubernetes
+            - name: SW_CLUSTER_K8S_NAMESPACE
+              value: "skywalking"
+            - name: SW_CLUSTER_K8S_LABEL
+              value: "app=skywalking,release=skywalking,component=skywalking-oap"
+            # 记录数据
+            - name: SW_CORE_RECORD_DATA_TTL
+              value: "2"
+            # Metrics数据
+            - name: SW_CORE_METRICS_DATA_TTL
+              value: "2"
+            - name: SKYWALKING_COLLECTOR_UID
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.uid
+            - name: SW_STORAGE
+              value: "elasticsearch"
+            - name: SW_STORAGE_ES_CLUSTER_NODES
+              value: "elasticsearch-hs.midplatform:9200"
+            - name: SW_TELEMETRY
+              value: "prometheus"
+            - name: SW_PROMETHEUS_FETCHER_ACTIVE
+              value: "true"
+            - name: SW_OTEL_RECEIVER
+              value: "default"
+            - name: SW_OTEL_RECEIVER_ENABLED_OC_RULES
+              value: "skywalking-oap"
+            - name: SW_PROMETHEUS_FETCHER
+              value: "default"
+      volumes:
+        - name: skywalking-alert
+          configMap:
+            name:  skywalking-alert
