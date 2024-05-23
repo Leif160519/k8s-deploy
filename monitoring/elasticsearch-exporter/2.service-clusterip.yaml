@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: elasticsearch-exporter
+  name: elasticsearch-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9114
+    protocol: TCP
+    targetPort: 9114
+  selector:
+    app: elasticsearch-exporter
+  type: ClusterIP
