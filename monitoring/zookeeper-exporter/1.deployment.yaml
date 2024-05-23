@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: zookeeper-exporter
+  name: zookeeper-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zookeeper-exporter
+  template:
+    metadata:
+      labels:
+        app: zookeeper-exporter
+    spec:
+      containers:
+      - args:
+        - -listen=0.0.0.0:9141
+        - -location=/metrics
+        - -timeout=30
+        - -zk-hosts=zookeeper-hs.midplatform:2181
+        - -zk-tls-auth=false
+        image: dabealu/zookeeper-exporter:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9141
+          timeoutSeconds: 3
+        name: zookeeper-exporter
+        ports:
+        - containerPort: 9141
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9141
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime

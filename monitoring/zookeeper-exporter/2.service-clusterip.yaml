@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: zookeeper-exporter
+  name: zookeeper-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9141
+    protocol: TCP
+    targetPort: 9141
+  selector:
+    app: zookeeper-exporter
+  type: ClusterIP
