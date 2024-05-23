@@ -31,3 +31,29 @@ spec:
     app.kubernetes.io/instance: elasticsearch
     app.kubernetes.io/name: elasticsearch
   type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: elasticsearch
+  namespace: midplatform
+  labels:
+    app.kubernetes.io/instance: elasticsearch
+    app.kubernetes.io/name: elasticsearch
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: elasticsearch.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: elasticsearch-cs
+            port:
+              number: 9200
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - elasticsearch.github.icu
+    secretName: github-tls
