@@ -1,0 +1,10 @@
+## Kibana切换中文语言
+在kibana.yml文件中配置
+
+vim /opt/kibana/config/kibana.yml
+再最后面加上一句配置
+```
+i18n.locale: "zh-CN"
+```
+
+然后保存重启 Kibana 服务
