@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ruoyi-auth
+  namespace: devops
+  labels:
+    app: ruoyi-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ruoyi-auth
+  strategy:
+    rollingUpdate:
+      maxSurge: 70%
+      maxUnavailable: 30%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: ruoyi-auth
+    spec:
+      terminationGracePeriodSeconds: 60
+      initContainers:
+        - name: agent-container
+          image: apache/skywalking-java-agent:8.9.0-alpine
+          env:
+            - name: SW_LOGGING_LEVEL
+              value: ERROR
+            - name: SW_AGENT_TRACE_IGNORE_PATH
+              value: '/actuator/**'
+          volumeMounts:
+            - mountPath: /agent
+              name: skywalking-agent
+          command: ["/bin/sh"]
+          args: ["-c","cp -R /skywalking/agent /agent/ "]
+          resources:
+            requests:
+              cpu: 0.2
+              memory: 200Mi
+            limits:
+              cpu: 0.2
+              memory: 200Mi
+      volumes:
+        - name: skywalking-agent
+          emptyDir: {}
+      containers:
+        - name: ruoyi-auth
+          image: registry.cn-beijing.aliyuncs.com/kubesre03/ruoyi-auth:v3.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8090
+          env:
+            - name: JAVA_SERVICE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app']
+            - name: JAVA_SERVICE_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NACOS_SERVICE_NAME
+              value: nacos-hs
+            - name: NACOS_NAMESPACE
+              value: public
+            - name: JAVA_TOOL_OPTIONS
+              value: "-javaagent:/skywalking-agent/agent/skywalking-agent.jar"
+            - name: SW_AGENT_COLLECTOR_BACKEND_SERVICES
+              value: skywalking-oap.skywalking.svc.cluster.local:11800
+            - name: SW_AGENT_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.labels['app']
+          ### 启动探针
+          startupProbe:
+            httpGet:
+              port: 8090
+              path: /actuator/health/ping
+            initialDelaySeconds: 300
+            failureThreshold: 30
+            periodSeconds: 30
+          ### 就绪探针
+          readinessProbe:
+            httpGet:
+              port: 8090
+              path: /actuator/health/ping
+            initialDelaySeconds: 30  # 第一次执行探针前等待的时间
+            periodSeconds: 30  # 每隔多少秒执行一次
+            failureThreshold: 5
+          ### 存活探针
+          livenessProbe:
+            httpGet:
+              port: 8090
+              path: /actuator/health/ping
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+            timeoutSeconds: 5
+          resources:
+            requests:
+              cpu: 0.3
+              memory: 800Mi
+            limits:
+              cpu: 0.3
+              memory: 800Mi
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","/data/down-nacos.sh"]
+          volumeMounts:
+            - mountPath: /skywalking-agent
+              name: skywalking-agent
