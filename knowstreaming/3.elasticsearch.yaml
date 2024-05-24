@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: knowstreaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: ES_JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        - name: discovery.type
+          value: single-node
+        image: elasticsearch:7.17.5
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 1
+        name: elasticsearch
+        ports:
+        - containerPort: 9200
+          protocol: TCP
+        - containerPort: 9300
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9200
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 20
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9200
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+        - mountPath: /usr/share/elasticsearch/data
+          name: elasticsearch
+          subPath: knowstreaming/elasticsearch/data
+      initContainers:
+      - name: chmod-data-dir
+        image: busybox
+        command: [chmod ,'777', -R ,/usr/share/elasticsearch/data]
+        volumeMounts:
+          - name: elasticsearch
+            mountPath: /usr/share/elasticsearch/data
+            subPath: knowstreaming/elasticsearch/data
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
+      - name: elasticsearch
+        persistentVolumeClaim:
+          claimName: knowstreaming

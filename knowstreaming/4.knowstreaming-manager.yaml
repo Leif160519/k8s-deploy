@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: knowstreaming-manager
+  namespace: knowstreaming
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: knowstreaming-manager
+  template:
+    metadata:
+      labels:
+        app: knowstreaming-manager
+    spec:
+      containers:
+      - env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: SERVER_MYSQL_ADDRESS
+          value: mysql:3306
+        - name: SERVER_MYSQL_DB
+          value: know_streaming
+        - name: SERVER_MYSQL_USER
+          value: root
+        - name: SERVER_MYSQL_PASSWORD
+          value: "123456"
+        - name: SERVER_ES_ADDRESS
+          value: knowstreaming-elasticsearch:9200
+        - name: JAVA_OPTS
+          value: "-Xmx1g -Xms1g"
+        image: knowstreaming/knowstreaming-manager:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/sh
+        - /ks-start.sh
+        livenessProbe:
+          failureThreshold: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+          timeoutSeconds: 1
+        name: knowstreaming-manager
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+          timeoutSeconds: 1
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 512Mi
+        startupProbe:
+          failureThreshold: 20
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      initContainers:
+      - name: init-es
+        image: knowstreaming/knowstreaming-manager:latest
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - /es_template_create.sh
+        env:
+        - name: TZ
+          value: Asia/Shanghai
+        - name: SERVER_ES_ADDRESS
+          value: elasticsearch:9200
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
