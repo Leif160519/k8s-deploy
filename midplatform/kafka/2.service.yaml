@@ -5,7 +5,12 @@ metadata:
   namespace: midplatform
 spec:
   ports:
-  - port: 9092
+  - name: broker
+    port: 9092
+    protocol: TCP
+    targetPort: 9092
+  - name: jmx
+    port: 9999
     protocol: TCP
     targetPort: 9092
   publishNotReadyAddresses: true
@@ -22,9 +27,14 @@ metadata:
   namespace: midplatform
 spec:
   ports:
-  - port: 9092
+  - name: broker
+    port: 9092
     protocol: TCP
     targetPort: 9092
+  - name: jmx
+    port: 9999
+    protocol: TCP
+    targetPort: 9999
   selector:
     app.kubernetes.io/instance: kafka
     app.kubernetes.io/name: kafka

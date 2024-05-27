@@ -70,6 +70,13 @@ spec:
           - name: elasticsearch
             mountPath: /usr/share/elasticsearch/data
             subPath: knowstreaming/elasticsearch/data
+      - name: delete-lock-file
+        image: busybox
+        command: [find, /usr/share/elasticsearch/data ,-type, f ,-name, '*.lock' ,-delete]
+        volumeMounts:
+          - name: elasticsearch
+            subPath: knowstreaming/elasticsearch/data
+            mountPath: /usr/share/elasticsearch/data
       volumes:
       - hostPath:
           path: /etc/localtime

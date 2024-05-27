@@ -28,6 +28,8 @@ spec:
           value: /opt/kafka/data
         - name: KAFKA_LOG_RETENTION_HOURS
           value: "168"
+        - name: JMX_PORT
+          value: "9999"
         - name: TZ
           value: Asia/Shanghai
         image: schrbr/kafka:2.13-2.6.0
@@ -41,6 +43,8 @@ spec:
         name: kafka
         ports:
         - containerPort: 9092
+          protocol: TCP
+        - containerPort: 9999
           protocol: TCP
         resources:
           requests:
@@ -69,6 +73,13 @@ spec:
         volumeMounts:
           - name: kafka-config
             mountPath: /tmp/
+      - name: delete-lock-file
+        image: busybox
+        command: [find, /opt/kafka/data ,-type, f ,-name, '*.lock' ,-delete]
+        volumeMounts:
+          - name: data
+            subPath: kafka/data
+            mountPath: /opt/kafka/data
       volumes:
         - name: localtime
           hostPath:

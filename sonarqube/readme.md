@@ -45,6 +45,33 @@ sed -i "s/^#sonar.ce.javaOpts=/csonar.ce.javaOpts=-Xmx3036m -Xms1024m -XX:+HeapD
 ## 5.安装分支插件，且配置branch.name之后报错
 查看参考3
 
+## 6.sonarqube停止之后无法启动，报错：(deployment中已解决)
+```
+java.lang.IllegalStateException: failed to obtain node locks, tried [[/opt/sonarqube/data/es7]] with lock id [0]; maybe these locations are not writable or multiple nodes were started without increasing [node.max_local_storage_nodes] (was [1])?
+        at org.elasticsearch.env.NodeEnvironment.<init>(NodeEnvironment.java:328)
+        at org.elasticsearch.node.Node.<init>(Node.java:427)
+        at org.elasticsearch.node.Node.<init>(Node.java:309)
+        at org.elasticsearch.bootstrap.Bootstrap$5.<init>(Bootstrap.java:234)
+        at org.elasticsearch.bootstrap.Bootstrap.setup(Bootstrap.java:234)
+        at org.elasticsearch.bootstrap.Bootstrap.init(Bootstrap.java:434)
+        at org.elasticsearch.bootstrap.Elasticsearch.init(Elasticsearch.java:166)
+        at org.elasticsearch.bootstrap.Elasticsearch.execute(Elasticsearch.java:157)
+        at org.elasticsearch.cli.EnvironmentAwareCommand.execute(EnvironmentAwareCommand.java:77)
+        at org.elasticsearch.cli.Command.mainWithoutErrorHandling(Command.java:112)
+        at org.elasticsearch.cli.Command.main(Command.java:77)
+        at org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:122)
+        at org.elasticsearch.bootstrap.Elasticsearch.main(Elasticsearch.java:80)
+For complete error details, refer to the log at /opt/sonarqube/logs/sonarqube.log
+2024.05.29 00:44:34 WARN  app[][o.s.a.p.AbstractManagedProcess] Process exited with exit value [es]: 1
+2024.05.29 00:44:34 INFO  app[][o.s.a.SchedulerImpl] Process[es] is stopped
+2024.05.29 00:44:34 INFO  app[][o.s.a.SchedulerImpl] SonarQube is stopped
+```
+
+解决方案：将es7下面的所有lock结尾的文件删除
+```
+find /opt/sonarqube/data/es7 -type f -name "*.lock" -delete
+```
+
 
 ## 三、补充插件
 
@@ -55,3 +82,4 @@ sed -i "s/^#sonar.ce.javaOpts=/csonar.ce.javaOpts=-Xmx3036m -Xms1024m -XX:+HeapD
 - [The Chinese translation pack for SonarQube](https://github.com/xuhuisheng/sonar-l10n-zh)
 - [plugin installed, still sonarq reports "Current edition does not support branch feature"](https://github.com/mc1arke/sonarqube-community-branch-plugin/issues/663)
 - [Sonarqube Community Branch Plugin](https://github.com/mc1arke/sonarqube-community-branch-plugin)
+- [SonarQube配置LDAP认证集成](https://www.cnblogs.com/mascot1/p/9963594.html)

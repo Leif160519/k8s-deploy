@@ -33,6 +33,10 @@ spec:
             port: 3306
           timeoutSeconds: 1
         name: mysql
+        securityContext:
+          privileged: true
+          runAsUser: 0
+          runAsGroup: 0
         ports:
         - containerPort: 3306
           name: http

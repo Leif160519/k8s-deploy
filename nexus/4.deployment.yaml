@@ -58,7 +58,7 @@ spec:
       initContainers:
       - name: delete-wal-lock-file
         image: busybox
-        command: [find , /nexus-data/db/config , -type , f , -name , '*.wal' , -o , -name , '*.lock', -o , -name , 'lock' , -delete]
+        command: [find , /nexus-data , -type , f , -name , '*.wal' , -o , -name , '*.lock', -o , -name , 'lock' , -delete]
         volumeMounts:
           - name: nexus3
             mountPath: /nexus-data

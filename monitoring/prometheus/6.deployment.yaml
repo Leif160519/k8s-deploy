@@ -46,6 +46,7 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
+          runAsGroup: 0
         livenessProbe:
           failureThreshold: 5
           httpGet:

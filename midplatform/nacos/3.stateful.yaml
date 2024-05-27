@@ -75,7 +75,7 @@ spec:
             path: /nacos/v1/console/health/liveness
             port: 8848
             scheme: HTTP
-          initialDelaySeconds: 10
+          initialDelaySeconds: 120
           periodSeconds: 5
           successThreshold: 1
           timeoutSeconds: 10
@@ -103,7 +103,7 @@ spec:
             path: /nacos/v1/console/health/readiness
             port: 8848
             scheme: HTTP
-          initialDelaySeconds: 180
+          initialDelaySeconds: 120
           periodSeconds: 5
           successThreshold: 1
           timeoutSeconds: 10
