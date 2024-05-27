@@ -22,7 +22,7 @@ spec:
         - name: SONAR_USERNAME
           value: admin
         - name: SONAR_PASSWORD
-          value: China-123
+          value: "123456"
         image: harbor.github.icu/peanut-public/akaword/sonar-exporter:latest
         imagePullPolicy: IfNotPresent
         livenessProbe:
