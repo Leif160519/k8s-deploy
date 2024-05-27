@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sonarqube-exporter-return200
+  name: sonarqube-exporter-return200
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 8198
+    protocol: TCP
+    targetPort: 8198
+  selector:
+    app: sonarqube-exporter-return200
+  type: ClusterIP

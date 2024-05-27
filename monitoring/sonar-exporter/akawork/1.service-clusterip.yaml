@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sonarqube-exporter-akawork
+  name: sonarqube-exporter-akawork
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9119
+    protocol: TCP
+    targetPort: 9119
+  selector:
+    app: sonarqube-exporter-akawork
+  type: ClusterIP

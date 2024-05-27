@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sonarqube-exporter-akawork
+  name: sonarqube-exporter-akawork
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube-exporter-akawork
+  template:
+    metadata:
+      labels:
+        app: sonarqube-exporter-akawork
+    spec:
+      containers:
+      - env:
+        - name: SONAR_SERVER
+          value: "http://sonarqube.sonarqube.svc:9000"
+        - name: SONAR_USERNAME
+          value: admin
+        - name: SONAR_PASSWORD
+          value: China-123
+        image: harbor.github.icu/peanut-public/akaword/sonar-exporter:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9119
+          timeoutSeconds: 3
+        name: sonarqube-exporter-akawork
+        ports:
+        - containerPort: 9119
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9119
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime

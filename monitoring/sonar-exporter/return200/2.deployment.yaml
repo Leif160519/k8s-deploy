@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sonarqube-exporter-return200
+  name: sonarqube-exporter-return200
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sonarqube-exporter-return200
+  template:
+    metadata:
+      labels:
+        app: sonarqube-exporter-return200
+    spec:
+      containers:
+      - env:
+        - name: SONARQUBE_SERVER
+          value: "http://sonarqube.sonarqube.svc:9000"
+        - name: SONARQUBE_TOKEN
+          value: "301e47196b8f66b2eaf66a6bc3015d0984dc8b9d"
+        image: return200/sonarqube-exporter:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8198
+          timeoutSeconds: 3
+        name: sonarqube-exporter-return200
+        ports:
+        - containerPort: 8198
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8198
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
