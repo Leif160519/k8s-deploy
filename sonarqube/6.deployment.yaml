@@ -24,7 +24,7 @@ spec:
           - name: SONARQUBE_JDBC_PASSWORD
             value: sonar
           - name: SONARQUBE_JDBC_URL
-            value: jdbc:postgresql://postgres:5432/sonar
+            value: jdbc:postgresql://postgresql:5432/sonar
         image: sonarqube:8.9.10-community
         ports:
           - containerPort: 9000
@@ -50,16 +50,15 @@ spec:
           failureThreshold: 3
         volumeMounts:
           - name: sonarqube
-            subPath: data
+            subPath: sonarqube/data
             mountPath: /opt/sonarqube/data
           - name: sonarqube
-            subPath: logs
+            subPath: sonarqube/logs
             mountPath: /opt/sonarqube/logs
-          - name: sonarqube
-            subPath: conf
+          - name: sonarqube-config
             mountPath: /opt/sonarqube/conf
           - name: sonarqube
-            subPath: extensions
+            subPath: sonarqube/extensions
             mountPath: /opt/sonarqube/extensions
           - mountPath: /etc/localtime
             name: localtime
@@ -71,3 +70,7 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+        - name: sonarqube-config
+          configMap:
+            defaultMode: 0644
+            name: sonarqube-config

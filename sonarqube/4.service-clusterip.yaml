@@ -12,5 +12,4 @@ spec:
     protocol: TCP
   selector:
     app: sonarqube
-  type: NodePort
-
+  type: ClusterIP

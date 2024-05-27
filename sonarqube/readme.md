@@ -1,19 +1,20 @@
 ## 零、使用方法
 1.依次执行
 ```
+kubectl create configmap -n sonarqube sonarqube-config --from-file=conf/sonar.properties --from-file=conf/wrapper.conf
 kubectl apply -f 1.namespace.yaml
-kubectl apply -f 2.postgresql.yaml
-kubectl apply -f 3.pvc-mfs.yaml
-kubectl apply -f 4.service-nodeport.yaml
+kubectl apply -f 2.pvc-mfs.yaml
+kubectl apply -f 3.postgresql.yaml
+kubectl apply -f 4.service-clusterip.yaml
 kubectl apply -f 5.service-ingress.yaml
 kubectl apply -f 6.deployment.yaml
 ```
 2.查找到sonarqube对应的pv
 ```
-kubectl get pv | grep sonarqube | grep -v postgresql
+kubectl get pv | grep sonarqube
 ```
 
-3.将conf和extension路径覆盖pv里的内容
+3.extension路径覆盖pv里的内容
 
 
 ## 一、注意
@@ -21,7 +22,6 @@ kubectl get pv | grep sonarqube | grep -v postgresql
  > - 安装sonarqube比较占用cpu和内存资源，运行之前确保配置足够（建议四核，8GB内存以上）
  > - sonarqube汉化教程:[SonarQube基础：中文设定设定方法](https://blog.csdn.net/liumiaocn/article/details/103043922)
  > - 汉化包下载地址:[xuhuisheng/sonar-l10n-zh](https://github.com/xuhuisheng/sonar-l10n-zh/releases/)
- > - `docker-compose-mysql.yml`中的`sonar.jdbc.*`与`docker-compose-postgresql.yml`中的`SONARQUBE_JDBC_*`等效,两种写法都可以。
 
 ## 二、常见问题和解决方案
 ### 1
