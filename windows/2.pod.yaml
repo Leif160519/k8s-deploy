@@ -1,0 +1,67 @@
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: windows
+  labels:
+    name: windows
+  namespace: devops
+spec:
+  terminationGracePeriodSeconds: 120 # the Kubernetes default is 30 seconds and it may be not enough
+  containers:
+    - name: windows
+      image: dockurr/windows
+      ports:
+        - containerPort: 8006
+          protocol: TCP
+        - containerPort: 3389
+          protocol: TCP
+        - containerPort: 3389
+          protocol: UDP
+#      resources:
+#        limits:
+#          devices.kubevirt.io/kvm: 1
+      securityContext:
+        privileged: true
+        capabilities:
+          add:
+            - NET_ADMIN
+            - NET_BIND_SERVICE
+            - NET_BROADCAST
+            - NET_RAW
+            - AUDIT_CONTROL
+            - FOWNER
+            - MKNOD
+            - SETGID
+            - SYS_CHROOT
+            - AUDIT_WRITE
+            - DAC_OVERRIDE
+            - FSETID
+            - KILL
+            - SETPCAP
+            - SETFCAP
+            - SETUID
+      env:
+        - name: RAM_SIZE
+          value: 4G
+        - name: CPU_CORES
+          value: "4"
+        - name: DISK_SIZE
+          value: "64G"
+        - name: VERSION
+          value: win7
+        - name: LANGUAGE
+          value: Chinese
+        - name: REGION
+          value: zh-CN
+        - name: KEYBOARD
+          value: zh-CN
+        - name: KVM
+          value: "N"
+      volumeMounts:
+        - mountPath: /storage
+          name: storage
+  volumes:
+    - name: storage
+      persistentVolumeClaim:
+        claimName: windows-data
