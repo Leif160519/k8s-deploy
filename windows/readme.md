@@ -5,6 +5,10 @@ INFO: Your CPU does not support KVM extensions
 KVM acceleration can NOT be used
 ```
 
+## 访问
+浏览器访问http://<任意k8s节点ip>:30006 打开vnc界面
+默认内置账户名：Docker，密码为空
+
 ## 参考
 - [dockur/windows][1]
 - [[Question]: How setting KVM=N with docker compose? #479][2]
