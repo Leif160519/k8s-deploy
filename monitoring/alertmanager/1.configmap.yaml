@@ -55,5 +55,5 @@ data:
       - name: 'peanut'
       - name: 'webhook'
         webhook_configs:
-          - url: 'https://prometheusalert.github.icu/prometheusalert?type=fs&tpl=prometheus-peanut&fsurl=https://open.feishu.cn/open-apis/bot/v2/hook/1339ac66-774c-4dcd-9c28-6949e68f999e'
+          - url: 'https://prometheusalert.github.icu/prometheusalert?type=fs&tpl=prometheus-peanut&fsurl=https://open.feishu.cn/open-apis/bot/v2/hook/xxxx-xxxx-xxxx-xxxx-xxxx'
             send_resolved: true
