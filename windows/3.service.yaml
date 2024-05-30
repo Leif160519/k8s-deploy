@@ -23,4 +23,4 @@ spec:
       protocol: UDP
       port: 3389
       targetPort: 3389
-      nodePort: 30388
+      nodePort: 30389

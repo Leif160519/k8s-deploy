@@ -43,13 +43,13 @@ spec:
             - SETUID
       env:
         - name: RAM_SIZE
-          value: 4G
+          value: 2G
         - name: CPU_CORES
-          value: "4"
+          value: "2"
         - name: DISK_SIZE
           value: "64G"
         - name: VERSION
-          value: win7
+          value: winxp
         - name: LANGUAGE
           value: Chinese
         - name: REGION
