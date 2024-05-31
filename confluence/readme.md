@@ -20,7 +20,7 @@ java -jar atlassian-agent.jar -d -m test@test.com -n test@test.com -p conf -o ht
 ## 数据库配置
 建议写jdbc的形式：
 ```
-jdbc:mysql://mysql:3306/confluence?sessionVariables=transaction_isolation='READ-COMMITTED'
+jdbc:mysql://mysql:3306/confluence?sessionVariables=transaction_isolation='READ-COMMITTED&useSSL=false'
 ```
 
 > 若提示collation错误，则修改mysql配置文件，参考[configure mysql server][1],如果修改字符集之前confluence数据库已经创建好，在修改玩字符集之后删除这个库，重新创建即可通过mysql检测
