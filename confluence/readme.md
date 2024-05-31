@@ -9,8 +9,10 @@ kubectl apply -f .
 ```
 kubectl exec -it -n devops confluence-xxxx bash
 cd /var/atlassian
-java -jar atlassian-agent.jar -d -m test@test.com -n test@test.com -p conf -o http://localhost:8090 -s confluence
+java -jar atlassian-agent.jar -d -m test@test.com -n test@test.com -p conf -o http://localhost:8090 -s <server-id>
 ```
+
+> `server-id`:`http(s)://confluence.example.net/setup/setuplicense.action`界面中显示的内容
 
 ## 数据库配置
 建议写jdbc的形式：
