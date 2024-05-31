@@ -66,6 +66,9 @@ spec:
             - mountPath: /var/atlassian/application-data/confluence
               name: confluence
               subPath: confluence
+            - mountPath: /opt/atlassian/confluence/conf/server.xml
+              name: confluence-config
+              subPath: server.xml
             - mountPath: /etc/localtime
               name: localtime
       volumes:
@@ -76,3 +79,6 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+        - name: confluence-config
+          configMap:
+            name: confluence-config
