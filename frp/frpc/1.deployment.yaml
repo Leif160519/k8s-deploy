@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: frpc
+  name: frpc
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frpc
+  template:
+    metadata:
+      labels:
+        app: frpc
+    spec:
+      containers:
+      - name: frpc
+        image: snowdreamtech/frpc:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 7400
+          timeoutSeconds: 3
+        ports:
+        - containerPort: 7400
+          name: client
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 7400
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 200m
+            memory: 250Gi
+          requests:
+            cpu: 100m
+            memory: 125Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+        - mountPath: /etc/frp/frpc.toml
+          name: frpc-config
+          subPath: frpc.toml
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
+      - name: frpc-config
+        configMap:
+          name: frpc-config

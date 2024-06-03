@@ -1,0 +1,9 @@
+bindPort = 7000                 # frp服务的特定端口，防火墙也需放开该端口
+
+auth.method = 'token'           # 客户端访问验证方式
+auth.token = '654321'           # 客户端访问验证密码，frpc要与frps一致
+
+webServer.addr = "0.0.0.0"      # 后台管理地址,默认是127.0.0.1，如果是公网访问则改成0.0.0.0
+webServer.port = 7500           # 后台管理端口
+webServer.user = "admin"        # （可选）后台登录用户名
+webServer.password = "123456"   # （可选）后台登录密码
