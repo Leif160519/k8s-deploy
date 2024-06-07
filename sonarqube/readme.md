@@ -5,9 +5,8 @@ kubectl create configmap -n sonarqube sonarqube-config --from-file=conf/sonar.pr
 kubectl apply -f 1.namespace.yaml
 kubectl apply -f 2.pvc-mfs.yaml
 kubectl apply -f 3.postgresql.yaml
-kubectl apply -f 4.service-clusterip.yaml
-kubectl apply -f 5.service-ingress.yaml
-kubectl apply -f 6.deployment.yaml
+kubectl apply -f 4.service.yaml
+kubectl apply -f 5.deployment.yaml
 ```
 2.查找到sonarqube对应的pv
 ```

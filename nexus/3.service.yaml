@@ -1,4 +1,19 @@
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus3
+  namespace: devops
+spec:
+  selector:
+    app: nexus3
+  type: ClusterIP
+  ports:
+    - name: web
+      port: 8081
+      protocol: TCP
+      targetPort: 8081
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

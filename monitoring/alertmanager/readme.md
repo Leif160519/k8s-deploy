@@ -1,10 +1,6 @@
 ## 使用方法
 ```
-kubectl apply -f 1.configmap.yaml
-kubectl apply -f 2.pvc-mfs.yaml
-kubectl apply -f 3.service-clusterip.yaml
-kubectl apply -f 4.service-clusterip.yaml
-kubectl apply -f 5.deployment.yaml
+kubectl apply -f .
 ```
 
 ## 更新配置
