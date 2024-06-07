@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextcloud
+  namespace: devops
+  labels:
+    app: nextcloud
+spec:
+  selector:
+    app: nextcloud
+  type: ClusterIP
+  ports:
+    - port: 80
+      name: web
+      targetPort: 80
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextcloud
+  namespace: devops
+  labels:
+    app: nextcloud
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nextcloud.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: nextcloud
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - nextcloud.github.icu
+    secretName: github-tls
