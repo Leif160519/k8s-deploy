@@ -35,7 +35,7 @@ spec:
               value: "123456"
             - name: NEXTCLOUD_TRUSTED_DOMAINS
               value: nextcloud.github.icu
-          image: nextcloud:stable-apache
+          image: nextcloud:29.0.1
           securityContext:
             privileged: true
           imagePullPolicy: IfNotPresent
