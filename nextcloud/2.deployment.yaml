@@ -46,10 +46,10 @@ spec:
           resources:
             limits:
               cpu: "0.5"
-              memory: 1.5Gi
+              memory: 1Gi
             requests:
               cpu: "0.25"
-              memory: 1Gi
+              memory: 0.5Gi
               #          livenessProbe:
               #            httpGet:
               #              port: 80
