@@ -23,6 +23,8 @@ metadata:
   namespace: devops
   labels:
     app: nextcloud
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "5120m"
 spec:
   ingressClassName: nginx
   rules:
