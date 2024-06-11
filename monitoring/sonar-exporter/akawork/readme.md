@@ -11,7 +11,7 @@ git clone https://github.com/akawork/Sonar-Exporter.git
 ## Step 1:Build image
 ```
 cd Sonar-Exporter
-docker build -t sonar_exporter .
+docker build -t harbor.github.icu/public/akawork/sonar-exporter .
 ```
 
 ## Step 3: Run

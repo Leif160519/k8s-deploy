@@ -194,3 +194,8 @@ validatingwebhookconfiguration.admissionregistration.k8s.io "rancher.cattle.io" 
 $ kubectl create secret tls github-tls --key STAR.github.icu.key --cert STAR.github.icu.pem -n devops
 secret/github-tls created
 ```
+
+## 参考
+- [Kubernetes排障方法][1]
+
+[1]: https://imroc.cc/kubernetes-troubleshooting/methods/
