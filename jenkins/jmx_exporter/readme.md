@@ -2,12 +2,12 @@
 
 - 1.构建镜像
 ```
-docker build . -t docker.github.icu/jenkins:2.415-jmx_0.19.0
+docker build . -t harbor.github.icu/jenkins:2.415-jmx_0.19.0
 ```
 
 - 2.上传镜像到私有仓库
 ```
-docker push docker.github.icu/jenkins:2.415-jmx_0.19.0
+docker push harbor.github.icu/jenkins:2.415-jmx_0.19.0
 ```
 
 - 3.创建jmx配置文件configmap

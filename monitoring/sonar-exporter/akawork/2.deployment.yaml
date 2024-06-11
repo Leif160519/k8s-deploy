@@ -23,7 +23,7 @@ spec:
           value: admin
         - name: SONAR_PASSWORD
           value: "123456"
-        image: harbor.github.icu/peanut-public/akaword/sonar-exporter:latest
+        image: harbor.github.icu/public/akaword/sonar-exporter:latest
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 5

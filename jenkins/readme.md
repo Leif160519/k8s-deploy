@@ -9,8 +9,8 @@ mfsseteattr -f nodatacache <jenkins-pv挂载路径>/jobs -r
 ## 若想用jdk 1.8部署低版本jenkins
 - 1.下载jdk1.8安装包
 ```
-wget -c https://nexus.example.com/repository/peanut/jdk/install-java.sh -P jdk/
-wget -c https://nexus.example.com/repository/peanut/jdk/jdk-8u201-linux-x64.tar.gz -P jdk/
+wget -c https://nexus.github.icu/repository/jdk/install-java.sh -P jdk/
+wget -c https://nexus.github.icu/repository/jdk/jdk-8u201-linux-x64.tar.gz -P jdk/
 ```
 
 - 2.准备Dockerfile重新编译jenkins镜像：
@@ -31,20 +31,20 @@ USER jenkins
 
 - 3.开始构建新镜像
 ```
-docker build . -t docker.example.com/jenkins:2.356-jdk8
+docker build . -t harbor.github.icu/jenkins:2.356-jdk8
 ```
 
 - 4.登录私有仓库
 ```
-docker login docker.example.com
+docker login harbor.github.icu
 ```
 
 - 5.上传私有镜像
 ```
-docker push docker.example.com/jenkins:2.356-jdk8
+docker push harbor.github.icu/jenkins:2.356-jdk8
 ```
 
-- 6.修改`5.deployment.yaml`中的镜像地址为`docker.example.com/jenkins:2.356-jdk8`
+- 6.修改`5.deployment.yaml`中的镜像地址为`harbor.github.icu/jenkins:2.356-jdk8`
 
 - 7.部署jenkins
 ```

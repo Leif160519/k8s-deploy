@@ -16,8 +16,8 @@ hesk
 
 ## 使用方法
 ```
-docker build . -t harbor.github.icu/peanut-public/hesk:latest
-docker push harbor.github.icu/peanut-public/hesk:latest
+docker build . -t harbor.github.icu/public/hesk:latest
+docker push harbor.github.icu/public/hesk:latest
 kubectl apply -f .
 ```
 

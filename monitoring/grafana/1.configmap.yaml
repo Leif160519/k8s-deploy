@@ -122,7 +122,7 @@ data:
     start_tls = false
     ssl_skip_verify = false
 
-    bind_dn = "cn=public,ou=peanut,dc=github,dc=icu"
+    bind_dn = "cn=public,ou=users,dc=github,dc=icu"
     bind_password = '123456'
 
     search_filter = "(sAMAccountName=%s)"

@@ -35,7 +35,7 @@ spec:
               value: root
             - name: RUN_GROUP
               value: root
-          image: harbor.github.icu/peanut-public/confluence-server:8.5.2
+          image: harbor.github.icu/public/confluence-server:8.5.2
           securityContext:
             privileged: true
             runAsUser: 0

@@ -2,8 +2,8 @@
 若confluence使用ingress访问https形式，则为了避免登录confluence后总是出现`base url`的警告，可以先将server.xml的`confluence.example.net`域名改为你实际的域名
 之后执行：
 ```
-docker build . -t harbor.github.icu/peanut-public/confluence-server:8.5.2
-docker push harbor.github.icu/peanut-public/confluence-server:8.5.2
+docker build . -t harbor.github.icu/public/confluence-server:8.5.2
+docker push harbor.github.icu/public/confluence-server:8.5.2
 kubectl create configmap -n devops confluence-config --from-file=server.xml
 kubectl apply -f .
 ```
