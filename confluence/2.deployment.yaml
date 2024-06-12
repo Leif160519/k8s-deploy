@@ -71,6 +71,21 @@ spec:
               subPath: server.xml
             - mountPath: /etc/localtime
               name: localtime
+      initContainers:
+      - command:
+        - find
+        - /var/atlassian/application-data/confluence
+        - -type
+        - f
+        - -name
+        - lock
+        - -delete
+        image: harbor.github.icu/peanut-public/busybox
+        name: delete-lock-file
+        volumeMounts:
+        - mountPath: /var/atlassian/application-data/confluence
+          name: confluence
+          subPath: confluence
       volumes:
         - name: confluence
           persistentVolumeClaim:
