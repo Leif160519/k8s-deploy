@@ -3,15 +3,15 @@
 
 
 # 若使用了私有docker镜像仓库，请执行以下操作
-- 1. 在master节点上登录私有仓库,输入用户名和密码，如果是nexus搭建的，那就是nexus的用户名和密码
+- 1. 在master节点上登录私有仓库,输入用户名和密码，如果是harbor搭建的，那就是harbor的用户名和密码
 ```
-docker login docker.example.com
+docker login harbor.github.icu
 ```
 - 2.登录完成后，会生成认证文件`/root/.docker/config.json`
 ```
 {
 	"auths": {
-		"docker.example.com": {
+		"harbor.github.icu": {
 			"auth": "YWRtaW46YWRtaW4="
 		}
 	}
@@ -19,7 +19,7 @@ docker login docker.example.com
 ```
 其中auth后面的内容可以手动生成
 ```
-echo -n "admin:admin" | base64 # admin:admin为nexus的用户名和密码
+echo -n "admin:admin" | base64 # admin:admin为harbor的用户名和密码
 ```
 
 - 3.在每个命名空间下，创建用于认证docker私有仓库的secret
@@ -36,7 +36,7 @@ metadata:
 spec:
   containers:
     - name: my-container
-      image: docker.example.com/my-image:1.0
+      image: harbor.github.icu/library/my-image:1.0
   imagePullSecrets:
     - name: registry-auth
 ```
@@ -72,7 +72,7 @@ kubectl create secret tls example-tls --key ${TLS_PATH_KEY} --cert ${TLS_PATH_CR
 
 - 2.更新ingress域名证书的脚本：`script/update_ingress_ssl.sh`
 
-- 3.自动拉取镜像并上传到nexus私有docker仓库：`script/docker-proxy.sh`
+- 3.自动拉取镜像并上传到harbor私有docker仓库：`script/docker-proxy.sh`
 
 # 启用历史版本
 在deployment中添加`annotations`和`revisionHistoryLimit`字段
