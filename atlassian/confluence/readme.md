@@ -4,13 +4,13 @@
 ```
 docker build . -t harbor.github.icu/public/confluence-server:8.5.2
 docker push harbor.github.icu/public/confluence-server:8.5.2
-kubectl create configmap -n devops confluence-config --from-file=server.xml
+kubectl create configmap -n atlassian confluence-config --from-file=server.xml
 kubectl apply -f .
 ```
 
 然后进容器跑
 ```
-kubectl exec -it -n devops confluence-xxxx bash
+kubectl exec -it -n atlassian confluence-xxxx bash
 cd /var/atlassian
 java -jar atlassian-agent.jar -d -m test@test.com -n test@test.com -p conf -o http://localhost:8090 -s <server-id>
 ```

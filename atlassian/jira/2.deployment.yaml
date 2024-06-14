@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: confluence
-  namespace: devops
+  name: jira
+  namespace: atlassian
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: confluence
+      app: jira
   template:
     metadata:
       labels:
-        app: confluence
+        app: jira
     spec:
       containers:
-        - name: confluence
+        - name: jira
           env:
             - name: TZ
               value: Asia/Shanghai
@@ -35,14 +35,14 @@ spec:
               value: root
             - name: RUN_GROUP
               value: root
-          image: harbor.github.icu/public/confluence-server:8.5.2
+          image: harbor.github.icu/public/jira-software:9.9.0
           securityContext:
             privileged: true
             runAsUser: 0
             runAsGroup: 0
           imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 8090
+            - containerPort: 8080
               name: web
               protocol: TCP
           resources:
@@ -54,46 +54,40 @@ spec:
               memory: 4Gi
           livenessProbe:
             tcpSocket:
-              port: 8090
+              port: 8080
             initialDelaySeconds: 60
             timeoutSeconds: 5
             failureThreshold: 12
           readinessProbe:
             tcpSocket:
-              port: 8090
+              port: 8080
             initialDelaySeconds: 60
           volumeMounts:
-            - mountPath: /var/atlassian/application-data/confluence
-              name: confluence
-              subPath: confluence
-            - mountPath: /opt/atlassian/confluence/conf/server.xml
-              name: confluence-config
-              subPath: server.xml
+            - mountPath: /var/atlassian/application-data/jira
+              name: jira
+              subPath: jira
             - mountPath: /etc/localtime
               name: localtime
       initContainers:
       - command:
         - find
-        - /var/atlassian/application-data/confluence
+        - /var/atlassian/application-data/jira
         - -type
         - f
         - -name
         - lock
         - -delete
-        image: harbor.github.icu/peanut-public/busybox
+        image: harbor.github.icu/public/busybox
         name: delete-lock-file
         volumeMounts:
-        - mountPath: /var/atlassian/application-data/confluence
-          name: confluence
-          subPath: confluence
+        - mountPath: /var/atlassian/application-data/jira
+          name: jira
+          subPath: jira
       volumes:
-        - name: confluence
+        - name: jira
           persistentVolumeClaim:
-            claimName: confluence
+            claimName: jira
         - hostPath:
             path: /etc/localtime
             type: ""
           name: localtime
-        - name: confluence-config
-          configMap:
-            name: confluence-config

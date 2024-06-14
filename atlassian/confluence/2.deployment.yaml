@@ -1,0 +1,99 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: confluence
+  namespace: atlassian
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: confluence
+  template:
+    metadata:
+      labels:
+        app: confluence
+    spec:
+      containers:
+        - name: confluence
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+            - name: JAVA_OPTS
+              value: "-javaagent:/var/atlassian/atlassian-agent.jar"
+            - name: JVM_MINIMUM_MEMORY
+              value: 4096m
+            - name: JVM_MAXIMUM_MEMORY
+              value: 4096m
+            - name: JVM_RESERVED_CODE_CACHE_SIZE
+              value: 512m
+            - name: RUN_UID
+              value: "0"
+            - name: RUN_GID
+              value: "0"
+            - name: RUN_USER
+              value: root
+            - name: RUN_GROUP
+              value: root
+          image: harbor.github.icu/public/confluence-server:8.5.2
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsGroup: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8090
+              name: web
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 6Gi
+            requests:
+              cpu: "1"
+              memory: 4Gi
+          livenessProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            tcpSocket:
+              port: 8090
+            initialDelaySeconds: 60
+          volumeMounts:
+            - mountPath: /var/atlassian/application-data/confluence
+              name: confluence
+              subPath: confluence
+            - mountPath: /opt/atlassian/confluence/conf/server.xml
+              name: confluence-config
+              subPath: server.xml
+            - mountPath: /etc/localtime
+              name: localtime
+      initContainers:
+      - command:
+        - find
+        - /var/atlassian/application-data/confluence
+        - -type
+        - f
+        - -name
+        - lock
+        - -delete
+        image: harbor.github.icu/public/busybox
+        name: delete-lock-file
+        volumeMounts:
+        - mountPath: /var/atlassian/application-data/confluence
+          name: confluence
+          subPath: confluence
+      volumes:
+        - name: confluence
+          persistentVolumeClaim:
+            claimName: confluence
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+        - name: confluence-config
+          configMap:
+            name: confluence-config
