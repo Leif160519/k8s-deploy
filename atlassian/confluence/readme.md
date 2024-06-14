@@ -18,7 +18,8 @@ java -jar atlassian-agent.jar -d -m test@test.com -n test@test.com -p conf -o ht
 > `server-id`:`http(s)://confluence.example.net/setup/setuplicense.action`界面中显示的内容
 
 ## 数据库配置
-建议写jdbc的形式：
+- 提前创建好数据库
+- 建议写jdbc的形式：
 ```
 jdbc:mysql://mysql:3306/confluence?sessionVariables=transaction_isolation='READ-COMMITTED&useSSL=false'
 ```
