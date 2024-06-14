@@ -1,7 +1,10 @@
 ## 使用方法：
+若jira使用ingress访问https形式，则为了避免登录jira后总是出现`base url`的警告，可以先将server.xml的`jira.example.net`域名改为你实际的域名
+之后执行：
 ```
 docker build . -t harbor.github.icu/public/jira-software:9.9.0
 docker push harbor.github.icu/public/jira-software:9.9.0
+kubectl create configmap -n atlassian jira-config --from-file=server.xml
 kubectl apply -f .
 ```
 

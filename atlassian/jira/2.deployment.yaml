@@ -66,6 +66,9 @@ spec:
             - mountPath: /var/atlassian/application-data/jira
               name: jira
               subPath: jira
+            - mountPath: /opt/atlassian/jira/conf/server.xml
+              name: jira-config
+              subPath: server.xml
             - mountPath: /etc/localtime
               name: localtime
       initContainers:
@@ -91,3 +94,6 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+        - name: jira-config
+          configMap:
+            name: jira-config
