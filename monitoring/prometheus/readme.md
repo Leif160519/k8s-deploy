@@ -51,5 +51,22 @@ github.com/prometheus/prometheus/promql.NewActiveQueryTracker({0x7ffcd7a1c6c8, 0
   - 3.创建nfs存储的pvc
   - 4.将prometheus的副本数设置为1
 
+## 2024年6月16日遇到了prometheus成功启动，日志没有报错，但是无法访问服务
+使用nfs作为sc之后，prometheus日志还是有以下提示:
+```
+ts=2024-06-16T02:05:03.903Z caller=main.go:1148 level=warn fs_type=NFS_SUPER_MAGIC msg="This filesystem is not supported and may lead to data corruption and data loss. Please carefully read https://prometheus.io/docs/prometheus/latest/storage/ to learn more about supported filesystems."
+```
+
+按照日志访问官方，找到关于存储的相关提示
+
+> CAUTION: Non-POSIX compliant filesystems are not supported for Prometheus' local storage as unrecoverable corruptions may happen. NFS filesystems (including AWS's EFS) are not supported. NFS could be POSIX-compliant, but most implementations are not. It is strongly recommended to use a local filesystem for reliability.
+
+翻译成中文就是:
+> 注意： Prometheus 的本地存储不支持非 POSIX 兼容文件系统，因为可能会发生不可恢复的损坏。不支持 NFS 文件系统（包括 AWS 的 EFS）。NFS 可能符合 POSIX 标准，但大多数实现都不符合。强烈建议使用本地文件系统以确保可靠性。
+
 ## 参考
-https://github.com/jimmidyson/configmap-reload
+- [comfigmap-reload][1]
+- [storage][2]
+
+[1]: https://github.com/jimmidyson/configmap-reload
+[2]: prometheus.io/docs/prometheus/latest/storage/
