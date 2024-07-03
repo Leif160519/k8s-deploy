@@ -1,0 +1,95 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redisinsight
+  namespace: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redisinsight
+  template:
+    metadata:
+      labels:
+        app: redisinsight
+    spec:
+      containers:
+        - name: redisinsight
+          image: redislabs/redisinsight:latest
+          securityContext:
+            privileged: true
+            runAsUser: 0
+            runAsGroup: 0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5540
+              name: web
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 0.5Gi
+          livenessProbe:
+            tcpSocket:
+              port: 5540
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            tcpSocket:
+              port: 5540
+            initialDelaySeconds: 60
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redisinsight
+  namespace: database
+  labels:
+    app: redisinsight
+spec:
+  selector:
+    app: redisinsight
+  type: ClusterIP
+  ports:
+    - port: 5540
+      name: web
+      targetPort: 5540
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redisinsight
+  namespace: database
+  labels:
+    app: redisinsight
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: redisinsight.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: redisinsight
+            port:
+              number: 5540
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - redisinsight.github.icu
+    secretName: github-tls
