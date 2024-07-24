@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pichome
+  name: pichome
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pichome
+  template:
+    metadata:
+      labels:
+        app: pichome
+    spec:
+      containers:
+      - name: pichome
+        image: oaooa/pichome:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 80
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: pichome
+          mountPath: /var/www/html
+          subPath: pichome
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: pichome
+        persistentVolumeClaim:
+          claimName: pichome
