@@ -9,6 +9,8 @@ type = 'tcp'              # 通讯方式
 localIP = '192.168.1.2'   # 客户端的ip(固定)
 localPort = 3389          # 客户端服务端口
 remotePort = 6000         # 映射到服务端端口（服务器需放行）
+transport.useEncryption = true  # 传输加密
+transport.useCompression = true # 传输压缩
 
 
 [[proxies]]
@@ -17,3 +19,5 @@ type = 'tcp'              # 通讯方式
 localIP = '192.168.1.3'   # 客户端的ip(固定)
 localPort = 22          # 客户端服务端口
 remotePort = 6001         # 映射到服务端端口（服务器需放行）
+transport.useEncryption = true  # 传输加密
+transport.useCompression = true # 传输压缩
