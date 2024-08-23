@@ -102,7 +102,7 @@ use test_db
 db.createUser(
   {
     user: "test",
-    pwd: "test"
+    pwd: "test",
     roles: [
        { role: "readWrite", db: "test_db" }]
   }
