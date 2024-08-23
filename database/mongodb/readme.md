@@ -47,7 +47,7 @@ mongo --host 127.0.0.1
 - 3.定义集群信息
 ```
 config = {
-     '_id': 'single',
+     '_id': 'cluster',
      'members': [
           {
                '_id': 0,
@@ -78,6 +78,11 @@ rs.status()
 > 若初始化失败，可以强制初始化`rs.reconfig(config, {force: true})`
 
 ## 创建用户并设置角色
+因为集群初始化了且创建了用户，所以需要重新登录mongodb集群，如果有mongosh的情况下可以用以下命令进入集群控制台：
+```
+mongosh mongodb://root:123456@mongodb-0.mongodb.database.svc:27017/
+```
+
 ```
 
 use admin
@@ -128,7 +133,7 @@ rs.status()
 ```
 #重新定义集群配置
 config = {
-     '_id': 'single',
+     '_id': 'cluster',
      'members': [
           {
                '_id': 0,
@@ -170,5 +175,10 @@ affinity:
       topologyKey: kubernetes.io/hostname
 ```
 
+## 注意点
+mongodb集群不建议使用单节点部署，首次成功后如果pod被删除或者驱逐，新启动的pod会导致集群失效，提示
+```
+MongoServerError: node is not in primary or recovering state
+```
 
 [1]: https://www.guojiangbo.com/2021/10/04/docker%E5%AE%89%E8%A3%85mongodb%EF%BC%8C%E9%80%80%E5%87%BA%E4%BB%A3%E7%A0%81132/
