@@ -8,6 +8,10 @@ kubectl create configmap -n gpt fastgpt-config --from-file=config.json
 kubectl apply -f .
 ```
 
+## 已知问题
+- mongodb部署必须使用副本集的形式，设计使然
+- mongodb无论是deployment还是statefulset形式部署，删除pod之后都会导致集群状态异常，因为pod的ip地址变了，所以建议使用外部mongo集群或单独用docker-compose部署
+
 ## 参考
 - [定制你的AI梦！快速搭建属于自己的本地FastGPT][1]
 - [oneapi][2]
