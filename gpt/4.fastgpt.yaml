@@ -1,0 +1,420 @@
+# {{{ postgresql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgresql
+  template:
+    metadata:
+      labels:
+        app: postgresql
+    spec:
+      containers:
+        - name: postgresql
+          env:
+            - name: POSTGRES_USER
+              value: username
+            - name: POSTGRES_PASSWORD
+              value: password
+            - name: POSTGRES_DB
+              value: postgres
+          image: registry.cn-hangzhou.aliyuncs.com/fastgpt/pgvector:v0.7.0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 5432
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - pg_isready -h localhost -U username -d postgres
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 5432
+              name: postgresql
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data/
+              name: fastgpt
+              subPath: fastgpt/postgresql/data
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: fastgpt
+          persistentVolumeClaim:
+            claimName: fastgpt
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: gpt
+spec:
+  selector:
+    app: postgresql
+  type: ClusterIP
+  ports:
+    - name: postgresql
+      port: 5432
+      protocol: TCP
+      targetPort: 5432
+# }}}
+
+# {{{ mongodb
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  namespace: gpt
+spec:
+  selector:
+    matchLabels:
+      app: mongo
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mongo
+    spec:
+      containers:
+        - name: mongo
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              value: myusername
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              value: mypassword
+          image: registry.cn-hangzhou.aliyuncs.com/fastgpt/mongo:5.0.18
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - -c
+            - |
+              openssl rand -base64 128 > /data/db/mongodb.key
+              chmod 400 /data/db/mongodb.key
+              chown 999:999 /data/db/mongodb.key
+              echo 'const isInited = rs.status().ok === 1
+              if(!isInited){
+                rs.initiate({
+                    _id: "rs0",
+                    members: [
+                        { _id: 0, host: "mongo:27017" }
+                    ]
+                })
+              }' > /data/initReplicaSet.js
+              # 启动MongoDB服务
+              exec docker-entrypoint.sh mongod --keyFile /data/db/mongodb.key --replSet rs0 &
+
+              # 等待MongoDB服务启动
+              until mongo -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin --eval "print('waited for connection')" > /dev/null 2>&1; do
+                echo "Waiting for MongoDB to start..."
+                sleep 2
+              done
+
+              # 执行初始化副本集的脚本
+              mongo -u ${MONGO_INITDB_ROOT_USERNAME} -p ${MONGO_INITDB_ROOT_PASSWORD} --authenticationDatabase admin /data/initReplicaSet.js
+
+              # 等待docker-entrypoint.sh脚本执行的MongoDB服务进程
+              wait $$!
+          args:
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 27017
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 27017
+              name: mongo
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /data/db
+              name: fastgpt
+              subPath: fastgpt/mongodb/data
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: fastgpt
+          persistentVolumeClaim:
+            claimName: fastgpt
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  namespace: gpt
+spec:
+  ports:
+  - name: mongo
+    port: 27017
+    protocol: TCP
+    targetPort: 27017
+  selector:
+    app: mongo
+  type: ClusterIP
+# }}}
+
+# {{{ sandbox
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sandbox
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sandbox
+  template:
+    metadata:
+      labels:
+        app: sandbox
+    spec:
+      containers:
+        - name: sandbox
+          image: registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt-sandbox:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 3000
+              name: sandbox
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sandbox
+  namespace: gpt
+spec:
+  selector:
+    app: sandbox
+  type: ClusterIP
+  ports:
+    - name: sandbox
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+# }}}
+
+# {{{ fastgpt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastgpt
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fastgpt
+  template:
+    metadata:
+      labels:
+        app: fastgpt
+    spec:
+      containers:
+        - name: fastgpt
+          env:
+            # root 密码，用户名为: root。如果需要修改 root 密码，直接修改这个环境变量，并重启即可。
+            - name: DEFAULT_ROOT_PSW
+              value: "1234"
+            # AI模型的API地址哦。务必加 /v1。这里默认填写了OneApi的访问地址。
+            - name: OPENAI_BASE_URL
+              value: http://oneapi:3000/v1
+            # AI模型的API Key。（这里默认填写了OneAPI的快速默认key，测试通后，务必及时修改）
+            - name: CHAT_API_KEY
+              value: sk-nYvNTomoJA3IrOmi10A61b22698e492e82423cA36c00C400
+            # 数据库最大连接数
+            - name: DB_MAX_LINK
+              value: "30"
+            # 登录凭证密钥
+            - name: TOKEN_KEY
+              value: any
+            # root的密钥，常用于升级时候的初始化请求
+            - name: ROOT_KEY
+              value: root_key
+            # 文件阅读加密
+            - name: FILE_TOKEN_KEY
+              value: filetoken
+            # MongoDB 连接参数. 用户名myusername,密码mypassword。
+            - name: MONGODB_URI
+              value: mongodb://myusername:mypassword@mongo:27017/fastgpt?authSource=admin
+            # pg 连接参数
+            - name: PG_URL
+              value: postgresql://username:password@postgresql:5432/postgres
+            # sandbox 地址
+            - name: SANDBOX_URL
+              value: http://sandbox:3000
+            # 日志等级: debug, info, warn, error
+            - name: LOG_LEVEL
+              value: info
+            - name: STORE_LOG_LEVEL
+              value: warn
+          image: registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt:v4.8.9
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3000
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 3000
+              name: fastgpt
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /app/data/config.json
+              name: fastgpt-config
+              subPath: config.json
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: fastgpt
+          persistentVolumeClaim:
+            claimName: fastgpt
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+        - name: fastgpt-config
+          configMap:
+            defaultMode: 0644
+            name: fastgpt-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fastgpt
+  namespace: gpt
+spec:
+  selector:
+    app: fastgpt
+  type: ClusterIP
+  ports:
+    - name: fastgpt
+      port: 3000
+      protocol: TCP
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastgpt
+  namespace: gpt
+  labels:
+    app: fastgpt
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: fastgpt.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: fastgpt
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - fastgpt.github.icu
+    secretName: github-tls
+# }}}

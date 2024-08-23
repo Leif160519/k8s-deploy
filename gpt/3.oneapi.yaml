@@ -1,0 +1,226 @@
+# {{{ mysql
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: gpt
+spec:
+  selector:
+    matchLabels:
+      app: mysql
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: oneapimmysql
+            - name: MYSQL_DATABASE
+              value: oneapi
+          image: ghcr.io/songquanpeng/one-api:v0.6.8
+          # image: registry.cn-hangzhou.aliyuncs.com/fastgpt/one-api:v0.6.6 # 阿里云
+          imagePullPolicy: IfNotPresent
+          command:
+            - bash
+            - -c
+            - --default-authentication-plugin=mysql_native_password
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: fastgpt
+              subPath: mysql/data
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: fastgpt
+          persistentVolumeClaim:
+            claimName: fastgpt
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: gpt
+spec:
+  ports:
+  - name: mysql
+    port: 3306
+    protocol: TCP
+    targetPort: 3306
+  selector:
+    app: mysql
+  type: ClusterIP
+  clusterIP: None
+# }}}
+
+# {{{ oneapi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: oneapi
+  name: oneapi
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oneapi
+  template:
+    metadata:
+      labels:
+        app: oneapi
+    spec:
+      containers:
+      - name: oneapi
+        image: ghcr.io/songquanpeng/one-api:v0.6.8
+        #image: registry.cn-hangzhou.aliyuncs.com/fastgpt/one-api:v0.6.6
+        imagePullPolicy: IfNotPresent
+        env:
+          # mysql 连接参数
+          - name: SQL_DSN
+            value: root:oneapimmysql@tcp(mysql:3306)/oneapi
+          # 登录凭证加密密钥
+          - name: SESSION_SECRET
+            value: oneapikey
+          # 内存缓存
+          - name: MEMORY_CACHE_ENABLED
+            value: "true"
+          # 启动聚合更新，减少数据交互频率
+          - name: BATCH_UPDATE_ENABLED
+            value: "true"
+          # 聚合更新时长
+          - name: BATCH_UPDATE_INTERVAL
+            value: "10"
+          # 初始化的 root 密钥（建议部署完后更改，否则容易泄露）
+          - name: INITIAL_ROOT_TOKEN
+            value: fastgpt
+          # 代理地址（若需要科学上网）
+          - name: http_proxy
+            value: http://192.168.31.252:7890
+          - name: https_proxy
+            value: http://192.168.31.252:7890
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 3000
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 3000
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: fastgpt
+          mountPath: /data
+          subPath: oneapi
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: fastgpt
+        persistentVolumeClaim:
+          claimName: fastgpt
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: oneapi
+  namespace: gpt
+  labels:
+    app: oneapi
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: oneapi
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oneapi
+  namespace: gpt
+  labels:
+    app: oneapi
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: oneapi.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: oneapi
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - oneapi.github.icu
+    secretName: github-tls
+# }}}

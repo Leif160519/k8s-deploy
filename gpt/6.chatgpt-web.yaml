@@ -1,0 +1,109 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: chatgpt
+  name: chatgpt
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chatgpt
+  template:
+    metadata:
+      labels:
+        app: chatgpt
+    spec:
+      containers:
+      - name: chatgpt
+        image: chenzhaoyu94/chatgpt-web
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: OPENAI_API_BASE_URL
+            value: http://oneapi:3000
+          - name: OPENAI_API_KEY
+            value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+          - name: OPENAI_API_MODEL
+            value: ERNIE-4.0-8K
+        ports:
+        - containerPort: 3002
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 3002
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 3002
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: chatgpt
+  namespace: gpt
+  labels:
+    app: chatgpt
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: chatgpt
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3002
+      targetPort: 3002
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chatgpt
+  namespace: gpt
+  labels:
+    app: chatgpt
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: chatgpt.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: chatgpt
+            port:
+              number: 3002
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - chatgpt.github.icu
+    secretName: github-tls

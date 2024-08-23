@@ -1,0 +1,117 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: nextchat
+  name: nextchat
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nextchat
+  template:
+    metadata:
+      labels:
+        app: nextchat
+    spec:
+      containers:
+      - name: nextchat
+        image: yidadaa/chatgpt-next-web:v2.14
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: BAIDU_API_KEY
+            value: api_key
+          - name: BAIDU_SECRET_KEY
+            value: secret_key
+          - name: DISABLE_GPT4
+            value: "1" #不想让用户使用 GPT-4
+          - name: DEFAULT_MODEL
+            value: ernie-4.0-8k
+          - name: CODE
+            value: "123456" # 访问密码
+          - name: HIDE_USER_API_KEY
+            value: "1" # 不想让用户自行填入 API Key
+          - name: DISABLE_FAST_LINK
+            value: "1" # 禁用从链接解析预制设置
+        ports:
+        - containerPort: 3000
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 3000
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 3000
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nextchat
+  namespace: gpt
+  labels:
+    app: nextchat
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: nextchat
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nextchat
+  namespace: gpt
+  labels:
+    app: nextchat
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: nextchat.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: nextchat
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - nextchat.github.icu
+    secretName: github-tls

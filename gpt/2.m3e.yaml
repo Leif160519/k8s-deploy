@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: m3e
+  name: m3e
+  namespace: gpt
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: m3e
+  template:
+    metadata:
+      labels:
+        app: m3e
+    spec:
+      containers:
+      - name: m3e
+        image: registry.cn-hangzhou.aliyuncs.com/fastgpt_docker/m3e-large-api
+        imagePullPolicy: IfNotPresent
+        env:
+          - name: sk-key
+            value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxx
+        ports:
+        - containerPort: 6008
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 1000m
+            memory: 2Gi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 6008
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 6008
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: m3e
+  namespace: gpt
+  labels:
+    app: m3e
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: m3e
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 6008
+      targetPort: 6008
