@@ -15,7 +15,7 @@ kubectl apply -f .
 MongoServerError: node is not in primary or recovering state
 ```
 
-> 建议statefulset多节点部署或使用外部mongo集群或单独用docker-compose部署
+> 建议statefulset多节点部署或使用外部mongo集群或单独用docker-compose部署,参考[StatefulSet部署Mongodb集群](../database/mongodb/readme.md)
 
 ## 参考
 - [定制你的AI梦！快速搭建属于自己的本地FastGPT][1]
