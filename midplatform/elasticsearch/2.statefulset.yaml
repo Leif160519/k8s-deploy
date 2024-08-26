@@ -20,6 +20,8 @@ spec:
       containers:
       - name: elasticsearch
         env:
+        - name: cluster.name
+          value: elk-cluster
         - name: node.name
           valueFrom:
             fieldRef:
