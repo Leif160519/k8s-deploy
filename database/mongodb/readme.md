@@ -146,12 +146,11 @@ config = {
           {
                '_id': 2,
                'host':'mongodb-2.mongodb.database.svc:27017'
-          }
+          },
           {
                '_id': 3,
                'host':'mongodb-3.mongodb.database.svc:27017'
           }
-
      ]
 }
 # 初始化或强制初始化

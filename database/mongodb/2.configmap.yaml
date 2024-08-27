@@ -22,7 +22,7 @@ data:
       authorization: enabled
       keyFile: /etc/mongodb-keyfile
     replication:
-      replSetName: single
+      replSetName: cluster
 kind: ConfigMap
 metadata:
   name: mongodb-conf
