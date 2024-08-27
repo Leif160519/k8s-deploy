@@ -28,10 +28,10 @@ spec:
           protocol: TCP
         resources:
           limits:
-            cpu: 2000m
+            cpu: 4000m
             memory: 4Gi
           requests:
-            cpu: 1000m
+            cpu: 2000m
             memory: 2Gi
         securityContext:
           privileged: true
