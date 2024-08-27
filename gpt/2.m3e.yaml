@@ -36,6 +36,12 @@ spec:
         securityContext:
           privileged: true
           runAsUser: 0
+        startupProbe:
+          initialDelaySeconds: 120
+          periodSeconds: 3
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
         livenessProbe:
           failureThreshold: 5
           initialDelaySeconds: 30
