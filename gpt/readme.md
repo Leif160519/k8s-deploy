@@ -16,6 +16,10 @@ MongoServerError: node is not in primary or recovering state
 ```
 
 > 建议statefulset多节点部署或使用外部mongo集群或单独用docker-compose部署,参考[StatefulSet部署Mongodb集群](../database/mongodb/readme.md)
+> 若采用mongodb集群(多节点),一定要配置主节点的连接方式，否则fastgpt会提示mongodb连接错误
+
+- oneapi中配置m3e的地址，一定要用`NodePort`类型的svc形式才可以,如：`http://192.168.31.81:32387`
+- oneapi中重新配置m3e地址后，需要重启fastgpt和oneapi的pod才能生效
 
 ## 参考
 - [定制你的AI梦！快速搭建属于自己的本地FastGPT][1]

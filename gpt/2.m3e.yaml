@@ -69,10 +69,9 @@ metadata:
   labels:
     app: m3e
 spec:
-  sessionAffinity: ClientIP
   selector:
     app: m3e
-  type: ClusterIP
+  type: NodePort
   ports:
     - name: http
       protocol: TCP
