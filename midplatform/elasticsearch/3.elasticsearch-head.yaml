@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: elasticsearch-head
+  name: elasticsearch-head
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: elasticsearch-head
+  template:
+    metadata:
+      labels:
+        app: elasticsearch-head
+    spec:
+      containers:
+        - image: mobz/elasticsearch-head:5
+          name: elasticsearch-head
+          ports:
+            - containerPort: 9100
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: elasticsearch-head
+  name: elasticsearch-head
+  namespace: midplatform
+spec:
+  ports:
+    - name: web
+      port: 9100
+      targetPort: 9100
+  selector:
+    app: elasticsearch-head
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: elasticsearch-head
+  namespace: midplatform
+  labels:
+    app: elasticseach-head
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: elasticsearch-head.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: elasticsearch-head
+            port:
+              number: 9100
+        path: /
+        pathType: ImplementationSpecific
+  tls:
+  - hosts:
+    - elasticsearch-head.github.icu
+    secretName: github-tls

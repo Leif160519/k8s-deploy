@@ -17,6 +17,10 @@ spec:
       - env:
         - name: ELASTICSEARCH_HOSTS
           value: http://elasticsearch-hs:9200
+        - name: ELASTICSEARCH_USERNAME
+          value: elastic
+        - name: ELASTICSEARCH_PASSWORD
+          value: elastic
         image: kibana:7.17.5
         imagePullPolicy: IfNotPresent
         livenessProbe:

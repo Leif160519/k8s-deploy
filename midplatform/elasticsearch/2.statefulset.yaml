@@ -29,21 +29,33 @@ spec:
         - name: discovery.seed_hosts
           value: "elasticsearch-0.elasticsearch-hs,elasticsearch-1.elasticsearch-hs,elasticsearch-2.elasticsearch-hs"
         - name: cluster.initial_master_nodes
-          value: elasticsearch-0
+          value: "elasticsearch-0,elasticsearch-1,elasticsearch-2"
+        - name: discovery.type
+          value: zen
         - name: ES_JAVA_OPTS
           value: "-Xms512m -Xmx512m"
+        - name: path.data
+          value: /usr/share/elasticsearch/data
+        - name: path.logs
+          value: /usr/share/elasticsearch/logs
+        - name: network.host
+          value: 0.0.0.0
+        - name: http.port
+          value: "9200"
+        - name: transport.tcp.port
+          value: "9300"
+        - name: xpack.security.enabled
+          value: "true"
+        - name: ELASTIC_PASSWORD
+          value: elastic
+        - name: http.cors.enabled
+          value: "true"
+        - name: http.cors.allow-origin
+          value: "*"
+        - name: http.cors.allow-headers
+          value: "*"
         image: elasticsearch:7.17.5
         imagePullPolicy: IfNotPresent
-        livenessProbe:
-          tcpSocket:
-            port: 9200
-          initialDelaySeconds: 10
-          timeoutSeconds: 10
-        readinessProbe:
-          tcpSocket:
-            port: 9200
-          initialDelaySeconds: 10
-          timeoutSeconds: 10
         securityContext:
           privileged: true
         ports:
@@ -55,8 +67,11 @@ spec:
           protocol: TCP
         resources:
           requests:
-            cpu: 500m
+            cpu: 1000m
             memory: 1Gi
+          limits:
+            cpu: 2000m
+            memory: 2Gi
         volumeMounts:
         - name: localtime
           mountPath: /etc/localtime
@@ -78,6 +93,16 @@ spec:
           - name: data
             subPath: elasticsearch/data
             mountPath: /usr/share/elasticsearch/data
+      - name: increase-vm-max-map
+        image: busybox
+        command: [sysctl, -w ,'vm.max_map_count=262144']
+        securityContext:
+          privileged: true
+      - name: increase-fd-ulimit
+        image: busybox
+        command: [sh,-c,ulimit,-n,'65536']
+        securityContext:
+          privileged: true
       volumes:
         - name: localtime
           hostPath:
