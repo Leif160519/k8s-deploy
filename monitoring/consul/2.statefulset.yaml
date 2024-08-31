@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
       - name: consul
-        image: consul:1.14.5
+        image: swr.cn-south-1.myhuaweicloud.com/starsl.cn/consul:latest
         imagePullPolicy: IfNotPresent
         args:
           - agent
