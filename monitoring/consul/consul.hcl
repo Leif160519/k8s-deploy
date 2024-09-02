@@ -18,7 +18,6 @@ connect {
   enabled = false
 }
 server = true
-bootstrap = true
 bootstrap_expect=1
 acl = {
   enabled = true
