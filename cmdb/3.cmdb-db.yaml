@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+  namespace: veops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - args:
+            - --character-set-server=utf8mb4
+            - --collation-server=utf8mb4_unicode_ci
+          env:
+            - name: MYSQL_DATABASE
+              value: cmdb
+            - name: MYSQL_HOST
+              value: mysql
+            - name: MYSQL_PASSWORD
+              value: "123456"
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123456"
+            - name: MYSQL_USER
+              value: cmdb
+            - name: TZ
+              value: Asia/Shanghai
+          image: registry.cn-hangzhou.aliyuncs.com/veops/cmdb-db:2.3
+          livenessProbe:
+            exec:
+              command:
+                - mysqladmin
+                - ping
+                - -h
+                - localhost
+                - -p123456
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: mysql
+          ports:
+            - containerPort: 3306
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: cmdb
+              subPath: mysql
+            - mountPath: /etc/mysql/conf.d/mysqld.cnf
+              name: cmdb-db-config
+              subPath: mysqld.cnf
+            - mountPath: /docker-entrypoint-initdb.d/cmdb.sql
+              name: cmdb-db-sql
+              subPath: cmdb.sql
+      volumes:
+        - name: cmdb
+          persistentVolumeClaim:
+            claimName: cmdb
+        - name: cmdb-db-config
+          configMap:
+            name: cmdb-db-config
+        - name: cmdb-db-sql
+          configMap:
+            name: cmdb-db-sql
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mysql
+  name: mysql
+  namespace: veops
+spec:
+  ports:
+    - name: tcp
+      port: 3306
+      targetPort: 3306
+      protocol: TCP
+  selector:
+    app: mysql
+  type: ClusterIP

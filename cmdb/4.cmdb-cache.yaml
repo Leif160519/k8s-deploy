@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: redis
+  name: redis
+  namespace: veops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - env:
+          - name: TZ
+            value: Asia/Shanghai
+          image: registry.cn-hangzhou.aliyuncs.com/veops/cmdb-cache:2.3
+          livenessProbe:
+            exec:
+              command:
+                - redis-cli
+                - ping
+            failureThreshold: 5
+            periodSeconds: 10
+            timeoutSeconds: 5
+          name: redis
+          ports:
+            - containerPort: 6379
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /data
+              name: cmdb
+              subPath: redis
+      volumes:
+        - name: cmdb
+          persistentVolumeClaim:
+            claimName: cmdb
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: redis
+  name: redis
+  namespace: veops
+spec:
+  ports:
+    - name: tcp
+      port: 6379
+      targetPort: 6379
+      protocol: TCP
+  selector:
+    app: redis
+  type: ClusterIP

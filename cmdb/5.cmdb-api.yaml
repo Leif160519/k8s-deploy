@@ -1,0 +1,85 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cmdb-api
+  name: cmdb-api
+  namespace: veops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cmdb-api
+  template:
+    metadata:
+      labels:
+        app: cmdb-api
+    spec:
+      containers:
+        - args:
+            - /bin/sh
+            - -c
+            - |
+              sed -i "s#USE_ACL = False#USE_ACL = True#g" settings.py
+              /wait
+              flask db-setup
+              flask common-check-new-columns
+              gunicorn --workers=4 autoapp:app -b 0.0.0.0:5000 -D
+
+              celery -A celery_worker.celery worker -E -Q one_cmdb_async --autoscale=4,1 --logfile=one_cmdb_async.log -D
+              celery -A celery_worker.celery worker -E -Q acl_async --logfile=one_acl_async.log --autoscale=2,1 -D
+
+              nohup flask cmdb-trigger > trigger.log 2>&1 &
+              flask cmdb-init-cache
+              flask cmdb-init-acl
+              flask init-import-user-from-acl
+              flask init-department
+              flask cmdb-patch -v 2.4.12
+              flask cmdb-counter > counter.log 2>&1
+          env:
+            - name: WAIT_HOSTS
+              value: mysql:3306,redis:6379
+            - name: MYSQL_DATABASE
+              value: cmdb
+            - name: MYSQL_HOST
+              value: mysql
+            - name: MYSQL_PASSWORD
+              value: "123456"
+            - name: MYSQL_PORT
+              value: "3306"
+            - name: MYSQL_ROOT_PASSWORD
+              value: "123456"
+            - name: MYSQL_USER
+              value: cmdb
+            - name: TZ
+              value: Asia/Shanghai
+          image: registry.cn-hangzhou.aliyuncs.com/veops/cmdb-api:2.4.12
+          #          livenessProbe:
+          #            exec:
+          #              command:
+          #                - ps aux|grep -v grep|grep -v '1 root'|grep gunicorn || exit 1
+          #            failureThreshold: 5
+          #            periodSeconds: 10
+          #            timeoutSeconds: 5
+          name: cmdb-api
+          ports:
+            - containerPort: 5000
+              protocol: TCP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cmdb-api
+  name: cmdb-api
+  namespace: veops
+spec:
+  ports:
+    - name: http
+      port: 5000
+      targetPort: 5000
+      protocol: TCP
+  selector:
+    app: cmdb-api
+  type: ClusterIP

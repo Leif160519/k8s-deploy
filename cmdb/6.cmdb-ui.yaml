@@ -1,0 +1,77 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: cmdb-ui
+  name: cmdb-ui
+  namespace: veops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cmdb-ui
+  template:
+    metadata:
+      labels:
+        app: cmdb-ui
+    spec:
+      containers:
+        - env:
+          - name: TZ
+            value: Asia/Shanghai
+          image: registry.cn-hangzhou.aliyuncs.com/veops/cmdb-ui:2.4.12
+          name: cmdb-ui
+          ports:
+            - containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /etc/nginx/conf.d/cmdb.conf
+              name: cmdb-ui-config
+              subPath: cmdb.conf
+      volumes:
+        - name: cmdb-ui-config
+          configMap:
+            name: cmdb-ui-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: cmdb-ui
+  name: cmdb-ui
+  namespace: veops
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    app: cmdb-ui
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cmdb-ui
+  namespace: veops
+  labels:
+    app: cmdb-ui
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: cmdb.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: cmdb-ui
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - cmdb.github.icu
+    secretName: github-tls
