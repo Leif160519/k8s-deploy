@@ -10,16 +10,17 @@ kubectl apply -f .
 
 ## 已知问题
 - mongodb部署必须使用副本集的形式，设计使然
-- mongodb无论是deployment还是statefulset形式部署，删除pod之后都会导致集群状态异常，提示以下错误：
+- mongodb副本集（k8s）只要是单副本形式部署，删除pod之后都会导致集群状态异常，提示以下错误（docker-compose部署不会）：
 ```
 MongoServerError: node is not in primary or recovering state
 ```
+> 建议statefulset多节点部署mongodb集群,参考[StatefulSet部署Mongodb集群](../database/mongodb/readme.md)
+> 若采用mongodb集群(多节点),则fastgpt中mongodb链接方式一定要配置集群连接方式，否则fastgpt会因为找不到主节点提示mongodb连接错误
+```
+mongodb://root:123456@mongodb-0.:27017,mongodb-1.mongodb.database.svc:27017,mongodb-2.mongodb.database.svc:27017/fastgpt?authSource=admin
+```
 
-> 建议statefulset多节点部署或使用外部mongo集群或单独用docker-compose部署,参考[StatefulSet部署Mongodb集群](../database/mongodb/readme.md)
-> 若采用mongodb集群(多节点),一定要配置主节点的连接方式，否则fastgpt会提示mongodb连接错误
-
-- 若mongodb集群有重建的情况，则重建后主节点可能会漂移到其他节点，故需要提前判断主节点，并同步修改fastgpt的mongodb连接地址，让其连接主节点的mongodb节点
-- oneapi中配置m3e的地址，一定要用`NodePort`类型的svc形式才可以,如：`http://192.168.31.81:32387`
+- oneapi中配置m3e的地址，一定要用`NodePort`类型的svc形式才可以,如：`http://192.168.31.81:32387`,原因暂时未知
 - oneapi中重新配置m3e地址后，需要重启fastgpt和oneapi的pod才能生效
 
 ## 参考
