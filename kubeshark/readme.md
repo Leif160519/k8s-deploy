@@ -3,6 +3,9 @@
 sh <(curl -Ls https://kubeshark.co/install)
 # 或者使用以下命令指定版本
 curl -Lo kubeshark https://github.com/kubeshark/kubeshark/releases/download/41.6/kubeshark_linux_amd64 && chmod 755 kubeshark
+
+# 卸载
+kubeshark clean
 ```
 
 > 其他方法可以在https://docs.kubeshark.co/en/install找到
