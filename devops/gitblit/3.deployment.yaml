@@ -1,0 +1,72 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitblit
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitblit
+  template:
+    metadata:
+      labels:
+        app: gitblit
+    spec:
+      containers:
+        - name: gitblit
+          image: gitblit/gitblit:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+            - containerPort: 8443
+              name: https
+              protocol: TCP
+            - containerPort: 9418
+              name: git-protocol
+              protocol: TCP
+            - containerPort: 29418
+              name: ssh
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /var/opt/gitblit
+              name: gitblit
+              subPath: gitblit
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: gitblit
+          persistentVolumeClaim:
+            claimName: gitblit
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
