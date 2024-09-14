@@ -1,0 +1,104 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mindoc
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mindoc
+  template:
+    metadata:
+      labels:
+        app: mindoc
+    spec:
+      containers:
+        - name: mindoc
+          env:
+            - name:
+              value:
+            - name: MINDOC_RUN_MODE
+              value: prod
+            - name: MINDOC_DB_ADAPTER
+              value: mysql
+            - name: MINDOC_DB_HOST
+              value: mysql.github.icu
+            - name: MINDOC_DB_PORT
+              value: "3306"
+            - name: MINDOC_DB_DATABASE
+              value: mindoc_db
+            - name: MINDOC_DB_USERNAME
+              value: root
+            - name: MINDOC_DB_PASSWORD
+              value: "123456"
+            - name: MINDOC_CACHE
+              value: "true"
+            - name: MINDOC_CACHE_PROVIDER
+              value: file
+            - name: MINDOC_ENABLE_EXPORT
+              value: "true"
+          image: registry.cn-hangzhou.aliyuncs.com/mindoc-org/mindoc:v2.1
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8181
+            timeoutSeconds: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 8181
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 30
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          ports:
+            - containerPort: 8181
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 0.5Gi
+          volumeMounts:
+            - mountPath: /mindoc/conf
+              name: mindoc
+              subPath: mindoc/conf
+            - mountPath: /mindoc/static
+              name: mindoc
+              subPath: mindoc/static
+            - mountPath: /mindoc/viewers
+              name: mindoc
+              subPath: mindoc/viewers
+            - mountPath: /mindoc/uploads
+              name: mindoc
+              subPath: mindoc/uploads
+            - mountPath: /mindoc/runtime
+              name: mindoc
+              subPath: mindoc/runtime
+            - mountPath: /mindoc/database
+              name: mindoc
+              subPath: mindoc/database
+            - mountPath: /mindoc/calibre
+              name: mindoc
+              subPath: mindoc/calibre
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: mindoc
+          persistentVolumeClaim:
+            claimName: mindoc
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
