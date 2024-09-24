@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alerta-db
+  name: alerta-db
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alerta-db
+  template:
+    metadata:
+      labels:
+        app: alerta-db
+    spec:
+      containers:
+      - env:
+          - name: POSTGRES_DB
+            value: monitoring
+          - name: POSTGRES_USER
+            value: postgres
+          - name: POSTGRES_PASSWORD
+            value: postgres
+        image: postgres
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 5432
+          timeoutSeconds: 3
+        name: alerta-db
+        ports:
+        - containerPort: 5432
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 5432
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+        - mountPath: /var/lib/postgresql/data
+          name: alerta
+          subPath: postgresql/data
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
+      - persistentVolumeClaim:
+          claimName: alerta
+        name: alerta
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: alerta-db
+  name: alerta-db
+  namespace: monitoring
+spec:
+  ports:
+  - name: alerta-db
+    port: 5432
+    protocol: TCP
+    targetPort: 5432
+  selector:
+    app: alerta-db
+  type: ClusterIP

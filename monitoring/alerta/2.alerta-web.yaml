@@ -1,0 +1,114 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: alerta-web
+  name: alerta-web
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alerta-web
+  template:
+    metadata:
+      labels:
+        app: alerta-web
+    spec:
+      containers:
+      - env:
+          - name: DEBUG
+            value: "1"
+          - name: DATABASE_URL
+            value: postgres://postgres:postgres@alerta-db:5432/monitoring
+          - name: AUTH_REQUIRED
+            value: "false"
+          - name: ADMIN_USERS
+            value: admin@alerta.io
+          - name: PLUGINS
+            value: remote_ip,reject,heartbeat,blackout,prometheus,slack
+          - name: ALERTMANAGER_API_URL
+            value: http://alertmanager:9093
+        image: alerta/alerta-web
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 3
+        name: alerta-web
+        ports:
+        - containerPort: 8080
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8080
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: alerta-web
+  name: alerta-web
+  namespace: monitoring
+spec:
+  ports:
+  - name: alert-web
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: alerta-web
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alerta
+  namespace: monitoring
+  labels:
+    app: alerta
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: alerta.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: alerta
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - alerta.github.icu
+    secretName: github-tls
