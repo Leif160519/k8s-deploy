@@ -103,7 +103,7 @@ spec:
       paths:
       - backend:
           service:
-            name: alerta
+            name: alerta-web
             port:
               number: 8080
         path: /
