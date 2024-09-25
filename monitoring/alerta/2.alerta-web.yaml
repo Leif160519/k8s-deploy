@@ -26,7 +26,7 @@ spec:
           - name: ADMIN_USERS
             value: admin@alerta.io
           - name: PLUGINS
-            value: remote_ip,reject,heartbeat,blackout,prometheus,slack
+            value: remote_ip,reject,heartbeat,blackout,prometheus
           - name: ALERTMANAGER_API_URL
             value: http://alertmanager:9093
         image: alerta/alerta-web
