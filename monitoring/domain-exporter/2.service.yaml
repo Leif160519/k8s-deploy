@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: domain-exporter
+  name: domain-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9222
+    protocol: TCP
+    targetPort: 9222
+  selector:
+    app: domain-exporter
+  type: ClusterIP
