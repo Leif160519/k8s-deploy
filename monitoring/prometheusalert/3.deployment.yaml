@@ -20,6 +20,8 @@ spec:
         image: feiyu563/prometheus-alert:latest
         imagePullPolicy: IfNotPresent
         env:
+        - name: PA_ALERTRECORD
+          value: "1"
         - name: PA_LOGIN_USER
           value: prometheusalert
         - name: PA_LOGIN_PASSWORD
