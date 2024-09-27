@@ -20,6 +20,10 @@ spec:
         image: feiyu563/prometheus-alert:latest
         imagePullPolicy: IfNotPresent
         env:
+        - name: PA_RUNMODE
+          value: prod
+        - name: PA_PROMETHEUS_CST_TIME
+          value: "1"
         - name: PA_ALERTRECORD
           value: "1"
         - name: PA_LOGIN_USER
