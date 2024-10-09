@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: consul
-  serviceName: consul-hs
+  serviceName: consul
   template:
     metadata:
       labels:

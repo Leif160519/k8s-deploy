@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: consul-cs
+  name: consul
   namespace: monitoring
   labels:
     app: consul
@@ -11,25 +11,6 @@ spec:
   selector:
     app: consul
   type: ClusterIP
-  ports:
-    - name: http
-      protocol: TCP
-      port: 8500
-      targetPort: 8500
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: consul-hs
-  namespace: monitoring
-  labels:
-    app: consul
-spec:
-  sessionAffinity: ClientIP
-  selector:
-    app: consul
-  type: ClusterIP
-  clusterIP: None
   ports:
     - name: http
       protocol: TCP
@@ -51,7 +32,7 @@ spec:
       paths:
       - backend:
           service:
-            name: consul-cs
+            name: consul
             port:
               number: 8500
         path: /
