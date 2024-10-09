@@ -46,6 +46,6 @@ consul snapshot restore --http-addr=https://consul.github.icu --token=xxxxx cons
 - 3.重启consul服务，让其重新生成consul数据
 - 4.使用consul命令恢复kv数据
 - 5.启动tensuns服务，kubernetes部署的话可以设置副本数为1
-- 6.登录tensuns，修改云厂商的access id和access key，点击同步看是否报错
+- 6.登录tensuns，先找到云厂商配置进行资源同步，同步有问题的话重新修改云厂商的access id和access key，点击同步看是否报错
 - 7.同步云厂商资源无报错之后再tensuns界面上导入之前备份的xlsx站点数据
 - 8.验证
