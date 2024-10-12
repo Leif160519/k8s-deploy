@@ -1,0 +1,97 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ui
+  namespace: devops
+spec:
+  selector:
+    matchLabels:
+      app: nginx-ui
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: nginx-ui
+    spec:
+      containers:
+        - name: nginx-ui
+          image: uozi/nginx-ui:latest
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 3
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+            - containerPort: 443
+              name: https
+              protocol: TCP
+            - containerPort: 9000
+              name: web
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+            - mountPath: /etc/nginx/vhost
+              name: nginx-vhost
+            - mountPath: /etc/nginx/sites-available
+              name: nginx-vhost
+            - mountPath: /var/log/nginx
+              name: nginx-log
+            - mountPath: /etc/nginx-ui
+              name: nginx-ui
+            - mountPath: /etc/nginx/nginx.conf
+              name: nginx-ui-conf
+              subPath: nginx.conf
+      initContainers:
+        - name: git-clone-nginx-ui
+          image: alpine/git:latest
+          command: [git ,clone , https://github.com/0xJacky/nginx-ui, /etc/nginx-ui]
+          volumeMounts:
+            - name: nginx-ui
+              mountPath: /etc/nginx-ui
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ""
+        - name: nginx-vhost
+          persistentVolumeClaim:
+            claimName: nginx-vhost
+        - name: nginx-log
+          persistentVolumeClaim:
+            claimName: nginx-log
+        - name: nginx-ui
+          persistentVolumeClaim:
+            claimName: nginx-ui
+        - name: nginx-ui-conf
+          configMap:
+            defaultMode: 420
+            name: nginx-ui-conf
+            items:
+              - key: nginx.conf
+                path: nginx.conf
