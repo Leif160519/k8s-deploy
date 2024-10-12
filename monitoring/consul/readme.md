@@ -18,7 +18,7 @@ consul kv export --http-addr=https://consul.github.icu -token=xxx > consul_kv_ba
 consul kv import --http-addr=https://consul.github.icu -token=xxx @consul_kv_backup.json
 ```
 
-> kv备份的是站点管理，自建主机管理，自建mysql管理和自建redis管理的数据
+> kv备份的是云厂商数据
 
 ## 备份恢复所有数据
 ```
@@ -32,7 +32,7 @@ consul snapshot inspect consul_backup.snap
 consul snapshot restore --http-addr=https://consul.github.icu --token=xxxxx consul_backup.snap
 ```
 
-> snapshot备份的全部数据，包含kv
+> snapshot备份的全部数据，包含kv和service数据
 
 ## 关于tensuns的备份和恢复操作
 
