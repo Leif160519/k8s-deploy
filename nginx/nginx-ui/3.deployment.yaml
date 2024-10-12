@@ -44,15 +44,15 @@ spec:
             periodSeconds: 5
             successThreshold: 1
             tcpSocket:
-              port: 80
+              port: 9000
             timeoutSeconds: 3
           resources:
             limits:
               cpu: "2"
-              memory: 2Gi
+              memory: 1Gi
             requests:
               cpu: 500m
-              memory: 1Gi
+              memory: 0.5Gi
           volumeMounts:
             - mountPath: /etc/localtime
               name: localtime
@@ -70,7 +70,13 @@ spec:
       initContainers:
         - name: git-clone-nginx-ui
           image: alpine/git:latest
-          command: [git ,clone , https://github.com/0xJacky/nginx-ui, /etc/nginx-ui]
+          command:
+          - /bin/sh
+          - -c
+          - |
+            if [ ! -d /etc/nginx-ui ]; then
+                git clone https://github.com/0xJacky/nginx-ui /etc/nginx-ui
+            fi
           volumeMounts:
             - name: nginx-ui
               mountPath: /etc/nginx-ui
