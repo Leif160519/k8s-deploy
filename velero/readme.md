@@ -119,8 +119,10 @@ $ velero create schedule <SCHEDULE NAME> --schedule="@every 24h" --include-names
 ```
 
 # 参考
-[k8s-基础-使用Velero备份恢复集群][0]
-[11、Velero + minio（备份容灾）][1]
+- [k8s-基础-使用Velero备份恢复集群][0]
+- [11、Velero + minio（备份容灾）][1]
+- [k8s集群备份与迁移][2]
 
 [0]: https://blog.mafeifan.com/DevOps/K8s/k8s-%E5%9F%BA%E7%A1%80-%E4%BD%BF%E7%94%A8Velero%E5%A4%87%E4%BB%BD%E6%81%A2%E5%A4%8D%E9%9B%86%E7%BE%A4.html
 [1]: https://blog.csdn.net/weixin_44797299/article/details/136007213
+[2]: https://mp.weixin.qq.com/s/Ywc2nQdM398w0wlQi_Z0Ow
