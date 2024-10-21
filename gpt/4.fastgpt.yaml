@@ -215,7 +215,7 @@ spec:
               value: info
             - name: STORE_LOG_LEVEL
               value: warn
-          image: registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt:v4.8.9
+          image: registry.cn-hangzhou.aliyuncs.com/fastgpt/fastgpt:v4.8.11
           imagePullPolicy: IfNotPresent
           livenessProbe:
             failureThreshold: 5
