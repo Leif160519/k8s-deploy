@@ -203,7 +203,7 @@ spec:
               value: filetoken
             # MongoDB 连接参数. 用户名myusername,密码mypassword。
             - name: MONGODB_URI
-              value: mongodb://root:123456@mongodb-0.:27017,mongodb-1.mongodb.database.svc:27017,mongodb-2.mongodb.database.svc:27017/fastgpt?authSource=admin
+              value: mongodb://root:123456@mongodb-0.database.svc:27017,mongodb-1.mongodb.database.svc:27017,mongodb-2.mongodb.database.svc:27017/fastgpt?authSource=admin
             # pg 连接参数
             - name: PG_URL
               value: postgresql://username:password@postgresql:5432/postgres
