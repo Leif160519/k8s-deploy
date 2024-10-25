@@ -1,5 +1,6 @@
 # 注意
 - 脚本或者yaml中的带有github.icu字样的域名为个人内网使用的域名，使用过程中清根据实际情况自行更换
+- pod起不来,describe提示`Evicted: Pod The node had condition: [DiskPressure] `,检查node节点的磁盘占用是否超过85%，超过了就清理一下磁盘，删除pod让其自动重建即可
 
 
 # 若使用了私有docker镜像仓库，请执行以下操作
