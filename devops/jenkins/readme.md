@@ -64,3 +64,11 @@ kubectl create token admin-user -n jms（执行完会自动输出token）
 ```
 kubectl get node --server=https://xxx.8443 --token=xxx --insecure-skip-tls-verify
 ```
+
+## client.pfx生成以配置jenkins访问kubernetes
+```
+cat /opt/kubernetes/ssl/ca.pem > ca.crt
+cat /opt/kubernetes/ssl/admin.pem > client.crt
+cat /opt/kubernetes/ssl/admin-key.pem > client.key
+openssl pkcs12 -export -out ./client.pfx -inkey ./client.key -in ./client.crt -certfile ./ca.crt
+```
