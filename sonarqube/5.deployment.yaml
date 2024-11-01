@@ -65,7 +65,13 @@ spec:
       initContainers:
       - name: delete-lock-file
         image: busybox
-        command: [find, /opt/sonarqube/data/es7 ,-type, f ,-name, '*.lock' ,-delete]
+        command:
+        - /bin/sh
+        - -c
+        - |
+          if [ -f /opt/sonarqube/data/es7/*.lock ];then
+              find /opt/sonarqube/data/es7 -type f -name "*.lock" -delete
+          fi
         volumeMounts:
           - name: sonarqube
             subPath: sonarqube/data
