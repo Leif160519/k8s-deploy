@@ -23,7 +23,7 @@ spec:
               value: X3uaAUpf6x83QMcn
             - name: LOG_LEVEL
               value: "ERROR"
-          image: jumpserver/magnus:v2.28.20
+          image: jumpserver/magnus:v2.28.21
           tty: true
           securityContext:
             runAsUser: 0
