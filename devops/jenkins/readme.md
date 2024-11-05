@@ -55,7 +55,7 @@ kubectl apply -f 5.deployment.yaml
 ```
 kubectl create serviceaccount admin-user -n default
 kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=default:admin-user
-kubectl create token admin-user -n jms（执行完会自动输出token）
+kubectl create token admin-user -n devops --duration 8760h（执行完会自动输出token,不指定过期时间默认24小时）
 ```
 
 注意：

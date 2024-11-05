@@ -51,7 +51,7 @@ kubectl get secret $(kubectl -n jms get secret | grep admin-user | awk 'NR==1{pr
 ```
 kubectl create serviceaccount admin-user -n jms
 kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=jms:admin-user
-kubectl create token admin-user -n jms --duration 8760h（执行完会自动输出token）
+kubectl create token admin-user -n jms --duration 8760h（执行完会自动输出token,不指定过期时间默认24小时）
 ```
 
 注意：
