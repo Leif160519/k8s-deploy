@@ -17,8 +17,6 @@ spec:
       containers:
         - name: mindoc
           env:
-            - name:
-              value:
             - name: MINDOC_RUN_MODE
               value: prod
             - name: MINDOC_DB_ADAPTER
@@ -39,6 +37,8 @@ spec:
               value: file
             - name: MINDOC_ENABLE_EXPORT
               value: "true"
+            - name: MINDOC_SESSION_MAX_LIFETIME
+              value: "86400"
           image: registry.cn-hangzhou.aliyuncs.com/mindoc-org/mindoc:v2.1
           imagePullPolicy: IfNotPresent
           livenessProbe:
