@@ -77,9 +77,9 @@ spec:
             - mountPath: /mindoc/static
               name: mindoc
               subPath: mindoc/static
-            - mountPath: /mindoc/viewers
+            - mountPath: /mindoc/views
               name: mindoc
-              subPath: mindoc/viewers
+              subPath: mindoc/views
             - mountPath: /mindoc/uploads
               name: mindoc
               subPath: mindoc/uploads
