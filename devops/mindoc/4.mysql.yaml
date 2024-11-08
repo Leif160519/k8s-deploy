@@ -1,0 +1,129 @@
+---
+apiVersion: v1
+data:
+  my.cnf: |
+    [client]
+    default-character-set = utf8mb4
+
+    [mysql]
+    default-character-set = utf8mb4
+
+    [mysql.server]
+    default-character-set = utf8mb4
+
+    [mysqld_safe]
+    default-character-set = utf8mb4
+
+    [mysqld]
+    port = 3306
+    bind-address = 0.0.0.0
+    character-set-server = utf8mb4
+    collation-server = utf8mb4_general_ci
+    skip-character-set-client-handshake
+    skip-external-locking
+    symbolic-links = 0
+    general_log = 1
+    max_connections = 2000
+    max_allowed_packet = 64M
+    lower_case_table_names = 1
+    default_authentication_plugin=mysql_native_password
+kind: ConfigMap
+metadata:
+  name: mysql-conf
+  namespace: devops
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: devops
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - name: mysql
+          env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: "123456"
+          - name: TZ
+            value: Asia/Shanghai
+          image: mysql:5.7.28
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 3306
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - /usr/bin/mysql -h127.0.0.1 -P3306 -uroot -p123456 -e 'SHOW DATABASES;create database if not exists mindoc_db;'
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 3306
+              name: mysql
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 0.5Gi
+            requests:
+              cpu: "0.5"
+              memory: 0.25Gi
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: mindoc
+              subPath: mysql/data
+            - mountPath: /etc/mysql/my.cnf
+              name: mysql-conf
+              subPath: my.cnf
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: mindoc
+          persistentVolumeClaim:
+            claimName: mindoc
+        - name: mysql-conf
+          configMap:
+            defaultMode: 420
+            name: mysql-conf
+            items:
+              - key: my.cnf
+                path: my.cnf
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql
+  namespace: devops
+spec:
+  selector:
+    app: mysql
+  type: ClusterIP
+  ports:
+    - name: mysql
+      port: 3306
+      protocol: TCP
+      targetPort: 3306
