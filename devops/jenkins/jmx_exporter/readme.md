@@ -36,5 +36,4 @@ kubectl apply -f service-clusterip.yaml
 ## 说明
 - 若添加宿主机的node节点无法通过ssh方式启动
 
->jenkins:2.415版本需要openjdk-11-jre版本即可
->若升级到jenkins:2.484版本，则需要同步升级宿主机jdk版本到openjdk-17-jre
+>jenkins:2.415版本需要openjdk-11-jre版本即可,若升级到jenkins:2.484版本，则需要同步升级宿主机jdk版本到openjdk-17-jre
