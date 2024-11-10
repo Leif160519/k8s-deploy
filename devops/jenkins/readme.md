@@ -1,3 +1,6 @@
+## 说明
+jenkins:2.356是最后一个支持jdk1.8版本的jenkins
+
 ## 参考资料
 https://developer.aliyun.com/article/1005052
 https://mp.weixin.qq.com/s/ub49u9ko886oJsZKlqngRA
