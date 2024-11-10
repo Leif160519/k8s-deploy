@@ -31,7 +31,7 @@ spec:
           service:
             name: mindoc
             port:
-              number: 8443
+              number: 8181
         path: /
         pathType: Prefix
   tls:
