@@ -32,7 +32,7 @@ spec:
               --prefix=/
               --sessionTimeout=1440
               --sessionEviction=1440
-          image: jenkins/jenkins:2.415
+          image: jenkins/jenkins:2.484
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
