@@ -1,0 +1,121 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: server
+  template:
+    metadata:
+      labels:
+        app: server
+    spec:
+      containers:
+        - name: server
+          env:
+          - name: UPLOAD_LOCATION
+            value: "./library"
+          - name: DB_DATA_LOCATION
+            value: "./postgres"
+          - name: IMMICH_VERSION
+            value: release
+          - name: DB_PASSWORD
+            value: postgres
+          - name: DB_USERNAME
+            value: postgres
+          - name: DB_DATABASE_NAME
+            value: immich
+          - name: REDIS_HOSTNAME
+            value: redis
+          - name: REDIS_PORT
+            value: "6379"
+          image: ghcr.io/immich-app/immich-server:release
+          tty: true
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            tcpSocket:
+              port: 2283
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            tcpSocket:
+              port: 2283
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 2283
+              name: server
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /usr/src/app/upload
+              name: immich
+              subPath: upload
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: immich
+          persistentVolumeClaim:
+            claimName: immich
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: server
+  namespace: immich
+spec:
+  ports:
+    - name: server
+      protocol: TCP
+      port: 2283
+      targetPort: 2283
+  type: ClusterIP
+  selector:
+    app: server
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: server
+  namespace: immich
+  labels:
+    app: server
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: immich.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: server
+            port:
+              number: 2283
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - immich.github.icu
+    secretName: github-tls

@@ -1,0 +1,90 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: database
+  template:
+    metadata:
+      labels:
+        app: database
+    spec:
+      containers:
+        - name: dataebase
+          env:
+            - name: POSTGRES_PASSWORD
+              value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_DB
+              value: immich
+            - name: POSTGRES_INITDB_ARGS
+              value: "--data-checksums"
+          image: tensorchord/pgvecto-rs:pg14-v0.2.0
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 5432
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - pg_isready -h localhost -U postgres -d immich
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 5432
+              name: database
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "1"
+              memory: 0.5Gi
+            requests:
+              cpu: "0.5"
+              memory: 0.25Gi
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: immich
+              subPath: postgres
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: immich
+          persistentVolumeClaim:
+            claimName: immich
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: database
+  namespace: immich
+spec:
+  selector:
+    app: database
+  type: ClusterIP
+  ports:
+    - name: database
+      port: 5432
+      protocol: TCP
+      targetPort: 5432

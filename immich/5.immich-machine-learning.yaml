@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: machine-learning
+  namespace: immich
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: machine-learning
+  template:
+    metadata:
+      labels:
+        app: machine-learning
+    spec:
+      containers:
+        - name: machine-learning
+          env:
+          - name: UPLOAD_LOCATION
+            value: "./library"
+          - name: DB_DATA_LOCATION
+            value: "./postgres"
+          - name: IMMICH_VERSION
+            value: release
+          - name: DB_PASSWORD
+            value: postgres
+          - name: DB_USERNAME
+            value: postgres
+          - name: DB_DATABASE_NAME
+            value: immich
+          image: ghcr.io/immich-app/immich-machine-learning:release
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          tty: true
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 1Gi
+            requests:
+              cpu: "0.25"
+              memory: 0.5Gi
+          volumeMounts:
+            - mountPath: /cache
+              name: immich
+              subPath: cache
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: immich
+          persistentVolumeClaim:
+            claimName: immich
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
