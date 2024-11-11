@@ -101,12 +101,12 @@ spec:
       targetPort: 2283
     - name: immich-api
       protocol: TCP
-      port: 8001
-      targetPort: 8001
+      port: 8081
+      targetPort: 8081
     - name: immich-microservices
       protocol: TCP
-      port: 8002
-      targetPort: 8002
+      port: 8082
+      targetPort: 8082
   type: ClusterIP
   selector:
     app: immich-server
