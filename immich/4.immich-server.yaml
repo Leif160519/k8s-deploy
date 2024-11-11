@@ -65,7 +65,13 @@ spec:
             timeoutSeconds: 5
           ports:
             - containerPort: 2283
-              name: immich-server
+              name: server
+              protocol: TCP
+            - containerPort: 8081
+              name: api
+              protocol: TCP
+            - containerPort: 8082
+              name: microservices
               protocol: TCP
           volumeMounts:
             - mountPath: /usr/src/app/upload
@@ -93,6 +99,14 @@ spec:
       protocol: TCP
       port: 2283
       targetPort: 2283
+    - name: immich-api
+      protocol: TCP
+      port: 8001
+      targetPort: 8001
+    - name: immich-microservices
+      protocol: TCP
+      port: 8002
+      targetPort: 8002
   type: ClusterIP
   selector:
     app: immich-server
