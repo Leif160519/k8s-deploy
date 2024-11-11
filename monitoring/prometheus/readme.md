@@ -64,6 +64,9 @@ ts=2024-06-16T02:05:03.903Z caller=main.go:1148 level=warn fs_type=NFS_SUPER_MAG
 翻译成中文就是:
 > 注意： Prometheus 的本地存储不支持非 POSIX 兼容文件系统，因为可能会发生不可恢复的损坏。不支持 NFS 文件系统（包括 AWS 的 EFS）。NFS 可能符合 POSIX 标准，但大多数实现都不符合。强烈建议使用本地文件系统以确保可靠性。
 
+## 说明
+- 随着监控目标的增加，prometheus的内存需求也会跟着增长，在分配的内存即将用完的时候，prometheus pod会经常OOMKiller，所以需要修改其分配的最大内存资源
+
 ## 参考
 - [comfigmap-reload][1]
 - [storage][2]
