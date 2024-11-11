@@ -116,6 +116,8 @@ kind: Ingress
 metadata:
   name: immich-server
   namespace: immich
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "5000m"
   labels:
     app: immich-server
 spec:
