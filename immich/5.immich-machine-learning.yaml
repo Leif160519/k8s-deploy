@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: machine-learning
+  name: immich-machine-learning
   namespace: immich
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: machine-learning
+      app: immich-machine-learning
   template:
     metadata:
       labels:
-        app: machine-learning
+        app: immich-machine-learning
     spec:
       containers:
-        - name: machine-learning
+        - name: immich-machine-learning
           env:
           - name: UPLOAD_LOCATION
             value: "./library"
@@ -41,6 +41,25 @@ spec:
             requests:
               cpu: "0.25"
               memory: 0.5Gi
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            tcpSocket:
+              port: 3003
+            timeoutSeconds: 5
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            successThreshold: 1
+            tcpSocket:
+              port: 3003
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 3003
+              protocol: TCP
           volumeMounts:
             - mountPath: /cache
               name: immich
@@ -55,3 +74,18 @@ spec:
             path: /etc/localtime
             type: ""
           name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: immich-machine-learning
+  namespace: immich
+spec:
+  ports:
+    - name: immich-machine-learning
+      protocol: TCP
+      port: 3003
+      targetPort: 3003
+  type: ClusterIP
+  selector:
+    app: immich-machine-learning

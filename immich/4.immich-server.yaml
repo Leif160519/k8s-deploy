@@ -2,21 +2,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: server
+  name: immich-server
   namespace: immich
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: server
+      app: immich-server
   template:
     metadata:
       labels:
-        app: server
+        app: immich-server
     spec:
       containers:
-        - name: server
+        - name: immich-server
           env:
+          - name: IMMICH_TELEMETRY_INCLUDE
+            value: all
           - name: UPLOAD_LOCATION
             value: "./library"
           - name: DB_DATA_LOCATION
@@ -63,7 +65,7 @@ spec:
             timeoutSeconds: 5
           ports:
             - containerPort: 2283
-              name: server
+              name: immich-server
               protocol: TCP
           volumeMounts:
             - mountPath: /usr/src/app/upload
@@ -83,25 +85,25 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: server
+  name: immich-server
   namespace: immich
 spec:
   ports:
-    - name: server
+    - name: immich-server
       protocol: TCP
       port: 2283
       targetPort: 2283
   type: ClusterIP
   selector:
-    app: server
+    app: immich-server
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: server
+  name: immich-server
   namespace: immich
   labels:
-    app: server
+    app: immich-server
 spec:
   ingressClassName: nginx
   rules:
@@ -110,7 +112,7 @@ spec:
       paths:
       - backend:
           service:
-            name: server
+            name: immich-server
             port:
               number: 2283
         path: /
