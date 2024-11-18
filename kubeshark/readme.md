@@ -50,7 +50,7 @@ spec:
         pathType: Prefix
   tls:
   - hosts:
-    - kubeshark-front.github.icu
+    - kubeshark.github.icu
     secretName: github-tls
 ```
 
