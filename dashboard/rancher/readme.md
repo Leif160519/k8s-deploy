@@ -12,4 +12,8 @@ reset-password
 ```
 
 # 参考
-https://ranchermanager.docs.rancher.com/zh/v2.6/getting-started/installation-and-upgrade/resources/add-tls-secrets
+- [添加 TLS 密文][1]
+- [对接 Active Directory][2]
+
+[1]: https://ranchermanager.docs.rancher.com/zh/v2.6/getting-started/installation-and-upgrade/resources/add-tls-secrets
+[2]: https://www.bookstack.cn/read/rancher-2.5.11-zh/43f79dbcbe808c28.md
