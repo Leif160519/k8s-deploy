@@ -16,7 +16,12 @@ spec:
     spec:
       containers:
         - name: speedtest
-          image: adolfintel/speedtest:latest
+          image: ghcr.io/librespeed/speedtest:latest
+          env:
+            - name: MODE
+              value: standalone
+            - name: TITLE
+              value: "Network Speed Test"
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
