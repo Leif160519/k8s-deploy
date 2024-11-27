@@ -18,6 +18,8 @@ spec:
       containers:
       - image: prom/snmp-exporter:latest
         imagePullPolicy: IfNotPresent
+        args:
+          - --config.file=/etc/snmp_exporter/snmp_synology.yml
         livenessProbe:
           failureThreshold: 5
           initialDelaySeconds: 30
@@ -52,8 +54,14 @@ spec:
         volumeMounts:
         - mountPath: /etc/localtime
           name: localtime
+        - name: snmp-config
+          mountPath: /etc/snmp_exporter/snmp_synology.yml
+          subPath: snmp_synology.yml
       volumes:
       - hostPath:
           path: /etc/localtime
           type: ""
         name: localtime
+      - configMap:
+          name: snmp-config
+        name: snmp-config

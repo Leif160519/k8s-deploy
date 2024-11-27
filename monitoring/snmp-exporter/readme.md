@@ -1,7 +1,8 @@
 ## 用法
 ```
 kubectl create configmap -n monitoring snmp-config --from-file=snmp_synology.yml
-kubectl apply -f .
+kubectl apply -f 1.deployment-synology.yaml
+kubectl apply -f 2.service.yaml
 ```
 
 ## 参考
@@ -25,6 +26,12 @@ kubectl apply -f .
         brand: Synology
       targets:
         - 192.168.31.250 # 群辉的ip地址
+```
+
+## 说明
+- 若想常规部署snmp-exporter则
+```
+kubectl apply -f 1.deployment.yaml
 ```
 
 [1]: https://grafana.com/grafana/dashboards/14284-synology-nas-details/
