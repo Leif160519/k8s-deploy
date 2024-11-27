@@ -21,7 +21,7 @@ kubectl apply -f 1.deployment-synology.yaml
 kubectl apply -f 2.service.yaml
 ```
 
-- 4. prometheus配置：
+- 4.prometheus配置
 ```
 - job_name: synology
   metrics_path: /snmp
