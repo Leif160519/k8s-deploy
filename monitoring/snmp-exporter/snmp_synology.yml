@@ -4,10 +4,10 @@ auths:
     community: public
     security_level: authPriv
     username: monitor
-    password: China-123
+    password: Mrot@2024neo
     auth_protocol: SHA
     priv_protocol: AES
-    priv_password: China-123
+    priv_password: Mrot@2024mei
     version: 3
 modules:
   synology_common:
