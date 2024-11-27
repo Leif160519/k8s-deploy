@@ -28,6 +28,17 @@ kubectl apply -f 2.service.yaml
         brand: Synology
       targets:
         - 192.168.31.250 # 群辉的ip地址
+  relabel_configs:
+  - source_labels: ["__address__"]
+    target_label: __param_target
+  - source_labels: ["__param_target"]
+    target_label: instance
+  - target_label: __address__
+    replacement: snmp-exporter:9116
+  - source_labels: ["module"]
+    target_label: __param_module
+  - source_labels: ["auth"]
+    target_label: __param_auth
 ```
 
 ## 说明
