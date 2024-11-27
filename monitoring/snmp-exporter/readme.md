@@ -11,6 +11,8 @@ kubectl apply -f 2.service.yaml
 - [Synology NAS Details Dashboard for Prometheus][2]
 - [Synology NAS Overview Dashboard for Prometheus][3]
 
+> `Synology NAS Details Dashboard for Prometheus`实际为`Synology NAS Details`的中文版
+
 ### 教程
 - [群晖 NAS 监控][4]
 - [snmp_synology_nas.yml][5]
