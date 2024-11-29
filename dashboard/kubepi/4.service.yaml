@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubepi
+  namespace: kubepi
+  labels:
+    app: kubepi
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: kubepi
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubepi
+  namespace: kubepi
+  labels:
+    app: kubepi
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubepi.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: kubepi
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - kubepi.github.icu
+    secretName: github-tls
