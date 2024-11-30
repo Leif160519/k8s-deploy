@@ -1,3 +1,6 @@
+## 前置条件
+mongodb集群如果使用moosefs文件存储，则需要设置文件夹属性`mfsseteattr -f nodatacache <mongodb-pvc-dir> -r`,否则若遇到异常关机的情况，会导致mongodb部分文件无法从缓存写入磁盘导致文件损坏无法读取，集群信息丢失等问题！
+
 ## 参数说明
 - 1.configmap中`replSetName`指的是集群的id名称，可自定义
 - 2.configmap中`keyFile`指的是集群内部加密通信的文件路径，非集群模式(单节点)可不指定,若集群模式未指定keyfile，后期想加keyfile，则需要重新加入集群，有数据丢失风险
