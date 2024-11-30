@@ -1,5 +1,5 @@
 ## 前置条件
-mongodb集群如果使用moosefs文件存储，则需要设置文件夹属性`mfsseteattr -f nodatacache <mongodb-pvc-dir> -r`,否则若遇到异常关机的情况，会导致mongodb部分文件无法从缓存写入磁盘导致文件损坏无法读取，集群信息丢失等问题！
+mongodb集群如果使用moosefs文件存储，则需要设置文件夹属性`mfsseteattr -f nodatacache <mongodb-pvc-dir> -r`,否则若遇到异常关机的情况，会导致mongodb部分文件(如WiredTiger.turtle)无法从缓存写入磁盘导致文件损坏无法读取，集群信息丢失等问题！
 
 ## 参数说明
 - 1.configmap中`replSetName`指的是集群的id名称，可自定义
