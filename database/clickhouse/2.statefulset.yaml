@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app: clickhouse
+  name: clickhouse
+  namespace: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  serviceName: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+      - name: clickhouse
+        image: registry.cn-shenzhen.aliyuncs.com/starsl/clickhouse-server:23.4
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8123
+        - containerPort: 9000
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2Gi
+          requests:
+            cpu: 100m
+            memory: 1Gi
+        securityContext:
+          privileged: true
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8123
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 8123
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: data
+          mountPath: /var/lib/clickhouse
+          subPath: clickhouse/data
+        - name: data
+          mountPath: /var/log/clickhouse-server
+          subPath: clickhouse/logs
+        - name: clickhouse-config
+          mountPath: /etc/clickhouse-server/config.d/config.xml
+          subPath: config.xml
+        - name: clickhouse-users
+          mountPath: /etc/clickhouse-server/users.d/users.xml
+          subPath: users.xml
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: clickhouse-config
+        configMap:
+          name: clickhouse
+          items:
+            - key: config.xml
+              path: config.xml
+      - name: clickhouse-users
+        configMap:
+          name: clickhouse
+          items:
+            - key: users.xml
+              path: users.xml
+  volumeClaimTemplates:
+    - apiVersion: v1
+      kind: PersistentVolumeClaim
+      metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 5Gi
+        storageClassName: moosefs-storage
+        volumeMode: Filesystem
