@@ -14,3 +14,7 @@ grafana安装clickhouse插件命令:
 ```
 grafana-cli plugins install grafana-clickhouse-datasource
 ```
+安装成功后重启grafana
+```
+kubectl rollout restart deployment -n monitoring grafana
+```
