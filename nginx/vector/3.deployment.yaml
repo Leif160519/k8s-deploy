@@ -1,0 +1,93 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vector
+  namespace: devops
+spec:
+  selector:
+    matchLabels:
+      app: vector
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: vector
+    spec:
+      containers:
+        - name: vector
+          image: registry.cn-shenzhen.aliyuncs.com/starsl/vector:0.41.1-alpine
+          imagePullPolicy: IfNotPresent
+          command:
+            - vector
+            - --config-dir
+            - /etc/vector/conf
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8686
+            timeoutSeconds: 3
+          securityContext:
+            runAsUser: 0
+          ports:
+            - containerPort: 8686
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8686
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: 500m
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+            - mountPath: /nginx_logs
+              name: nginx-log
+            - mountPath: /etc/vector/conf/vector.yaml
+              name: vector-config
+              subPath: vector.yaml
+            - mountPath: /etc/vector/conf/nginx-access.yaml
+              name: nginx-access
+              subPath: nginx-access.yaml
+            - mountPath: /etc/vector/mmdb
+              name: vector
+              subPath: vector/mmdb
+            - mountPath: /etc/vector/logs
+              name: vector
+              subPath: vector/logs
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+            type: ""
+        - name: vector
+          persistentVolumeClaim:
+            claimName: vector
+        - name: nginx-log
+          persistentVolumeClaim:
+            claimName: nginx-log
+        - name: vector-config
+          configMap:
+            name: vector
+            items:
+              - key: vector.yaml
+                path: vector.yaml
+        - name: nginx-access
+          configMap:
+            name: vector
+            items:
+              - key: nginx-access.yaml
+                path: nginx-access.yaml
