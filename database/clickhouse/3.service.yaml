@@ -20,6 +20,10 @@ spec:
       protocol: TCP
       port: 9000
       targetPort: 9000
+    - name: metrics
+      protocol: TCP
+      port: 9363
+      targetPort: 9363
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

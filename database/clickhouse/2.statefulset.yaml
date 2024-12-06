@@ -23,6 +23,7 @@ spec:
         ports:
         - containerPort: 8123
         - containerPort: 9000
+        - containerPort: 9363
         resources:
           limits:
             cpu: 500m

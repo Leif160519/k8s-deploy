@@ -18,3 +18,24 @@ grafana-cli plugins install grafana-clickhouse-datasource
 ```
 kubectl rollout restart deployment -n monitoring grafana
 ```
+
+
+## 暴露内部监控指标
+`config.xml`中新增以下配置
+```
+<prometheus>
+    <endpoint>/metrics</endpoint>
+    <port>9363</port>
+    <metrics>true</metrics>
+    <events>true</events>
+    <asynchronous_metrics>true</asynchronous_metrics>
+    <status_info>true</status_info>
+</prometheus>
+```
+
+将9363端口暴露出来，之后在prometheus中添加clickhouse的job即可
+
+## 添加看板
+- [14192-clickhouse][]
+
+[1]: https://grafana.com/grafana/dashboards/14192-clickhouse/
