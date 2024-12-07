@@ -10,7 +10,7 @@ spec:
       storage: 1Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -23,5 +23,5 @@ spec:
       storage: 1Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
 

@@ -2,12 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: cmdb
-  namespace: veops
+  name: victoria
+  namespace: monitoring
 spec:
   resources:
     requests:
       storage: 50Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
+

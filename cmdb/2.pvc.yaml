@@ -2,13 +2,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: gitblit
-  namespace: devops
+  name: cmdb
+  namespace: veops
 spec:
   resources:
     requests:
-      storage: 10Gi
+      storage: 50Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
-
+  storageClassName: nfs-storage

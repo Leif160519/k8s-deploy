@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: jms
-  namespace: jms
+  name: confluence
+  namespace: atlassian
 spec:
   resources:
     requests:
-      storage: 50Gi
+      storage: 10Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
 

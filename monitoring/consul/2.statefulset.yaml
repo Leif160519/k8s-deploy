@@ -86,5 +86,5 @@ spec:
         resources:
           requests:
             storage: 5Gi
-        storageClassName: moosefs-storage
+        storageClassName: nfs-storage
         volumeMode: Filesystem

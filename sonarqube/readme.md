@@ -3,7 +3,7 @@
 ```
 kubectl create configmap -n sonarqube sonarqube-config --from-file=conf/sonar.properties --from-file=conf/wrapper.conf
 kubectl apply -f 1.namespace.yaml
-kubectl apply -f 2.pvc-mfs.yaml
+kubectl apply -f 2.pvc.yaml
 kubectl apply -f 3.postgresql.yaml
 kubectl apply -f 4.service.yaml
 kubectl apply -f 5.deployment.yaml

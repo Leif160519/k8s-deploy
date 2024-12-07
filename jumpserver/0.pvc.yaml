@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: rancher
-  namespace: cattle-system
+  name: jms
+  namespace: jms
 spec:
   resources:
     requests:
       storage: 50Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
 

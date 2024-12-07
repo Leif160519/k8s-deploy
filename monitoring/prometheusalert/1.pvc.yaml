@@ -10,5 +10,5 @@ spec:
       storage: 5Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
 

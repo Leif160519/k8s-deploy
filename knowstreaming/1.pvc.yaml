@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: confluence
-  namespace: atlassian
+  name: knowstreaming
+  namespace: knowstreaming
 spec:
   resources:
     requests:
-      storage: 10Gi
+      storage: 50Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: moosefs-storage
+  storageClassName: nfs-storage
 
