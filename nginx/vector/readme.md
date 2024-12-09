@@ -1,6 +1,6 @@
 ## 使用步骤
 - 1.搭建[clickhouse][2],并创建nginxlogs数据库
-- 2.根据nginx日志存储情况和clickhouse的信息更改configmap内容
+- 2.根据nginx日志存储情况和clickhouse的信息更改configmap内容,确保log_format的名称是main
 - 3.`kubectl apply -f .`
 - 4.第一次启动vector会失败，但是会在pvc中创建对应的路径，在<pvc-dir>/vector/logs下新建日志文件`access_vector_error.log`;将`GeoLite2-City.mmdb`复制到<pvc-dir>/vector/mmdb下，重新启动vector
 - 5.grafana安装clickhouse插件:`grafana-cli plugins install grafana-clickhouse-datasource`，安装成功后重启grafana
