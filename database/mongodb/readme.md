@@ -195,7 +195,6 @@ MongoServerSelectionError: Server selection timed out after 30000 ms
 ### 发现日志报错：
 ```
 {"t":{"$date":"2024-12-10T08:43:25.888+08:00"},"s":"I",  "c":"NETWORK",  "id":4333208, "ctx":"ReplicaSetMonitor-TaskExecutor","msg":"RSM host selection timeout","attr":{"replicaSet":"cluster","error":"FailedToSatisfyReadPreference: Could not find host matching read preference { mode: \"primary\" } for set cluster"}}
-
 ```
 > 副本集监视器超时：这些日志条目表明副本集监视器（ReplicaSetMonitor）在尝试选择主节点时发生了超时。这通常意味着它无法与配置中的任何节点通信，或者集群中没有可用的主节点。
 
