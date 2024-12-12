@@ -21,19 +21,19 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
           - name: BAIDU_API_KEY
-            value: api_key
+            value: api_key         # 修改成百度的api_key
           - name: BAIDU_SECRET_KEY
-            value: secret_key
+            value: secret_key      # 修改成百度的secret_key
           - name: DISABLE_GPT4
             value: "1" #不想让用户使用 GPT-4
           - name: DEFAULT_MODEL
-            value: ernie-4.0-8k
+            value: ernie-4.0-8k    # 修改默认模型
           - name: CODE
-            value: "123456" # 访问密码
+            value: "123456"        # 访问密码
           - name: HIDE_USER_API_KEY
-            value: "1" # 不想让用户自行填入 API Key
+            value: "1"             # 不想让用户自行填入 API Key
           - name: DISABLE_FAST_LINK
-            value: "1" # 禁用从链接解析预制设置
+            value: "1"             # 禁用从链接解析预制设置
         ports:
         - containerPort: 3000
           name: http

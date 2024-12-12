@@ -21,7 +21,7 @@ spec:
         imagePullPolicy: IfNotPresent
         env:
           - name: sk-key
-            value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxx
+            value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxx ## 修改之,自定义
         ports:
         - containerPort: 6008
           name: http
