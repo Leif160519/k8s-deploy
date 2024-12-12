@@ -188,7 +188,7 @@ spec:
               value: http://oneapi:3000/v1
             # AI模型的API Key。（这里默认填写了OneAPI的快速默认key，测试通后，务必及时修改）
             - name: CHAT_API_KEY
-              value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # 修改之，保证与m3e中的sk-key值保持一致
+              value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx # 修改之，替换成oneapi中ai模型的api key
             # 数据库最大连接数
             - name: DB_MAX_LINK
               value: "30"

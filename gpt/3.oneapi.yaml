@@ -22,12 +22,10 @@ spec:
               value: oneapimmysql
             - name: MYSQL_DATABASE
               value: oneapi
-          image: ghcr.io/songquanpeng/one-api:v0.6.8
+          image: mysql:8.0.36
           # image: registry.cn-hangzhou.aliyuncs.com/fastgpt/one-api:v0.6.6 # 阿里云
           imagePullPolicy: IfNotPresent
-          command:
-            - bash
-            - -c
+          args:
             - --default-authentication-plugin=mysql_native_password
           livenessProbe:
             failureThreshold: 5

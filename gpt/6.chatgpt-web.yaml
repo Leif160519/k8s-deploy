@@ -23,7 +23,7 @@ spec:
           - name: OPENAI_API_BASE_URL
             value: http://oneapi:3000
           - name: OPENAI_API_KEY
-            value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  # 修改成m3e的sk-key的值
+            value: sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx  # 替换成oneapi中ai模型的api key
           - name: OPENAI_API_MODEL
             value: ERNIE-4.0-8K
         ports:
