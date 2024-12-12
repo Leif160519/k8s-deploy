@@ -22,6 +22,7 @@ mongodb://root:123456@mongodb-0.:27017,mongodb-1.mongodb.database.svc:27017,mong
 
 - oneapi中配置m3e的地址，一定要用`NodePort`类型的svc形式才可以,如：`http://192.168.31.81:32387`,原因暂时未知
 - oneapi中重新配置m3e地址后，需要重启fastgpt和oneapi的pod才能生效
+- oneapi初始账号：root  密码：123456
 
 ## 参考
 - [定制你的AI梦！快速搭建属于自己的本地FastGPT][1]
