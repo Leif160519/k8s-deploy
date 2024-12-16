@@ -19,6 +19,7 @@ spec:
           image: victoriametrics/victoria-metrics:latest
           imagePullPolicy: IfNotPresent
           args:
+#            - -maxLabelsPerTimeseries=200 # 允许指标包含的最大标签数为200
             - -retentionPeriod=1
             - -storageDataPath=/var/lib/victoria-metrics-data
             - -httpListenAddr=:8428
