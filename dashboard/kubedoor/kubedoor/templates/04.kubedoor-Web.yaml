@@ -1,0 +1,158 @@
+{{- if .Values.kubedoor_web_secret.enabled }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: nginx-auth
+  namespace: kubedoor
+data:
+  user.passwd: {{ .Values.kubedoor_web_secret.nginx_auth | join "\n" | b64enc | quote }}
+type: Opaque
+{{- end }}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: kubedoor
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log notice;
+    pid        /var/run/nginx.pid;
+
+
+    events {
+        worker_connections  1024;
+    }
+
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+        map "$time_iso8601 # $msec" $time_iso8601_ms { "~(^[^+]+)(\+[0-9:]+) # \d+\.(\d+)$" $1.$3$2; }
+        log_format main
+            '{"timestamp":"$time_iso8601_ms",'
+            '"server_ip":"$server_addr",'
+            '"remote_ip":"$remote_addr",'
+            '"xff":"$http_x_forwarded_for",'
+            '"remote_user":"$remote_user",'
+            '"domain":"$host",'
+            '"url":"$request_uri",'
+            '"referer":"$http_referer",'
+            '"upstreamtime":"$upstream_response_time",'
+            '"responsetime":"$request_time",'
+            '"request_method":"$request_method",'
+            '"status":"$status",'
+            '"response_length":"$bytes_sent",'
+            '"request_length":"$request_length",'
+            '"protocol":"$server_protocol",'
+            '"upstreamhost":"$upstream_addr",'
+            '"http_user_agent":"$http_user_agent",'
+            '"【body】": "$request_body"'
+            '}';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  7200;
+
+        #gzip  on;
+        auth_basic "KubeDoor Login";
+        auth_basic_user_file  /etc/nginx/user.passwd;
+
+        include /etc/nginx/conf.d/*.conf;
+    }
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kubedoor-web
+  namespace: kubedoor
+  labels:
+    app: kubedoor-web
+    app.kubernetes.io/instance: kubedoor-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kubedoor-web
+  template:
+    metadata:
+      labels:
+        app: kubedoor-web
+    spec:
+      volumes:
+        - name: nginx-auth
+          secret:
+            secretName: nginx-auth
+        - name: nginx-config
+          configMap:
+            name: nginx-config
+      containers:
+        - name: kubedoor-web
+          image: {{ .Values.image.repository }}/kubedoor-web:{{ .Values.image.kubedoor_web_tag }}
+          envFrom:
+            - configMapRef:
+                name: kubedoor-config
+          env:
+            - name: TZ
+              value: Asia/Shanghai
+          resources:
+            limits:
+              cpu: '1'
+              memory: 1Gi
+            requests:
+              cpu: 1m
+              memory: 1Mi
+          volumeMounts:
+            - name: nginx-auth
+              mountPath: /etc/nginx/user.passwd
+              subPath: user.passwd
+            - name: nginx-config
+              mountPath: /etc/nginx/nginx.conf
+              subPath: nginx.conf
+          livenessProbe:
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          imagePullPolicy: IfNotPresent
+      restartPolicy: Always
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: kubedoor-web
+  namespace: kubedoor
+  labels:
+    app: kubedoor-web
+    app.kubernetes.io/instance: kubedoor-web
+spec:
+  ports:
+    - name: http
+      protocol: TCP
+      port: 80
+      targetPort: 80
+  selector:
+    app: kubedoor-web
+  type: NodePort
+  externalTrafficPolicy: Cluster

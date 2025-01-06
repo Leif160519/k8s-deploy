@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: kubedoor
+  namespace: kubedoor
+  labels:
+    app: kubedoor-web
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: kubedoor.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: kubedoor-web
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - kubedoor.github.icu
+    secretName: github-tls
