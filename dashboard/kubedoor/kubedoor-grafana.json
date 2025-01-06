@@ -1,0 +1,4221 @@
+{
+  "__inputs": [
+    {
+      "name": "DS_KUBEDOOR-CLICKHOUSE",
+      "label": "KubeDoor-Clickhouse",
+      "description": "",
+      "type": "datasource",
+      "pluginId": "grafana-clickhouse-datasource",
+      "pluginName": "ClickHouse"
+    }
+  ],
+  "__elements": {},
+  "__requires": [
+    {
+      "type": "panel",
+      "id": "bargauge",
+      "name": "Bar gauge",
+      "version": ""
+    },
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": ""
+    },
+    {
+      "type": "datasource",
+      "id": "grafana-clickhouse-datasource",
+      "name": "ClickHouse",
+      "version": "4.5.1"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "table",
+      "name": "Table",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ],
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 32,
+      "panels": [],
+      "title": "【${__from:date:YYYY-MM-DD}~${__to:date:YYYY-MM-DD}最大资源使用的日期：${maxday}】【$env】高峰时段全局资源统计与各资源TOP10",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/内存.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "mbytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 30,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select count(DISTINCT namespace) as \"命名空间\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select count(DISTINCT deployment) as \"微服务\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(pod_count) as \"Pod\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "C"
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/内存.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "mbytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "id": 31,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(request_pod_cpu_m * pod_count)/1000 as \"CPU需求\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "H"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(p95_pod_load * pod_count) as \"负载使用\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "I"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(limit_pod_cpu_m * pod_count)/1000 as \"CPU限制\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "A"
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/内存.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "mbytes"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 33,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "/.*/",
+          "values": true
+        },
+        "showPercentChange": false,
+        "textMode": "value_and_name",
+        "wideLayout": true
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(request_pod_mem_mb * pod_count) as \"内存需求\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "F"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(p95_pod_wss_mb * pod_count) as \"内存使用\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "hide": false,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "select sum(limit_pod_mem_mb * pod_count) as \"内存限制\"\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n\r\n",
+          "refId": "G"
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 1,
+          "fieldMinMax": false,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 5,
+        "x": 0,
+        "y": 4
+      },
+      "id": 25,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "  SELECT\r\n    concat(namespace,':',deployment) AS name,\r\n    sum(p95_pod_load * pod_count) AS load\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n  GROUP BY\r\n    name\r\n    order by load desc\r\n    limit 10",
+          "refId": "A"
+        }
+      ],
+      "title": "微服务负载使用TOP10",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 5,
+        "x": 5,
+        "y": 4
+      },
+      "id": 28,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "  SELECT\r\n    concat(namespace,':',deployment) AS name,\r\n    sum(p95_pod_cpu_pct) AS load\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n  GROUP BY\r\n    name\r\n    order by load desc\r\n    limit 10",
+          "refId": "A"
+        }
+      ],
+      "title": "微服务CPU使用率TOP10",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "decimals": 1,
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "mbytes"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 5,
+        "x": 10,
+        "y": 4
+      },
+      "id": 26,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "  SELECT\r\n    concat(namespace,':',deployment) AS name,\r\n    sum(p95_pod_wss_mb * pod_count) AS load\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n  GROUP BY\r\n    name\r\n    order by load desc\r\n    limit 10",
+          "refId": "A"
+        }
+      ],
+      "title": "微服务内存使用TOP10",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 5,
+        "x": 15,
+        "y": 4
+      },
+      "id": 29,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "  SELECT\r\n    concat(namespace,':',deployment) AS name,\r\n    sum(p95_pod_wss_pct) AS load\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n  GROUP BY\r\n    name\r\n    order by load desc\r\n    limit 10",
+          "refId": "A"
+        }
+      ],
+      "title": "微服务内存使用率TOP10",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 12,
+        "w": 4,
+        "x": 20,
+        "y": 4
+      },
+      "id": 27,
+      "options": {
+        "displayMode": "gradient",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "top",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": true,
+        "sizing": "auto",
+        "valueMode": "color"
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "  SELECT\r\n    concat(namespace,':',deployment) AS name,\r\n    sum(pod_count) AS load\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n  GROUP BY\r\n    name\r\n    order by load desc\r\n    limit 10",
+          "refId": "A"
+        }
+      ],
+      "title": "微服务Pod数TOP10",
+      "type": "bargauge"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 24,
+      "panels": [],
+      "title": "命名空间级别最大资源使用分析",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-clickhouse-datasource",
+        "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic-by-name"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "applyToRow": false,
+              "type": "color-background",
+              "wrapText": false
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/内存.*/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "mbytes"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "微服务数"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 88
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "命名空间"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 86
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "微服务%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 88
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pod数"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 77
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pod%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 76
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU限制"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 91
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text",
+                  "wrapText": false
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU需求%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 107
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU需求"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 92
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text",
+                  "wrapText": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU限制%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 107
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU负载%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 105
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "内存需求"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 91
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text",
+                  "wrapText": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "CPU负载"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 93
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text",
+                  "wrapText": false
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "内存需求%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 102
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byRegexp",
+              "options": "/.*%/"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "内存限制%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 102
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "内存限制"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text",
+                  "wrapText": false
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "内存使用"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 89
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text",
+                  "wrapText": false
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "yellow",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "内存%"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 74
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 17,
+        "w": 24,
+        "x": 0,
+        "y": 17
+      },
+      "id": 10,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "frameIndex": 1,
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "CPU负载"
+          }
+        ]
+      },
+      "pluginVersion": "",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "format": 1,
+          "meta": {
+            "builderOptions": {
+              "fields": [],
+              "limit": 100,
+              "mode": "list"
+            }
+          },
+          "queryType": "sql",
+          "rawSql": "-- 计算每个命名空间的值\r\nWITH per_namespace AS (\r\n  SELECT\r\n    namespace,\r\n    count(DISTINCT(deployment)) AS deployment,\r\n    sum(pod_count) AS pod,\r\n    sum(p95_pod_load * pod_count) AS load,\r\n    sum(p95_pod_wss_mb * pod_count) AS mem,\r\n    sum(request_pod_cpu_m * pod_count/1000) AS cpu_request,\r\n    sum(limit_pod_cpu_m * pod_count/1000) AS cpu_limit,\r\n    sum(request_pod_mem_mb * pod_count) AS mem_request,\r\n    sum(limit_pod_mem_mb * pod_count) AS mem_limit\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}'AND ${env}\r\n  GROUP BY\r\n    namespace\r\n),\r\n-- 计算总数\r\ntotals AS (\r\n  SELECT\r\n    sum(deployment) AS total_deployment,\r\n    sum(pod) AS total_pod,\r\n    sum(load) AS total_load,\r\n    sum(mem) AS total_mem,\r\n    sum(cpu_request) AS total_cpu_request,\r\n    sum(cpu_limit) AS total_cpu_limit,\r\n    sum(mem_request) AS total_mem_request,\r\n    sum(mem_limit) AS total_mem_limit\r\n  FROM\r\n    per_namespace\r\n) -- 合并并计算占比\r\nSELECT\r\n  per_namespace.namespace,\r\n  per_namespace.deployment,\r\n  per_namespace.deployment / totals.total_deployment AS deployment_percentage,\r\n  per_namespace.pod,\r\n  per_namespace.pod / totals.total_pod AS pod_percentage,\r\n\r\n  per_namespace.cpu_request,\r\n  per_namespace.cpu_request / totals.total_cpu_request AS cpu_request_percentage,\r\n  per_namespace.load,\r\n  per_namespace.load / totals.total_load AS load_percentage,\r\n  per_namespace.cpu_limit,\r\n  per_namespace.cpu_limit / totals.total_cpu_limit AS cpu_limit_percentage,\r\n\r\n  per_namespace.mem_request,\r\n  per_namespace.mem_request / totals.total_mem_request AS mem_request_percentage,\r\n  per_namespace.mem,\r\n  per_namespace.mem / totals.total_mem AS mem_percentage,\r\n  per_namespace.mem_limit,\r\n  per_namespace.mem_limit / totals.total_mem_limit AS mem_limit_percentage\r\n\r\nFROM\r\n  per_namespace\r\n  CROSS JOIN totals",
+          "refId": "A"
+        }
+      ],
+      "title": "【${__from:date:YYYY-MM-DD}~${__to:date:YYYY-MM-DD}最大资源使用的日期：${maxday}】【各命名空间级别】高峰时段P95资源使用量与资源占整体资源比例",
+      "transformations": [
+        {
+          "id": "seriesToRows",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "cpu_limit": "CPU限制",
+              "cpu_limit_percentage": "CPU限制%",
+              "cpu_request": "CPU需求",
+              "cpu_request_percentage": "CPU需求%",
+              "date": "日期",
+              "deployment": "微服务数",
+              "deployment_percentage": "微服务%",
+              "load": "CPU负载",
+              "load_percentage": "CPU负载%",
+              "mem": "内存使用",
+              "mem_limit": "内存限制",
+              "mem_limit_percentage": "内存限制%",
+              "mem_percentage": "内存%",
+              "mem_request": "内存需求",
+              "mem_request_percentage": "内存需求%",
+              "namespace": "命名空间",
+              "pod": "Pod数",
+              "pod_percentage": "Pod%"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 34
+      },
+      "id": 19,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic-by-name"
+              },
+              "custom": {
+                "align": "center",
+                "cellOptions": {
+                  "applyToRow": false,
+                  "type": "color-background",
+                  "wrapText": false
+                },
+                "filterable": false,
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/内存.*/"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "mbytes"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "命名空间"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 70
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pod数"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 67
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pod%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 68
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU限制"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 83
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU需求%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 107
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU需求"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 86
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU限制%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 107
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU负载%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 105
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存需求"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 91
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU负载"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 90
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存需求%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 102
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/.*%/"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "percentunit"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存限制%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 102
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存限制"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 90
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存使用"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 89
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 74
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "微服务"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width"
+                  },
+                  {
+                    "id": "custom.filterable",
+                    "value": true
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 24,
+            "x": 0,
+            "y": 79
+          },
+          "id": 21,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "enablePagination": false,
+              "fields": [],
+              "reducer": [
+                "sum"
+              ],
+              "show": true
+            },
+            "frameIndex": 1,
+            "showHeader": true,
+            "sortBy": [
+              {
+                "desc": false,
+                "displayName": "CPU需求"
+              }
+            ]
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "-- 计算每个命名空间的值\r\nWITH per_namespace AS (\r\n  SELECT\r\n    namespace,\r\n    deployment,\r\n    sum(pod_count) AS pod,\r\n    sum(p95_pod_load * pod_count) AS load,\r\n    sum(p95_pod_wss_mb * pod_count) AS mem,\r\n    sum(request_pod_cpu_m * pod_count/1000) AS cpu_request,\r\n    sum(limit_pod_cpu_m * pod_count/1000) AS cpu_limit,\r\n    sum(request_pod_mem_mb * pod_count) AS mem_request,\r\n    sum(limit_pod_mem_mb * pod_count) AS mem_limit\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}' AND ${env} AND ${namespace}\r\n  GROUP BY\r\n    namespace,deployment\r\n),\r\n-- 计算总数\r\ntotals AS (\r\n  SELECT\r\n    sum(pod) AS total_pod,\r\n    sum(load) AS total_load,\r\n    sum(mem) AS total_mem,\r\n    sum(cpu_request) AS total_cpu_request,\r\n    sum(cpu_limit) AS total_cpu_limit,\r\n    sum(mem_request) AS total_mem_request,\r\n    sum(mem_limit) AS total_mem_limit\r\n  FROM\r\n    per_namespace\r\n) -- 合并并计算占比\r\nSELECT\r\n  per_namespace.namespace,\r\n  per_namespace.deployment,\r\n  per_namespace.pod,\r\n  per_namespace.pod / totals.total_pod AS pod_percentage,\r\n  per_namespace.cpu_request,\r\n  per_namespace.cpu_request / totals.total_cpu_request AS cpu_request_percentage,\r\n  per_namespace.load,\r\n  per_namespace.load / totals.total_load AS load_percentage,\r\n  per_namespace.cpu_limit,\r\n  per_namespace.cpu_limit / totals.total_cpu_limit AS cpu_limit_percentage,\r\n\r\n  per_namespace.mem_request,\r\n  per_namespace.mem_request / totals.total_mem_request AS mem_request_percentage,\r\n  per_namespace.mem,\r\n  per_namespace.mem / totals.total_mem AS mem_percentage,\r\n  per_namespace.mem_limit,\r\n  per_namespace.mem_limit / totals.total_mem_limit AS mem_limit_percentage\r\n\r\nFROM\r\n  per_namespace\r\n  CROSS JOIN totals",
+              "refId": "A"
+            }
+          ],
+          "title": "【${__from:date:YYYY-MM-DD}~${__to:date:YYYY-MM-DD}最大资源使用的日期：${maxday}】【各微服务级别】高峰时段P95资源使用量与资源占整体资源比例",
+          "transformations": [
+            {
+              "id": "seriesToRows",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "includeByName": {},
+                "indexByName": {},
+                "renameByName": {
+                  "cpu_limit": "CPU限制",
+                  "cpu_limit_percentage": "CPU限制%",
+                  "cpu_request": "CPU需求",
+                  "cpu_request_percentage": "CPU需求%",
+                  "date": "日期",
+                  "deployment": "微服务",
+                  "deployment_percentage": "微服务%",
+                  "load": "CPU负载",
+                  "load_percentage": "CPU负载%",
+                  "mem": "内存使用",
+                  "mem_limit": "内存限制",
+                  "mem_limit_percentage": "内存限制%",
+                  "mem_percentage": "内存%",
+                  "mem_request": "内存需求",
+                  "mem_request_percentage": "内存需求%",
+                  "namespace": "命名空间",
+                  "pod": "Pod数",
+                  "pod_percentage": "Pod%"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "percent"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 0,
+            "y": 91
+          },
+          "id": 4,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(p95_pod_cpu_pct) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "每日高峰时段P95CPU使用率",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 8,
+            "y": 91
+          },
+          "id": 5,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(p95_pod_wss_pct) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "每日高峰时段P95内存使用率",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 16,
+            "y": 91
+          },
+          "id": 2,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(pod_count) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "每日微服务Pod数",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "align": "center",
+                "cellOptions": {
+                  "applyToRow": false,
+                  "mode": "gradient",
+                  "type": "color-background",
+                  "wrapText": false
+                },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/内存.*/"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "mbytes"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "命名空间"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 107
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pod数"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 81
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pod%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 122
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU限制"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 91
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU需求"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 117
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存需求"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 104
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "green",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU负载"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 106
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "yellow",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byRegexp",
+                  "options": "/.*%/"
+                },
+                "properties": [
+                  {
+                    "id": "unit",
+                    "value": "percent"
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "mode": "gradient",
+                      "type": "gauge",
+                      "valueDisplayMode": "color"
+                    }
+                  },
+                  {
+                    "id": "min",
+                    "value": 0
+                  },
+                  {
+                    "id": "max",
+                    "value": 100
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "mode": "continuous-GrYlRd"
+                    }
+                  },
+                  {
+                    "id": "decimals",
+                    "value": 1
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存限制"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 110
+                  },
+                  {
+                    "id": "color",
+                    "value": {
+                      "fixedColor": "red",
+                      "mode": "fixed"
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存使用"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 103
+                  },
+                  {
+                    "id": "custom.cellOptions",
+                    "value": {
+                      "type": "color-text",
+                      "wrapText": false
+                    }
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "Pod"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 302
+                  },
+                  {
+                    "id": "custom.filterable",
+                    "value": true
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "CPU使用%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 137
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "内存使用%"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 135
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "微服务"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 320
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 12,
+            "w": 24,
+            "x": 0,
+            "y": 101
+          },
+          "id": 22,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": [
+                "pod",
+                "cpu_request",
+                "load",
+                "cpu_limit",
+                "mem_request",
+                "mem",
+                "mem_limit",
+                "pod_percentage"
+              ],
+              "reducer": [
+                "sum"
+              ],
+              "show": true
+            },
+            "frameIndex": 1,
+            "showHeader": true,
+            "sortBy": [
+              {
+                "desc": true,
+                "displayName": "CPU使用"
+              }
+            ]
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 1,
+              "meta": {
+                "builderOptions": {
+                  "fields": [],
+                  "limit": 100,
+                  "mode": "list"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "-- 计算每个命名空间的值\r\nWITH per_namespace AS (\r\n  SELECT\r\n    namespace,\r\n    deployment,\r\n    sum(pod_count) AS pod,\r\n    sum(p95_pod_load) AS load,\r\n    sum(p95_pod_wss_mb) AS mem,\r\n    sum(p95_pod_cpu_pct) AS cpu_pct,\r\n    sum(p95_pod_wss_pct) AS mem_pct,\r\n    sum(request_pod_cpu_m/1000) AS cpu_request,\r\n    sum(limit_pod_cpu_m/1000) AS cpu_limit,\r\n    sum(request_pod_mem_mb) AS mem_request,\r\n    sum(limit_pod_mem_mb) AS mem_limit\r\n  FROM\r\n    kubedoor.${table} PREWHERE date = '${maxday}' AND ${env} AND ${namespace}\r\n  GROUP BY\r\n    namespace,deployment\r\n),\r\n-- 计算总数\r\ntotals AS (\r\n  SELECT\r\n    sum(pod) AS total_pod\r\n  FROM\r\n    per_namespace\r\n) -- 合并并计算占比\r\nSELECT\r\n  per_namespace.namespace,\r\n  per_namespace.deployment,\r\n  per_namespace.pod,\r\n  per_namespace.pod / totals.total_pod * 100 AS pod_percentage,\r\n\r\n  per_namespace.cpu_request,\r\n  per_namespace.load,\r\n  per_namespace.cpu_pct,\r\n  per_namespace.cpu_limit,\r\n\r\n  per_namespace.mem_request,\r\n  per_namespace.mem,\r\n  per_namespace.mem_pct,\r\n  per_namespace.mem_limit\r\n\r\nFROM\r\n  per_namespace\r\n  CROSS JOIN totals",
+              "refId": "A"
+            }
+          ],
+          "title": "【${__from:date:YYYY-MM-DD}~${__to:date:YYYY-MM-DD}最大资源使用的日期：${maxday}】【各Pod级别】高峰时段P95资源使用量与使用率分析",
+          "transformations": [
+            {
+              "id": "seriesToRows",
+              "options": {}
+            },
+            {
+              "id": "organize",
+              "options": {
+                "excludeByName": {},
+                "includeByName": {},
+                "indexByName": {
+                  "cpu_limit": 6,
+                  "cpu_pct": 7,
+                  "cpu_request": 4,
+                  "deployment": 1,
+                  "load": 5,
+                  "mem": 9,
+                  "mem_limit": 10,
+                  "mem_pct": 11,
+                  "mem_request": 8,
+                  "namespace": 0,
+                  "pod": 2,
+                  "pod_percentage": 3
+                },
+                "renameByName": {
+                  "cpu_limit": "CPU限制",
+                  "cpu_limit_percentage": "CPU限制%",
+                  "cpu_pct": "CPU使用%",
+                  "cpu_request": "CPU需求",
+                  "cpu_request_percentage": "CPU需求%",
+                  "date": "日期",
+                  "deployment": "微服务",
+                  "deployment_percentage": "微服务%",
+                  "load": "CPU负载",
+                  "load_percentage": "CPU负载%",
+                  "mem": "内存使用",
+                  "mem_limit": "内存限制",
+                  "mem_limit_percentage": "内存限制%",
+                  "mem_pct": "内存使用%",
+                  "mem_percentage": "内存%",
+                  "mem_request": "内存需求",
+                  "mem_request_percentage": "内存需求%",
+                  "namespace": "命名空间",
+                  "pod": "Pod数",
+                  "pod_percentage": "Pod%"
+                }
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "title": "微服务整体分析【$namespace】",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 7,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 0,
+            "y": 711
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Name",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(p95_pod_load * pod_count) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各微服务每日高峰时段P95 CPU负载",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 8,
+            "y": 711
+          },
+          "id": 14,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(request_pod_cpu_m * pod_count)/1000 FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各微服务CPU需求值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 16,
+            "y": 711
+          },
+          "id": 12,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(limit_pod_cpu_m * pod_count)/1000 FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各微服务CPU限制值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 0,
+            "y": 721
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(p95_pod_wss_mb * pod_count) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各微服务每日高峰时段P95 内存使用量",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 8,
+            "y": 721
+          },
+          "id": 11,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(request_pod_mem_mb * pod_count) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各微服务内存需求值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 16,
+            "y": 721
+          },
+          "id": 18,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(limit_pod_mem_mb * pod_count) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各微服务内存限制值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        }
+      ],
+      "title": "微服务资源曲线图【$namespace】",
+      "type": "row"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "id": 6,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 0,
+            "y": 324
+          },
+          "id": 1,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Mean",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(p95_pod_load) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各Pod每日高峰时段P95 CPU负载",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 8,
+            "y": 324
+          },
+          "id": 15,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(request_pod_cpu_m)/1000 FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各Pod CPU需求值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 16,
+            "y": 324
+          },
+          "id": 16,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(limit_pod_cpu_m)/1000 FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各Pod CPU限制值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 0,
+            "y": 334
+          },
+          "id": 3,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(p95_pod_wss_mb) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各Pod每日高峰时段P95内存使用量",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 8,
+            "y": 334
+          },
+          "id": 17,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(request_pod_mem_mb) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各Pod内存需求值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "grafana-clickhouse-datasource",
+            "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 0,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              },
+              "unit": "mbytes"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 8,
+            "x": 16,
+            "y": 334
+          },
+          "id": 13,
+          "options": {
+            "legend": {
+              "calcs": [
+                "last",
+                "mean",
+                "max"
+              ],
+              "displayMode": "table",
+              "placement": "bottom",
+              "showLegend": true,
+              "sortBy": "Last",
+              "sortDesc": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "pluginVersion": "11.4.0",
+          "targets": [
+            {
+              "builderOptions": {
+                "database": "kubedoor",
+                "fields": [],
+                "filters": [],
+                "limit": 100,
+                "mode": "list",
+                "orderBy": [],
+                "table": "k8s_resources"
+              },
+              "datasource": {
+                "type": "grafana-clickhouse-datasource",
+                "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+              },
+              "format": 0,
+              "meta": {
+                "builderOptions": {
+                  "database": "kubedoor",
+                  "fields": [],
+                  "filters": [],
+                  "limit": 100,
+                  "mode": "list",
+                  "orderBy": [],
+                  "table": "k8s_resources"
+                }
+              },
+              "queryType": "sql",
+              "rawSql": "SELECT date as time, deployment, max(limit_pod_mem_mb) FROM kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace} and ${deployment}\r\ngroup by time,deployment\r\norder by time\r\n",
+              "refId": "A"
+            }
+          ],
+          "title": "各Pod内存限制值",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "/.+ (.*)/",
+                "renamePattern": "$1"
+              }
+            }
+          ],
+          "type": "timeseries"
+        }
+      ],
+      "title": "Pod资源曲线图【$namespace】",
+      "type": "row"
+    }
+  ],
+  "schemaVersion": 40,
+  "tags": [
+    "StarsL.cn"
+  ],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+        },
+        "definition": "show tables from kubedoor",
+        "description": "",
+        "label": "数据表",
+        "name": "table",
+        "options": [],
+        "query": "show tables from kubedoor",
+        "refresh": 1,
+        "regex": "/^k8s_resources.*/",
+        "type": "query"
+      },
+      {
+        "allValue": "1 = 1",
+        "current": {},
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+        },
+        "definition": "SELECT\nconcat(env ,'#env = \\'',env,'\\'') \nfrom  kubedoor.${table} PREWHERE $__timeFilter(date) \ngroup by env",
+        "includeAll": false,
+        "label": "环境",
+        "name": "env",
+        "options": [],
+        "query": "SELECT\nconcat(env ,'#env = \\'',env,'\\'') \nfrom  kubedoor.${table} PREWHERE $__timeFilter(date) \ngroup by env",
+        "refresh": 1,
+        "regex": "/(?<text>.*)#(?<value>.*)/",
+        "sort": 5,
+        "type": "query"
+      },
+      {
+        "allValue": "1=1",
+        "current": {},
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+        },
+        "definition": "SELECT\nconcat(namespace,'#namespace = \\'',namespace,'\\'') \nfrom  kubedoor.${table} PREWHERE $__timeFilter(date) and ${env}\ngroup by namespace",
+        "description": "",
+        "includeAll": true,
+        "label": "命名空间",
+        "name": "namespace",
+        "options": [],
+        "query": "SELECT\nconcat(namespace,'#namespace = \\'',namespace,'\\'') \nfrom  kubedoor.${table} PREWHERE $__timeFilter(date) and ${env}\ngroup by namespace",
+        "refresh": 1,
+        "regex": "/(?<text>.*)#(?<value>.*)/",
+        "sort": 5,
+        "type": "query"
+      },
+      {
+        "allValue": "1=1",
+        "current": {},
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+        },
+        "definition": "SELECT\nconcat(deployment,'#deployment = \\'',deployment,'\\'') \nfrom  kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace}\ngroup by deployment",
+        "includeAll": true,
+        "label": "微服务",
+        "name": "deployment",
+        "options": [],
+        "query": "SELECT\nconcat(deployment,'#deployment = \\'',deployment,'\\'') \nfrom  kubedoor.${table} PREWHERE $__timeFilter(date) and ${env} and ${namespace}\ngroup by deployment",
+        "refresh": 1,
+        "regex": "/(?<text>.*)#(?<value>.*)/",
+        "sort": 5,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": {
+          "type": "grafana-clickhouse-datasource",
+          "uid": "${DS_KUBEDOOR-CLICKHOUSE}"
+        },
+        "definition": "SELECT\n\nconcat(formatDateTime(toDateTime(date), '%Y-%m-%d'),'#',formatDateTime(toDateTime(date), '%Y-%m-%d %T'))\n AS formatted_date\nFROM\n    kubedoor.${table}\nPREWHERE\n    $__timeFilter(date) AND ${env}\nGROUP BY\n    formatted_date\nORDER BY\n    SUM(pod_count * p95_pod_load) DESC\nLIMIT\n    1\n",
+        "description": "",
+        "label": "最大资源使用的日期",
+        "name": "maxday",
+        "options": [],
+        "query": "SELECT\n\nconcat(formatDateTime(toDateTime(date), '%Y-%m-%d'),'#',formatDateTime(toDateTime(date), '%Y-%m-%d %T'))\n AS formatted_date\nFROM\n    kubedoor.${table}\nPREWHERE\n    $__timeFilter(date) AND ${env}\nGROUP BY\n    formatted_date\nORDER BY\n    SUM(pod_count * p95_pod_load) DESC\nLIMIT\n    1\n",
+        "refresh": 2,
+        "regex": "/(?<text>.*)#(?<value>.*)/",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-30d",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "Asia/Shanghai",
+  "title": "K8S每日高峰时段资源数据分析",
+  "uid": "KubeDoor",
+  "version": 1,
+  "weekStart": ""
+}
