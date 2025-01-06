@@ -25,6 +25,9 @@ kubectl edit configmap -n kubedoor kubedoor-config
 kubectl rollout restart deployment -n kubedoor kubedoor-api kubedoor-webhook
 ```
 
+## 访问内置grafana
+浏览器访问`http://<server_ip>:xxxxx/grafana`,如果是ingress域名访问，也同样在域名后面加上`/grafana`路由
+
 ## 参考
 - [CassInfra/KubeDoor][1]
 
