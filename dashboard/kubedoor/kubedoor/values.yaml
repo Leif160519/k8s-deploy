@@ -22,8 +22,8 @@ config: # 调用外部资源的配置信息
   # 注意：Prometheus默认端口是9090，Victoria-Metrics-Single默认端口是8428，Victoria-Metrics-Cluster默认读端口是8481。
   PROM_TYPE: "Victoria-Metrics-Single" # 从Prometheus中采集数据，输入Prom数据源的类型：Prometheus, Victoria-Metrics-Single, Victoria-Metrics-Cluster
   PROM_URL: "http://victoria.monitoring.svc:8428" #Prometheus的地址，http开头，端口号结尾，有认证的按例子格式填写。
-  PROM_K8S_TAG_KEY: "env" # 这是用于多K8S数据采集到同一个Prom数据库时，用来给各指标区分不同K8S的标签的key，如果没有请留空""。
-  PROM_K8S_TAG_VALUE: "kubernetes" # 是用于多K8S数据采集到同一个Prom数据库时，用来给各指标区分不同K8S的标签的key对应的value，如果你的K8S采集到单独的Prometheus，或者没有区分K8S的标签，请key，value都留空""。
+  PROM_K8S_TAG_KEY: "env" # 这是用于多K8S数据采集到同一个Prom数据库时，用来给各指标区分不同K8S的标签的key，不能留空，值取自prometheus配置中的external_labels字段内容。
+  PROM_K8S_TAG_VALUE: "kubernetes" # 是用于多K8S数据采集到同一个Prom数据库时，用来给各指标区分不同K8S的标签的key对应的value，无论你的K8S是否采集到单独的Prometheus，不能留空，值取自prometheus配置中的external_labels字段内容。
 
   # 这里是填写业务相关的信息
   NAMESPACE_LIST: "database,default,devops,gpt,immich,ingress-nginx,jms,kube-system,kubepi,metallb-system,monitoring,velero" # 需要采集数据和管控的命名空间列表，所有操作都关联这些命名空间。
