@@ -1,7 +1,7 @@
 image:
   repository: swr.cn-south-1.myhuaweicloud.com/starsl.cn
   kubedoor_api_tag: 1564-b54d09cc
-  kubedoor_web_tag: 1567-273b7e60
+  kubedoor_web_tag: 1585-635a7495
   kubedoor_webhook_tag: 1562-d3889fb4
 
 kubedoor_web_secret:
