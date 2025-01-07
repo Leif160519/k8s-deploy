@@ -41,6 +41,8 @@ data:
       uid: KubeDoor-Clickhouse
   grafana.ini: |
     app_mode = production
+    [live]
+    allowed_origins = *
     [analytics]
     check_for_updates = false
     reporting_enabled = false
