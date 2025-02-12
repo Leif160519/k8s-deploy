@@ -33,6 +33,9 @@ curl -fsSL https://ollama.com/install.sh | sh
 ```
 ollama pull llama3.1:latest
 ```
+
+> 如果是其他大模型，比如deepseek，可以类推`ollama pull deepseek-r1:8b`
+
 - 3.设置ollama服务允许外部服务器访问
   - a.编辑ollama服务文件
   ```
@@ -52,8 +55,8 @@ ollama pull llama3.1:latest
   curl http://<ollama-server>:11434
   Ollama is running
   ```
-- 3.oneapi中新增渠道，选择自定义模型，新增llama3.1:latest大模型，名称写llama3.1:latest,模型手动填入llama3.1:latest
-- 4.oneapi中新增令牌或者修改令牌，将llama3.1:latest模型添加进去即可
+- 4.oneapi中新增渠道，选择自定义模型，新增llama3.1:latest大模型，名称写llama3.1:latest,模型手动填入llama3.1:latest
+- 5.oneapi中新增令牌或者修改令牌，将llama3.1:latest模型添加进去即可
 
 ## 参考
 - [定制你的AI梦！快速搭建属于自己的本地FastGPT][1]
