@@ -66,6 +66,7 @@ ollama pull llama3.1:latest
 - [chatgpt-web][5]
 - [ChatGPT-Next-Web][6]
 - [DeepSeek-R1本地部署，再也不怕宕机，还有语音功能！][7]
+- [FastGPT 一招帮你解决 DeepSeek R1 的卡顿问题][8]
 
 [1]: https://mp.weixin.qq.com/s/ECMU8puDhumDIonfsdYlUA
 [2]: https://github.com/songquanpeng/one-api
@@ -74,3 +75,4 @@ ollama pull llama3.1:latest
 [5]: https://github.com/Chanzhaoyu/chatgpt-web
 [6]: https://github.com/Yidadaa/ChatGPT-Next-Web
 [7]: https://blog.csdn.net/2401_84204207/article/details/14538991
+[8]: https://mp.weixin.qq.com/s/qvUrioKPhTrXlu0WqIDwKw
