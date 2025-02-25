@@ -1,0 +1,43 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homebox
+  namespace: tools
+  labels:
+    app: homebox
+spec:
+  sessionAffinity: ClientIP
+  selector:
+    app: homebox
+  type: ClusterIP
+  ports:
+    - name: http
+      protocol: TCP
+      port: 7745
+      targetPort: 7745
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homebox
+  namespace: tools
+  labels:
+    app: homebox
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: homebox.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: homebox
+            port:
+              number: 7745
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - homebox.github.icu
+    secretName: github-tls

@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: homebox
+  name: homebox
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homebox
+  template:
+    metadata:
+      labels:
+        app: homebox
+    spec:
+      containers:
+      - name: homebox
+        env:
+          - name: HBOX_WEB_MAX_UPLOAD_SIZE
+            value: "10"
+          - name: HBOX_LOG_FORMAT
+            value: text
+          - name: HBOX_LOG_LEVEL
+            value: info
+          - name: TZ
+            value: Asia/Shanghai
+        image: registry.cn-hangzhou.aliyuncs.com/jeson/homebox:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 7745
+          name: http
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 7745
+          timeoutSeconds: 3
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 7745
+          timeoutSeconds: 3
+        volumeMounts:
+        - name: localtime
+          mountPath: /etc/localtime
+        - name: homebox
+          mountPath: /data
+          subPath: homebox
+      volumes:
+      - name: localtime
+        hostPath:
+          path: /etc/localtime
+          type: ""
+      - name: homebox
+        persistentVolumeClaim:
+          claimName: homebox
