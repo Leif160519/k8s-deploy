@@ -122,6 +122,29 @@
       "customExtractPrompt": "",
       "defaultSystemChatPrompt": "",
       "defaultConfig":{}
+    },
+    {
+      "model": "deepseek-chat",
+      "name": "deepseek-chat",
+      "avatar": "/imgs/model/openai.svg",
+      "maxContext": 16000,
+      "maxResponse": 4000,
+      "quoteMaxToken": 13000,
+      "maxTemperature": 1.2,
+      "charsPointsPrice": 0,
+      "censor": false,
+      "vision": true,
+      "datasetProcess": true,
+      "usedInClassify": true,
+      "usedInExtractFields": true,
+      "usedInToolCall": true,
+      "usedInQueryExtension": true,
+      "toolChoice": true,
+      "functionCall": false,
+      "customCQPrompt": "",
+      "customExtractPrompt": "",
+      "defaultSystemChatPrompt": "",
+      "defaultConfig":{}
     }
   ],
   "vectorModels": [
