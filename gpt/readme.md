@@ -23,6 +23,7 @@ mongodb://root:123456@mongodb-0.:27017,mongodb-1.mongodb.database.svc:27017,mong
 - oneapi中配置m3e的地址，一定要用`NodePort`类型的svc形式才可以,如：`http://192.168.31.81:32387`,原因暂时未知
 - oneapi中重新配置m3e地址后，需要重启fastgpt和oneapi的pod才能生效
 - oneapi初始账号：root  密码：123456
+- 当oneapi日志中出现大量`batch update started`和`batch update finished`，且健康检查期间未能就绪时，可以延长健康检查的时间间隔，确保pod有充足的时间启动.
 
 ## 添加llama大模型
 - 1.安装ollama

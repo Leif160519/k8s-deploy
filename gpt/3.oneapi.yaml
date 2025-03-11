@@ -107,7 +107,7 @@ spec:
     spec:
       containers:
       - name: oneapi
-        image: ghcr.io/songquanpeng/one-api:v0.6.8
+        image: ghcr.io/songquanpeng/one-api:v0.6.10
         #image: registry.cn-hangzhou.aliyuncs.com/fastgpt/one-api:v0.6.6
         imagePullPolicy: IfNotPresent
         env:
