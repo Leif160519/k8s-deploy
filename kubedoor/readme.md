@@ -28,8 +28,6 @@ kubectl apply -f ingress.yaml
 ## 访问内置grafana
 浏览器访问`http://<server_ip>:xxxxx/grafana`,如果是ingress域名访问，也同样在域名后面加上`/grafana`路由
 
-> 如想用外置grafana查看监控，可导入`kubedoor-grafana.json`看板
-
 ## 参考
 - [CassInfra/KubeDoor][1]
 
