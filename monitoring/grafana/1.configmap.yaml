@@ -24,6 +24,7 @@ data:
     [snapshots]
     [dashboards]
     [users]
+    default_language = zh-Hans
     [auth]
     [auth.anonymous]
     enabled = true
