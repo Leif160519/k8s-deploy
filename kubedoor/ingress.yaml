@@ -22,3 +22,28 @@ spec:
   - hosts:
     - kubedoor.github.icu
     secretName: github-tls
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vmalert
+  namespace: kubedoor
+  labels:
+    app: vmalert
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: vmalert.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: vmalert
+            port:
+              number: 8080
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - vmalert.github.icu
+    secretName: github-tls

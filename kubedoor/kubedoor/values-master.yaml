@@ -1,0 +1,95 @@
+# kubedoor 1.0.0 开始分为agent端和master端，支持多K8S集群。
+# 这是master端的配置
+
+kubedoor:
+  master:
+    enable: true
+  web:
+    enable: true
+  dash:
+    enable: true
+
+clickhouse:
+  enable: true # enable为true时，表示自动新安装clickhouse单机版到kubedoor命名空间内。
+
+  storage: 100Gi # 存储空间大小。(enable为true时会使用该变量)
+  storageClass: nfs-storage # 查看您K8S的StorageClass，指定有效的存储类，会自动创建PV/PVC。(enable为true时会使用该变量)
+
+  CK_PASSWORD: "di88fg2k" # enable为true时，填写为default用户创建的ClickHouse密码。enable为false时，请填写已有的ClickHouse密码。
+
+  #【enable为true时，以下信息请勿修改】
+  #【enable为false时，请填写您已有的ClickHouse信息】
+  CK_HOST: "clickhouse.kubedoor" # ClickHouse数据库的IP
+  CK_PORT: "9000" # ClickHouse数据库的TCP端口
+  CK_HTTP_PORT: "8123" # ClickHouse数据库的HTTP端口
+  CK_USER: "default" # ClickHouse数据库的账号
+
+
+tsdb:
+  # 采集K8S的指标数据存入时序数据库，请输入时序数据库的类型：KubeDoor, Victoria-Metrics-Single, Victoria-Metrics-Cluster。
+  # type为KubeDoor时，表示自动新安装VictoriaMetrics单机版到kubedoor命名空间内，其它为使用您已有的时序数据库。
+  type: "KubeDoor"
+
+  # 以下两个字段用于多K8S监控数据，通过远程写方式，写入到同一个时序数据库的场景，即为Prometheus/vmagent设置中的external_labels的key/value。
+  # 使用远程存储时，这个key/value会作为标签增加到每一个指标中，这样通过这个标签就可以区分出指标属于哪个K8S了。
+
+  # 如果是使用您已有的Victoria-Metrics，请在您的Prometheus/vmagent配置中找到external_labels的key填入，如果您没有配置过请在您的Prometheus/vmagent配置中新增一个。
+  external_labels_key: "origin_prometheus" # 注意key只能字母数字下划线，不能数字开头，不能有中横线和点。
+  # external_labels_value: "" # master端不需要填写该字段。
+
+
+  #【当type为: KubeDoor时，vm地址会自动生成，以下变量无效，无需填写】
+  #【当type为: Victoria-Metrics-Single, 请填写您的时序数据库地址】
+  url: "http://monit:dduF1E3sj@10.7.0.100:8428" #时序数据库的地址，http开头，端口号结尾，有认证的按例子格式填写。
+
+  #【当type为: KubeDoor时，vm地址会自动生成，以下变量无效，无需填写】
+  #【当type为: Victoria-Metrics-Cluster, 请分别填写完整的时序数据库读/写接口地址】
+  # 注意：Victoria-Metrics-Cluster默认读端口是8481，写端口是8480。
+  remoteRead: "http://vmselect:8481/select/0/prometheus"
+  remoteWrite: "http://vminsert:8480/insert/0/prometheus"
+
+
+monit:
+  #【当tsdb.type: "KubeDoor"时,才会安装Victoria-Metrics-Single，需要填写以下vm_single的内容】
+  #【当tsdb.type非KubeDoor时，无需填写以下vm_single的内容】
+  vm_single:
+    retention: 30d # 监控数据的存储时长
+    user: monit # vm_single的账号
+    passwd: dduF1E3sj # vm_single的密码
+    storage: 100Gi # 存储空间大小
+    storageClass: nfs-storage # 查看您K8S的StorageClass，指定有效的存储类，会自动创建PV/PVC
+
+
+  # kubedoor集成的alertmanager，会安装到kubedoor命名空间，不会影响已有的alertmanager。
+  # 集成了对接kubedoor_alarm进行告警通知，告警入库的配置。
+  alertmanager:
+    enable: true
+
+
+  # 这是对接alertmanager的webhook方式的告警通知服务：支持企微，钉钉，飞书；并且提供了告警入库的功能，提供给kuibedoor-web展示分析告警数据。
+  # kubedoor集成的alertmanager中已经配置好对接到kubedoor-alarm通知服务。
+  kubedoor_alarm:
+    enable: true
+    DEFAULT_AT: "a01100" # 如果在告警规则中找不到annotations.at的值，则会使用该值(IM工具的用户ID)作为@的通知人。
+    ALERTMANAGER_EXTURL: "http://192.168.31.81:31751" # alertmanager外部可访问的链接，用于收到告警通知后，可直接点击访问alertmanager进行屏蔽告警的按钮。(部署后可在kubedoor-config中修改)
+
+
+  # vmalert是替代Prometheus中告警规则计算并触发告警的组件。tsdb.type非Prometheus，并且monit.vmalert.enable是true时会安装。
+  vmalert:
+    enable: true
+    # 如果alertmanager.enable为false，则需要填写您自己已有的alertmanager_url。
+    alertmanager_url: "http://alertmanager:9093"
+
+
+kubedoor_web_secret:
+  # nginx basic认证配置，用于KuboDoor-Web登录的账号密码。
+  nginx_auth: # htpasswd格式："用户名:加密密码"，可以在https://tool.lu/htpasswd/在线生成，加密方式选Crypt。
+    - kubedoor:a3rsHbfPnb4Ps # 这是默认的账号密码，都是"kubedoor"，可以配置多个账号。
+    - Up4biLko1dNh:cUo3fhryKizac # 这是预置的用于agent连接master进行basic认证用的。账号：Up4biLko1dNh 密码：qCa22jDkfc9y
+
+
+config:
+  # 这里填写通知的信息(包括告警的默认通知，告警的通知可以在alertmanager更改)
+  # 钉钉机器人安全设置的自定义关键词请设置为：告警
+  MSG_TYPE: "feishu" # 各类操作通知的消息类型：wecom, dingding, feishu
+  MSG_TOKEN: "c0021d50-8bc9-4c6c-8857-143cc467305c" # 通知服务对应的token

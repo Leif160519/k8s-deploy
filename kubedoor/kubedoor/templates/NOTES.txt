@@ -1,0 +1,35 @@
+{{- if .Values.kubedoor.master.enable }}
+🎉
+# ClickHouse
+ClickHouse WEBUI: http://{{ .Values.clickhouse.CK_HOST }}:{{ .Values.clickhouse.CK_HTTP_PORT }}/play
+ClickHouse 用户名: {{ .Values.clickhouse.CK_USER }}
+ClickHouse 密码: {{ .Values.clickhouse.CK_PASSWORD }}
+
+# TSDB
+{{- if eq .Values.tsdb.type "KubeDoor" }}
+时序数据库类型: KubeDoor (Victoria-Metrics-Single)
+Victoria-Metrics WEBUI: http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428
+vmagent配置远程写地址: http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428/api/v1/write
+注意: 跨K8S访问时，请把victoria-metrics.kubedoor:8428替换为您外部可访问的IP和端口
+{{- else if eq .Values.tsdb.type "Victoria-Metrics-Cluster" }}
+时序数据库类型: Victoria-Metrics-Cluster
+Victoria-Metrics远程读地址: http://{{ .Values.tsdb.remoteRead }}
+vmagent配置远程写地址: http://{{ .Values.tsdb.remoteWrite }}
+{{- else }}
+时序数据库类型: Victoria-Metrics-Single
+Victoria-Metrics WEBUI: {{ .Values.tsdb.url }}
+vmagent配置远程写地址: {{ .Values.tsdb.url }}/api/v1/write
+{{- end }}
+
+统一的external_labels_key: {{ .Values.tsdb.external_labels_key }}
+
+# KubeDoor web
+KubeDoor webUI: http://nodeIP:kubedoor-web nodeport
+默认账号密码都是: kubedoor
+{{- else }}
+🎉
+KubeDoor Agent: {{ .Values.tsdb.external_labels_value }} 安装完成。
+请访问KubeDoor-Web，点击agent管理，找到您部署的agent：{{ .Values.tsdb.external_labels_value }}，状态应该是在线，先开启自动采集，设置好高峰期时段，再执行采集：输入需要采集的历史数据时长，点击采集，即可采集历史数据并更新高峰时段数据到管控表。 
+
+注意：如果您是新安装的监控系统，并且已过了当天的高峰期时段，将会无法采集到数据；需要等第二天高峰期时段之后才能采集到数据。或者临时修改高峰时段为采集过监控数据的时段，再手动点击采集。
+{{- end }}

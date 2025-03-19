@@ -1,3 +1,4 @@
+{{- if .Values.kubedoor.webhook.enable }}
 apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
@@ -33,16 +34,22 @@ metadata:
   name: kubedoor-config
   namespace: kubedoor
 data:
-  CK_HOST: {{ .Values.config.CK_HOST | quote }}
-  CK_PORT: {{ .Values.config.CK_PORT | quote }}
-  CK_HTTP_PORT: {{ .Values.config.CK_HTTP_PORT | quote }}
-  CK_USER: {{ .Values.config.CK_USER | quote }}
-  CK_PASSWORD: {{ .Values.config.CK_PASSWORD | quote }}
+  CK_HOST: {{ .Values.clickhouse.CK_HOST | quote }}
+  CK_PORT: {{ .Values.clickhouse.CK_PORT | quote }}
+  CK_HTTP_PORT: {{ .Values.clickhouse.CK_HTTP_PORT | quote }}
+  CK_USER: {{ .Values.clickhouse.CK_USER | quote }}
+  CK_PASSWORD: {{ .Values.clickhouse.CK_PASSWORD | quote }}
   CK_DATABASE: kubedoor
-  PROM_TYPE: {{ .Values.config.PROM_TYPE | quote }}
-  PROM_URL: {{ .Values.config.PROM_URL | quote }}
-  PROM_K8S_TAG_KEY: {{ .Values.config.PROM_K8S_TAG_KEY | quote }}
-  PROM_K8S_TAG_VALUE: {{ .Values.config.PROM_K8S_TAG_VALUE | quote }}
+  PROM_TYPE: {{ .Values.tsdb.type | quote }}
+  {{- if eq .Values.tsdb.type "KubeDoor" }}
+  PROM_URL: "http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428"
+  {{- else if eq .Values.tsdb.type "Victoria-Metrics-Cluster" }}
+  PROM_URL: {{ .Values.tsdb.remoteRead | quote }}
+  {{- else }}
+  PROM_URL: {{ .Values.tsdb.url | quote }}
+  {{- end }}
+  PROM_K8S_TAG_KEY: {{ .Values.tsdb.external_labels_key | quote }}
+  PROM_K8S_TAG_VALUE: {{ .Values.tsdb.external_labels_value | quote }}
   NAMESPACE_LIST: {{ .Values.config.NAMESPACE_LIST | quote }}
   PEAK_TIME: {{ .Values.config.PEAK_TIME | quote }}
   MSG_TYPE: {{ .Values.config.MSG_TYPE | quote }}
@@ -199,74 +206,6 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: kubedoor-cluster-role
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: kubedoor-api
-  namespace: kubedoor
-  labels:
-    app: kubedoor-api
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: kubedoor-api
-  template:
-    metadata:
-      labels:
-        app: kubedoor-api
-    spec:
-      containers:
-        - name: kubedoor-api
-          image: {{ .Values.image.repository }}/kubedoor-api:{{ .Values.image.kubedoor_api_tag }}
-          envFrom:
-            - configMapRef:
-                name: kubedoor-config
-          env:
-            - name: TZ
-              value: Asia/Shanghai
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1Gi
-            requests:
-              cpu: 1m
-              memory: 1Mi
-          livenessProbe:
-            tcpSocket:
-              port: 80
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
-          readinessProbe:
-            tcpSocket:
-              port: 80
-            timeoutSeconds: 1
-            periodSeconds: 10
-            successThreshold: 1
-            failureThreshold: 3
-      restartPolicy: Always
-      serviceAccountName: kubedoor-service-account
-      serviceAccount: kubedoor-service-account
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kubedoor-api
-  namespace: kubedoor
-  labels:
-    app: kubedoor-api
-spec:
-  ports:
-    - name: http
-      protocol: TCP
-      port: 80
-      targetPort: 80
-  selector:
-    app: kubedoor-api
-  type: ClusterIP 
 
 ---
 
@@ -297,3 +236,4 @@ spec:
           restartPolicy: Never
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 1
+{{- end }}
