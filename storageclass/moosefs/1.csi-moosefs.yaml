@@ -222,7 +222,7 @@ spec:
             capabilities:
               add: ["SYS_ADMIN"]
             allowPrivilegeEscalation: true
-          image: registry.moosefs.com:443/moosefs-csi-plugin:0.9.4-3.0.117
+          image: registry.moosefs.com:443/moosefs-csi-plugin:0.9.6-3.0.118
           args:
             - "--mode=controller"
             - "--csi-endpoint=$(CSI_ENDPOINT)"
