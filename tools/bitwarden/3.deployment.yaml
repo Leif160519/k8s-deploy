@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: bitwarden
-          image: bitwardenrs/server:latest
+          image: vaultwarden/server:latest
           env:
             - name: WEBSOCKET_ENABLE
               value: "true"
