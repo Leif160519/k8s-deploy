@@ -26,6 +26,20 @@ spec:
               value: "https://password.github.icu"
             - name: ADMIN_TOKEN
               value: "UqiLZGrPFez0SJkvUhux84IOWFayGarZQuQhG4RnetYJMiGNKJezZsLzmBCIEVYQ"
+            - name: SQLITE_WAL_MODE
+              value: "true"
+            - name: SQLITE_CACHE_SIZE
+              value: "256"
+            - name: DB_MAX_CONNECTIONS
+              value: "50"
+            - name: DB_TIMEOUT
+              value: "30"
+            - name: HTTP2_ENABLED
+              value: "true"
+            - name: WEBSOCKET_PING_INTERVAL
+              value: "60"
+            - name: AESNI_ENABLED
+              value: "true"
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
