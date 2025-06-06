@@ -10,7 +10,7 @@ kubedoor:
 config:
   # 这里填写通知的信息，大部分操作会通过该机器人进行通知，钉钉机器人安全设置的自定义关键词请设置为：告警
   MSG_TYPE: "feishu" # 各类操作通知的消息类型：wecom, dingding, feishu
-  MSG_TOKEN: "c0021d50-8bc9-4c6c-8857-143cc467305c" # 通知服务对应的token
+  MSG_TOKEN: "c0021d50-xxxx-xxxx-xxxx-143cc467305c" # 通知服务对应的token
 
   #java服务执行dump、jfr、jstack时会把数据存放到OBS，请填写您的OBS地址。(暂无OBS可以安装后在agent端修改，注意设置允许内网免认证上传。)
   OSS_URL: "https://xxxxxxxxx.obs.cn-south-1.myhuaweicloud.com"

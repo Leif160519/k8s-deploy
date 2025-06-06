@@ -70,4 +70,4 @@ config:
   # 这里填写通知的信息(包括告警的默认通知，部署后可以自行在alertmanager配置中，更改通知路由规则。)
   # 钉钉机器人安全设置的自定义关键词请设置为：告警
   MSG_TYPE: "feishu" # 各类操作通知的消息类型：wecom, dingding, feishu
-  MSG_TOKEN: "c0021d50-8bc9-4c6c-8857-143cc467305c" # 通知服务对应的token
+  MSG_TOKEN: "c0021d50-xxxx-xxxx-xxxx-143cc467305c" # 通知服务对应的token
