@@ -14,7 +14,9 @@ data:
         `collect` Bool DEFAULT false,
         `peak_hours` String,
         `admission` Bool DEFAULT false,
-        `admission_namespace` String
+        `admission_namespace` String,
+        `nms_not_confirm` Bool DEFAULT false,
+        `scheduler` Bool DEFAULT false
     )
     ENGINE = MergeTree
     PRIMARY KEY tuple(env)
@@ -244,7 +246,11 @@ spec:
         - name: clickhouse-config
           configMap:
             name: clickhouse-config
-
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
 ---
 
 apiVersion: v1
@@ -258,7 +264,7 @@ spec:
   resources:
     requests:
       storage: {{ .Values.clickhouse.storage }}
-  storageClassName: {{ .Values.clickhouse.storageClass }}
+  storageClassName: {{ .Values.storageClass }}
 
 ---
 

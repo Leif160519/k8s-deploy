@@ -1,4 +1,4 @@
-{{- if .Values.monit.vmalert.enable }}
+{{- if .Values.kubedoor.master.enable }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -429,9 +429,9 @@ spec:
           imagePullPolicy: IfNotPresent
           args:
             {{- if eq .Values.tsdb.type "KubeDoor" }}
-            - -datasource.url=http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428
-            - -remoteWrite.url=http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428
-            - -remoteRead.url=http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428
+            - -datasource.url=http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428
+            - -remoteWrite.url=http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428
+            - -remoteRead.url=http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428
             {{- else if eq .Values.tsdb.type "Victoria-Metrics-Cluster" }}
             - -datasource.url={{ .Values.tsdb.remoteRead }}
             - -remoteWrite.url={{ .Values.tsdb.remoteWrite }}
@@ -441,11 +441,7 @@ spec:
             - -remoteWrite.url={{ .Values.tsdb.url }}
             - -remoteRead.url={{ .Values.tsdb.url }}
             {{- end }}
-            {{- if .Values.monit.alertmanager.enable }}
             - -notifier.url=http://alertmanager.kubedoor:9093
-            {{- else }}
-            - -notifier.url={{ .Values.monit.vmalert.alertmanager_url }}
-            {{- end }}
             - -rule=/etc/ruler/*.yaml
             - -evaluationInterval=15s
             - -httpListenAddr=0.0.0.0:8080

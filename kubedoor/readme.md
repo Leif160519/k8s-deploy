@@ -28,6 +28,13 @@ kubectl apply -f ingress.yaml
 ## 访问内置grafana
 浏览器访问`http://<server_ip>:xxxxx/grafana`,如果是ingress域名访问，也同样在域名后面加上`/grafana`路由
 
+## 修改定时任务产生的job数量
+```
+kubectl edit cronjobs.batch -n kubedoor kubedoor-collect
+
+找到successfulJobsHistoryLimit，修改为其他数字，设置为0代表不保留
+```
+
 ## 参考
 - [CassInfra/KubeDoor][1]
 

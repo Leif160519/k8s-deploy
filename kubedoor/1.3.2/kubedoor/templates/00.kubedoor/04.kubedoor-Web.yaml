@@ -1,4 +1,4 @@
-{{- if .Values.kubedoor.web.enable }}
+{{- if .Values.kubedoor.master.enable }}
 apiVersion: v1
 kind: Secret
 metadata:

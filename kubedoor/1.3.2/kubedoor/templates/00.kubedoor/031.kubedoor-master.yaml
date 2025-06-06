@@ -13,7 +13,7 @@ data:
   CK_DATABASE: kubedoor
   PROM_TYPE: {{ .Values.tsdb.type | quote }}
   {{- if eq .Values.tsdb.type "KubeDoor" }}
-  PROM_URL: "http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428"
+  PROM_URL: "http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428"
   {{- else if eq .Values.tsdb.type "Victoria-Metrics-Cluster" }}
   PROM_URL: {{ .Values.tsdb.remoteRead | quote }}
   {{- else }}
@@ -22,8 +22,9 @@ data:
   PROM_K8S_TAG_KEY: {{ .Values.tsdb.external_labels_key | quote }}
   MSG_TYPE: {{ .Values.config.MSG_TYPE | quote }}
   MSG_TOKEN: {{ .Values.config.MSG_TOKEN | quote }}
-  DEFAULT_AT: {{ .Values.monit.kubedoor_alarm.DEFAULT_AT | quote }}
-  ALERTMANAGER_EXTURL: {{ .Values.monit.kubedoor_alarm.ALERTMANAGER_EXTURL | quote }}
+  DEFAULT_AT: {{ .Values.kubedoor_alarm.DEFAULT_AT | quote }}
+  ALERTMANAGER_EXTURL: {{ .Values.kubedoor_alarm.ALERTMANAGER_EXTURL | quote }}
+  LOG_LEVEL: INFO
 
 ---
 apiVersion: v1
@@ -41,8 +42,8 @@ data:
     # TSDB
     {{- if eq .Values.tsdb.type "KubeDoor" }}
     时序数据库类型: KubeDoor (Victoria-Metrics-Single)
-    Victoria-Metrics WEBUI: http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428
-    vmagent配置远程写地址: http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428/api/v1/write
+    Victoria-Metrics WEBUI: http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428
+    vmagent配置远程写地址: http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428/api/v1/write
     注意: 跨K8S访问时，请把victoria-metrics.kubedoor:8428替换为您外部可访问的IP和端口
     {{- else if eq .Values.tsdb.type "Victoria-Metrics-Cluster" }}
     时序数据库类型: Victoria-Metrics-Cluster

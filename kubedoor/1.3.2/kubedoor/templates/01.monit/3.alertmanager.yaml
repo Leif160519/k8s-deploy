@@ -1,4 +1,4 @@
-{{- if .Values.monit.alertmanager.enable }}
+{{- if .Values.kubedoor.master.enable }}
 apiVersion: v1
 kind: ConfigMap
 metadata:

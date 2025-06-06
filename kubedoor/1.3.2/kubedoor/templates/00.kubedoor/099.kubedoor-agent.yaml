@@ -101,6 +101,34 @@ rules:
       - ''
     resources:
       - pods/exec
+  - verbs:
+      - patch
+      - update
+      - list
+    apiGroups:
+      - ''
+    resources:
+      - nodes
+  - verbs:
+      - get
+    apiGroups:
+      - ''
+    resources:
+      - pods/log
+  - verbs:
+      - list
+    apiGroups:
+      - ''
+    resources:
+      - events
+  - verbs:
+      - get
+      - list
+    apiGroups:
+      - metrics.k8s.io
+    resources:
+      - nodes
+      - pods
 ---
 
 apiVersion: rbac.authorization.k8s.io/v1

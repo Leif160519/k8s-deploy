@@ -1,4 +1,4 @@
-{{- if .Values.kubedoor.dash.enable }}
+{{- if .Values.kubedoor.master.enable }}
 apiVersion: v1
 kind: Secret
 metadata:
@@ -44,7 +44,7 @@ data:
       uid: KubeDoor-Prometheus
       type: prometheus
       {{- if eq .Values.tsdb.type "KubeDoor" }}
-      url: "http://{{ .Values.monit.vm_single.user }}:{{ .Values.monit.vm_single.passwd }}@victoria-metrics.kubedoor:8428"
+      url: "http://{{ .Values.tsdb.vm_single.user }}:{{ .Values.tsdb.vm_single.passwd }}@victoria-metrics.kubedoor:8428"
       {{- else if eq .Values.tsdb.type "Victoria-Metrics-Cluster" }}
       url: {{ .Values.tsdb.remoteRead | quote }}
       {{- else }}
