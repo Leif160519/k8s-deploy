@@ -45,7 +45,7 @@ spec:
         - name: transport.tcp.port
           value: "9300"
         - name: xpack.security.enabled
-          value: "true"
+          value: "false" # 禁用安全模块，否则需要配置ssl证书
         - name: ELASTIC_PASSWORD
           value: elastic
         - name: http.cors.enabled
