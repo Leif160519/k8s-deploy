@@ -1,0 +1,112 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consul-server
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consul-server
+  template:
+    metadata:
+      labels:
+        app: consul-server
+    spec:
+      containers:
+        - name: consul-server
+          image: hashicorp/consul:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - agent
+            - "-server"
+            - "-bootstrap-expect=1"
+            - "-ui"
+            - "-node=mes-server"
+            - "-bind=0.0.0.0"
+            - "-client=0.0.0.0" 
+            - "-datacenter=mes_datacenter"
+          ports:
+            - containerPort: 8500
+              name: web
+              protocol: TCP
+            - containerPort: 8600
+              name: dns
+              protocol: UDP
+            - containerPort: 8300
+              name: rpc
+              protocol: TCP
+            - containerPort: 8301
+              name: lan
+              protocol: TCP
+            - containerPort: 8302
+              name: wan
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            tcpSocket:
+              port: 8500
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - consul members
+            initialDelaySeconds: 30
+          volumeMounts:
+            - mountPath: /consul/data
+              name: consul
+              subPath: server
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: consul
+          persistentVolumeClaim:
+            claimName: consul
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: consul-server
+  namespace: midplatform
+  labels:
+    app: consul-server
+spec:
+  selector:
+    app: consul-server
+  type: NodePort
+  ports:
+    - port: 8500
+      name: web
+      targetPort: 8500
+      protocol: TCP
+    - name: dns
+      port: 8600
+      targetPort: 8600
+      protocol: UDP
+    - name: rpc
+      port: 8300
+      targetPort: 8300
+      protocol: TCP
+    - name: lan
+      port: 8301
+      targetPort: 8301
+      protocol: TCP
+    - name: wan
+      port: 8302
+      targetPort: 8302
+      protocol: TCP

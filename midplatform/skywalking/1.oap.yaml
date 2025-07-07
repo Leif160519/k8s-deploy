@@ -1,0 +1,88 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: skywalking-oap
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: skywalking-oap
+  template:
+    metadata:
+      labels:
+        app: skywalking-oap
+    spec:
+      containers:
+        - name: skywalking-oap
+          env:
+          - name: JAVA_OPTS
+            value: "-Xms1g -Xmx1g" #限制运行大小
+          - name: SW_STORAGE
+            value: elasticsearch
+          - name: SW_STORAGE_ES_CLUSTER_NODES
+            value: elasticsearch-0.elasticsearch-hs:9200,elasticsearch-1.elasticsearch-hs:9200,elasticsearch-2.elasticsearch-hs:9200
+          - name: SW_STORAGE_ES_CLUSTER_NAME
+            value: elk-cluster
+          - name: SW_TELEMETRY
+            value: prometheus
+          - name: TZ
+            value: Asia/Shanghai
+          image: apache/skywalking-oap-server:10.1.0
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 11800
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 11800
+            failureThreshold: 5
+            initialDelaySeconds: 60
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 11800
+            - containerPort: 12800
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: skywalking-oap
+  namespace: midplatform
+spec:
+  selector:
+    app: skywalking-oap
+  type: NodePort
+  ports:
+    - name: report
+      port: 11800
+      protocol: TCP
+      targetPort: 11800
+    - name: ui
+      port: 12800
+      protocol: TCP
+      targetPort: 12800

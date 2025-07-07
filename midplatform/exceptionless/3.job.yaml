@@ -1,0 +1,60 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exceptionless-job
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exceptionless-job
+  template:
+    metadata:
+      labels:
+        app: exceptionless-job
+    spec:
+      containers:
+        - name: exceptionless-job
+          env:
+          - name: EX_AppMode
+            value: Production
+          - name: EX_BaseURL
+            value: http://exceptionless-app:8080
+          - name: EX_ConnectionStrings__Cache
+            value: provider=redis
+          - name: EX_ConnectionStrings__Elasticsearch
+            value: server=http://elasticsearch-0.elasticsearch-hs:9200,http://elasticsearch-1.elasticsearch-hs:9200,http://elasticsearch-2.elasticsearch-hs:9200
+          - name: EX_ConnectionStrings__MessageBus
+            value: provider=redis
+          - name: EX_ConnectionStrings__Queue
+            value: provider=redis
+          - name: EX_ConnectionStrings__Redis
+            value: redis.database.svc,abortConnect=false,password=123456
+          - name: EX_ConnectionStrings__Storage
+            value: provider=folder;path=/app/storage
+          image: exceptionless/job:latest
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          volumeMounts:
+            - name: exceptionless
+              mountPath: /app/storage
+              subPath: jobs/storage
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+        - name: exceptionless
+          persistentVolumeClaim:
+            claimName: exceptionless

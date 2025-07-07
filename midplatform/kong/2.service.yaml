@@ -1,0 +1,27 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kong
+  namespace: midplatform
+spec:
+  selector:
+    app: kong
+  type: NodePort
+  ports:
+    - name: agent-http
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+    - name: agent-https
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    - name: api-http
+      port: 8001
+      protocol: TCP
+      targetPort: 8001
+    - name: api-https
+      port: 8444
+      protocol: TCP
+      targetPort: 8444

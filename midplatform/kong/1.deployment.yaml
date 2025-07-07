@@ -1,0 +1,98 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kong
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kong
+  template:
+    metadata:
+      labels:
+        app: kong
+    spec:
+      containers:
+        - name: kong
+          env:
+          - name: KONG_DATABASE
+            value: postgres
+          - name: KONG_PG_HOST
+            value: 10.0.0.33 # 必须写postgresql的svc IP地址，否则无法解析
+          - name: KONG_PG_USER
+            value: mes
+          - name: KONG_PG_PASSWORD
+            value: "123456"
+          - name: KONG_PG_DATABASE
+            value: kong
+          - name: KONG_PROXY_ACCESS_LOG
+            value: /dev/stdout
+          - name: KONG_ADMIN_ACCESS_LOG
+            value: /dev/stdout
+          - name: KONG_PROXY_ERROR_LOG
+            value: /dev/stderr
+          - name: KONG_ADMIN_ERROR_LOG
+            value: /dev/stderr
+          - name: KONG_ADMIN_LISTEN
+            value: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+          - name: KONG_DNS_RESOLVER
+            value: 10.0.0.218:8600 # 必须写consul-server的svc IP地址，否则无法解析
+          - name: KONG_DNS_ORDER
+            value: SRV,LAST,A,CNAME
+          - name: KONG_DNS_CACHE_TTL
+            value: "10"  # 减少缓存时间
+          - name: KONG_DISCOVERY
+            value: consul
+          - name: KONG_CONSUL_HOST
+            value: consul-server
+          - name: KONG_CONSUL_PORT
+            value: "8500"
+          - name: KONG_DNS_ERROR_TTL
+            value: "5"
+          - name: KONG_DNS_NOT_FOUND_TTL
+            value: "5"
+          image: kong:latest
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 12
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8000
+            timeoutSeconds: 3
+          readinessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - "-c"
+                - kong health
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 8000
+            - containerPort: 8443
+            - containerPort: 8001
+            - containerPort: 8444
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

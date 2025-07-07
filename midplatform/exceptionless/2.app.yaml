@@ -1,0 +1,96 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exceptionless-app
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exceptionless-app
+  template:
+    metadata:
+      labels:
+        app: exceptionless-app
+    spec:
+      containers:
+        - name: exceptionless-app
+          env:
+          - name: EX_AppMode
+            value: Production
+          - name: EX_ConnectionStrings__Cache
+            value: provider=redis
+          - name: EX_ConnectionStrings__Elasticsearch
+            value: server=http://elasticsearch-0.elasticsearch-hs:9200,http://elasticsearch-1.elasticsearch-hs:9200,http://elasticsearch-2.elasticsearch-hs:9200
+          - name: EX_ConnectionStrings__MessageBus
+            value: provider=redis
+          - name: EX_ConnectionStrings__Queue
+            value: provider=redis
+          - name: EX_ConnectionStrings__Redis
+            value: redis.database.svc,abortConnect=false,password=123456
+          - name: EX_ConnectionStrings__Storage
+            value: provider=folder;path=/app/storage
+          - name: EX_RunJobsInProcess
+            value: "false"
+          image: exceptionless/app:latest
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 12
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 8080
+          resources:
+            limits:
+              cpu: "1"
+              memory: 2Gi
+            requests:
+              cpu: "0.5"
+              memory: 1Gi
+          volumeMounts:
+            - name: exceptionless
+              mountPath: /app/storage
+              subPath: app/storage
+            - name: exceptionless
+              mountPath: /https
+              subPath: app/https
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+        - name: exceptionless
+          persistentVolumeClaim:
+            claimName: exceptionless
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exceptionless-app
+  namespace: midplatform
+spec:
+  selector:
+    app: exceptionless-app
+  type: NodePort
+  ports:
+    - name: web
+      port: 8080
+      protocol: TCP
+      targetPort: 8080

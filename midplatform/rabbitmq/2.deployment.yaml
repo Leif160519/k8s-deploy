@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      containers:
+        - name: rabbitmq
+          env:
+            - name: RABBITMQ_DEFAULT_USER
+              value: rabbitmq
+            - name: RABBITMQ_DEFAULT_PASS
+              value: "123456"
+          image: rabbitmq:4.1.1-management
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5672
+              name: web
+              protocol: TCP
+            - containerPort: 15672
+              name: amqp
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 2Gi
+            requests:
+              cpu: "1"
+              memory: 1Gi
+          livenessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 6
+          readinessProbe:
+            tcpSocket:
+              port: 5672
+            initialDelaySeconds: 30
+          volumeMounts:
+            - mountPath: /var/lib/rabbitmq
+              name: rabbitmq
+              subPath: data
+            - mountPath: /var/log/rabbitmq
+              name: rabbitmq
+              subPath: log
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: rabbitmq
+          persistentVolumeClaim:
+            claimName: rabbitmq
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

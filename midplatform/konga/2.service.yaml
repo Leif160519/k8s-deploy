@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: konga
+  namespace: midplatform
+spec:
+  selector:
+    app: konga
+  type: NodePort
+  ports:
+    - name: web
+      port: 1337
+      protocol: TCP
+      targetPort: 1337

@@ -1,0 +1,64 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: konga
+  namespace: midplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: konga
+  template:
+    metadata:
+      labels:
+        app: konga
+    spec:
+      containers:
+        - name: konga
+          env:
+          - name: DB_HOST
+            value: postgresql.database.svc
+          - name: DB_USER
+            value: mes
+          - name: DB_PASSWORD
+            value: "123456"
+          - name: DB_DATABASE
+            value: kong
+          image: harbor.github.icu/konga:latest
+          securityContext:
+            runAsUser: 0
+          imagePullPolicy: IfNotPresent
+          livenessProbe:
+            failureThreshold: 5
+            initialDelaySeconds: 12
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 1337
+            timeoutSeconds: 3
+          readinessProbe:
+            tcpSocket:
+              port: 1337
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 3
+          ports:
+            - containerPort: 1337
+          resources:
+            limits:
+              cpu: "1"
+              memory: 1Gi
+            requests:
+              cpu: "0.5"
+              memory: 512Mi
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
