@@ -47,7 +47,7 @@ spec:
           volumeMounts:
             - name: exceptionless
               mountPath: /app/storage
-              subPath: jobs/storage
+              subPath: app/storage
             - mountPath: /etc/localtime
               name: localtime
       volumes:
