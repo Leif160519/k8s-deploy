@@ -54,7 +54,7 @@ spec:
           value: "*"
         - name: http.cors.allow-headers
           value: "*"
-        image: elasticsearch:7.17.5
+        image: elasticsearch:7.17.28
         imagePullPolicy: IfNotPresent
         securityContext:
           privileged: true
