@@ -112,6 +112,14 @@ data:
             proxy_pass  http://kubedoor-dash.kubedoor:3000;
         }
 
+        location /ws/pod-logs {
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection $connection_upgrade;
+            proxy_set_header Host $host;
+            proxy_pass  http://kubedoor-master.kubedoor;
+        }
+
         location /ws {
             if ($user_permission = "read") {
                 return 403;
@@ -133,12 +141,35 @@ data:
             proxy_pass  http://kubedoor-master.kubedoor;
         }        
 
+        location /api/custom_alert {
+            if ($user_permission = "read") {
+                return 403;
+            }
+            proxy_read_timeout 60;
+            proxy_pass  http://kubedoor-alarm.kubedoor;
+        }
+
         location /api/ {
             if ($user_permission = "read") {
                 return 403;
             }
             proxy_read_timeout 600;
             proxy_pass  http://kubedoor-master.kubedoor;
+        }
+
+        location ~ ^/(sse|messages)(/|$) {
+            if ($user_permission = "read") {
+                return 403;
+            }
+            proxy_http_version 1.1;
+            proxy_set_header Connection "";
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header Host $host;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_read_timeout 86400s;
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_pass http://kubedoor-mcp.kubedoor:8000;
         }
     }
 

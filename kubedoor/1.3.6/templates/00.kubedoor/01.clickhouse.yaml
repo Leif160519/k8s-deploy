@@ -130,13 +130,20 @@ data:
   users.xml: |
     <?xml version="1.0"?>
     <clickhouse replace="true">
+        <max_server_memory_usage>3500000000</max_server_memory_usage>
+        <mark_cache_size>536870912</mark_cache_size>
+        <background_pool_size>8</background_pool_size>
+        <max_concurrent_queries>20</max_concurrent_queries>
         <profiles>
             <default>
                 <local_filesystem_read_method>pread</local_filesystem_read_method>
-                <max_memory_usage>10000000000</max_memory_usage>
+                <max_memory_usage>2000000000</max_memory_usage>
+                <max_bytes_before_external_group_by>1500000000</max_bytes_before_external_group_by>
+                <max_bytes_before_external_sort>1500000000</max_bytes_before_external_sort>
                 <use_uncompressed_cache>0</use_uncompressed_cache>
                 <load_balancing>in_order</load_balancing>
-                <log_queries>1</log_queries>
+                <max_threads>4</max_threads>
+                <log_queries>0</log_queries>
             </default>
         </profiles>
         <users>
@@ -190,7 +197,7 @@ spec:
     spec:
       containers:
         - name: clickhouse
-          image: registry.cn-shenzhen.aliyuncs.com/starsl/clickhouse-server:latest-alpine
+          image: registry.cn-shenzhen.aliyuncs.com/starsl/clickhouse-server:25.3-alpine
           ports:
             - containerPort: 8123
             - containerPort: 9000
@@ -226,14 +233,14 @@ spec:
               memory: 1Gi
           livenessProbe:
             tcpSocket:
-              port: 8123
+              port: 9000
             timeoutSeconds: 3
             periodSeconds: 10
             successThreshold: 1
             failureThreshold: 3
           readinessProbe:
             tcpSocket:
-              port: 8123
+              port: 9000
             timeoutSeconds: 3
             periodSeconds: 10
             successThreshold: 1
@@ -250,7 +257,7 @@ spec:
     type: RollingUpdate
     rollingUpdate:
       maxUnavailable: 1
-      maxSurge: 1
+      maxSurge: 0
 ---
 
 apiVersion: v1
