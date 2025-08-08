@@ -35,6 +35,21 @@ kubectl edit cronjobs.batch -n kubedoor kubedoor-collect
 找到successfulJobsHistoryLimit，修改为其他数字，设置为0代表不保留
 ```
 
+## 不想用vmalert和重复部署alertmanager
+- 1.删除vmalert和alertmanager相关组件
+```
+kubectl delete deployment -n kubedoor alertmanager vmalert
+kubectl delete configmap -n kubedoor alertmanager-config vmalert-config
+kubectl delete svc -n kubedoor alertmanager vmalert
+```
+
+- 2.在monitoring里的alertmanager新增kubedoor-alarm的webhook接口
+```
+webhook_configs:
+  - url: 'http://kubedoor-alarm.kubedoor.svc/clickhouse'
+     send_resolved: true
+```
+
 ## 参考
 - [CassInfra/KubeDoor][1]
 
