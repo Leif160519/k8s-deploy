@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: speedtest
-          image: ghcr.io/librespeed/speedtest:latest
+          image: docker.io/adolfintel/speedtest:latest
           env:
             - name: MODE
               value: standalone
