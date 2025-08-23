@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: openspeedtest
+  namespace: tools
+  labels:
+    app: openspeedtest
+spec:
+  selector:
+    app: openspeedtest
+  type: ClusterIP
+  ports:
+    - port: 3000
+      name: http
+      targetPort: 3000
+      protocol: TCP
+    - port: 3001
+      name: https
+      targetPort: 3001
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openspeedtest
+  namespace: tools
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "5000m"
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "600"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "600"
+  labels:
+    app: openspeedtest
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: openspeedtest.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: openspeedtest
+            port:
+              number: 3000
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - openspeedtest.github.icu
+    secretName: github-tls
