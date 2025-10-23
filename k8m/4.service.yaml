@@ -1,0 +1,42 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: k8m
+  namespace: k8m
+  labels:
+    app: k8m
+spec:
+  selector:
+    app: k8m
+  type: ClusterIP
+  ports:
+    - port: 3618
+      name: http
+      targetPort: 3618
+      protocol: TCP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: k8m
+  namespace: k8m
+  labels:
+    app: k8m
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: k8m.github.icu
+    http:
+      paths:
+      - backend:
+          service:
+            name: k8m
+            port:
+              number: 3618
+        path: /
+        pathType: Prefix
+  tls:
+  - hosts:
+    - k8m.github.icu
+    secretName: github-tls

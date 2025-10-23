@@ -1,0 +1,111 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: k8m
+  namespace: k8m
+  labels:
+    app: k8m
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: k8m
+  template:
+    metadata:
+      labels:
+        app: k8m
+    spec:
+      serviceAccountName: k8m
+      containers:
+        - name: k8m
+          image: registry.cn-hangzhou.aliyuncs.com/minik8m/k8m:v0.0.170
+          env:
+            # kubectl shell镜像地址
+            - name: KUBECTL_SHELL_IMAGE
+              value: "bitnami/kubectl:latest"
+            # Node shell镜像地址
+            - name: NODE_SHELL_IMAGE
+              value: "alpine:latest"
+            # 持久化数据库地址
+            - name: SQLITE_PATH
+              value: "/app/data/k8m.db"
+            # 启动程序后，是否自动连接发现的集群，默认关闭
+            - name: CONNECT_CLUSTER
+              value: "false"
+            # 是否自动注册纳管宿主集群，默认启用
+            - name: IN_CLUSTER
+              value: "true"
+            # 是否打印配置信息
+            - name: PRINT_CONFIG
+              value: "false"
+            # 是否开启debug模式
+            - name: DEBUG
+              value: "false"
+            # log输出日志级别，同klog用法
+            - name: LOG_V
+              value: "2"
+            # 监听的端口号
+            - name: PORT
+              value: "3618"
+            # kubeconfig文件路径，会自动扫描识别同级目录下所有的配置文件
+            - name: KUBECONFIG
+              value: "~/.kube/config"
+            # 开启AI功能，默认开启
+            - name: ENABLE_AI
+              value: "true"
+            - name: TZ
+              value: Asia/Shanghai
+            - name: LOGIN_TYPE
+              value: password
+            - name: IMAGE_PULL_TIMEOUT
+              value: "30"
+            - name: GIN_MODE
+              value: release
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3618
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 1024Mi
+            requests:
+              cpu: "0.25"
+              memory: 512Mi
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: 3618
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: 3618
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+            - name: k8m
+              mountPath: /app/data
+              subPath: k8m
+            - name: kube-config
+              mountPath: ~/.kube/config
+              subPath: config
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+        - name: k8m
+          persistentVolumeClaim:
+            claimName: k8m
+        - name: kube-config
+          configMap:
+            defaultMode: 420
+            name: kube-config
