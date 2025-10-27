@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea
+  namespace: gitea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea
+  template:
+    metadata:
+      labels:
+        app: gitea
+    spec:
+      containers:
+        - name: gitea
+          env:
+            - name: USER_UID
+              value: "1000"              # 容器内用户UID（匹配宿主机用户）
+            - name: USER_GID
+              value: "1000"              # 容器内用户GID
+            - name: GITEA__database__DB_TYPE
+              value: mysql  # 数据库类型（可选sqlite3/postgresql）
+            - name: GITEA__database__HOST
+              value: mysql:3306   # 数据库主机（MySQL服务名）
+            - name: GITEA__database__NAME
+              value: gitea     # 数据库名
+            - name: GITEA__database__USER
+              value: gitea     # 数据库用户
+            - name: GITEA__database__PASSWD
+              value: gitea   # 数据库密码
+            - name: GITEA__server__DOMAIN
+              value: git.github.icu  # 服务器IP或域名
+            - name: GITEA__server__ROOT_URL
+              value: http://git.github.icu  # 访问地址
+            - name: GITEA_server_SSH_PORT
+              value: "22"
+            - name: GITEA_server_DISABLE_SSH
+              value: "false"
+          image: gitea/gitea:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+              name: web
+              protocol: TCP
+            - containerPort: 22
+              name: ssh
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "2"
+              memory: 4Gi
+            requests:
+              cpu: "1"
+              memory: 2Gi
+          livenessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+            failureThreshold: 12
+          readinessProbe:
+            tcpSocket:
+              port: 3000
+            initialDelaySeconds: 60
+          volumeMounts:
+            - mountPath: /data
+              name: gitea
+              subPath: gitea/data
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - name: gitea
+          persistentVolumeClaim:
+            claimName: gitea
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime

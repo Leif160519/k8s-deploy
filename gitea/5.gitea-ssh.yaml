@@ -1,0 +1,6 @@
+spec:
+  ports:
+  - name: gitea-ssh
+    port: 22
+    protocol: TCP
+    targetPort: 22

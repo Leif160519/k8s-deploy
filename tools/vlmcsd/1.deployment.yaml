@@ -1,0 +1,49 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vlmcsd
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vlmcsd
+  template:
+    metadata:
+      labels:
+        app: vlmcsd
+    spec:
+      containers:
+        - name: vlmcsd
+          image: harbor.github.icu/library/vlmcsd:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 1688
+              name: vlmcsd
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 50Mi
+            requests:
+              cpu: "0.25"
+              memory: 25Mi
+          livenessProbe:
+            tcpSocket:
+              port: 1688
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+          readinessProbe:
+            tcpSocket:
+              port: 1688
+            initialDelaySeconds: 10
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
