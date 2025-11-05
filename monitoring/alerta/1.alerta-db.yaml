@@ -23,7 +23,7 @@ spec:
             value: postgres
           - name: POSTGRES_PASSWORD
             value: postgres
-        image: postgres
+        image: postgres:17
         imagePullPolicy: IfNotPresent
         livenessProbe:
           failureThreshold: 5
