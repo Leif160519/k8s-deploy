@@ -58,7 +58,7 @@ kubectl apply -f 5.deployment.yaml
 ```
 kubectl create serviceaccount admin-user -n default
 kubectl create clusterrolebinding admin-user --clusterrole=cluster-admin --serviceaccount=default:admin-user
-kubectl create token admin-user -n default --duration 8760h（执行完会自动输出token,不指定过期时间默认24小时）
+kubectl create token admin-user -n default --duration 8760h（执行完会自动输出token,不指定过期时间默认24小时,后面jenkins或者jumpserver的token过期了可以直接执行这一句生成新的token）
 ```
 
 注意：
