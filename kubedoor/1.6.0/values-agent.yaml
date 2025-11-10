@@ -9,7 +9,7 @@ kubedoor:
 
 config:
   # 这里填写通知的信息，大部分操作会通过该机器人进行通知，钉钉机器人安全设置的自定义关键词请设置为：告警
-  MSG_TYPE: "feishu" # 各类操作通知的消息类型：wecom, dingding, feishu
+  MSG_TYPE: "feishu" # 各类操作通知的消息类型：wecom, dingding, feishu, slack
   MSG_TOKEN: "c0021d50-xxxx-xxxx-xxxx-143cc467305c" # 通知服务对应的token
 
   #java服务执行dump、jfr、jstack时会把数据存放到OBS，请填写您的OBS地址。(暂无OBS可以安装后在agent端修改，注意设置允许内网免认证上传。)
@@ -27,7 +27,8 @@ tsdb:
 
   #【注意】如果您当前K8S已经有完整的Prometheus/vmagent监控，并且是远程写入时序数据库，则以下remoteWriteUrl不用管，并且请把以下所有的enable都设置为false，将不会安装false的组件。
 
-  # 这是vmagent远程写Victoria-Metrics的地址。如果您使用kubeDoor安装的Victoria-Metrics，并且agent和master在同一个K8S时，可使用以下默认地址(注意认证信息)，否则请填写实际的Victoria-Metrics地址。
+  # 当您需要kubedoor-agent为您安装vmagent时才需要配置这个地址。
+  # 这是vmagent远程写Victoria-Metrics使用。如果您的agent和master在同一个K8S时，可直接使用以下地址(注意认证信息)，否则请填写vmagent能访问的Victoria-Metrics地址。
   remoteWriteUrl: "http://monit:dduF1E3sj@victoria-metrics.kubedoor:8428/api/v1/write" # 注意:Victoria-Metrics-Cluster地址格式：http://你的vminsert地址:8480/insert/0/prometheus
 
 

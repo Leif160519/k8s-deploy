@@ -112,6 +112,21 @@ data:
             proxy_pass  http://kubedoor-dash.kubedoor:3000;
         }
 
+        location /api/sql {
+            proxy_read_timeout 300;
+            proxy_set_header X-User-Permission $user_permission;
+            proxy_pass  http://kubedoor-master.kubedoor;
+        }
+
+        location /api/custom_alert {
+            if ($user_permission = "read") {
+                return 403;
+            }
+            proxy_read_timeout 60;
+            proxy_pass  http://kubedoor-alarm.kubedoor;
+        }
+
+
         location /ws/pod-logs {
             proxy_http_version 1.1;
             proxy_set_header Upgrade $http_upgrade;
@@ -133,20 +148,31 @@ data:
 
         location ~ ^/api/prom_.* {
             proxy_read_timeout 300;
+            proxy_set_header X-User-Name $remote_user;
+            proxy_set_header X-User-Permission $user_permission;
             proxy_pass  http://kubedoor-master.kubedoor;
         }  
 
-        location /api/sql {
+        location /api/events {
             proxy_read_timeout 300;
             proxy_pass  http://kubedoor-master.kubedoor;
-        }        
+        } 
 
-        location /api/custom_alert {
-            if ($user_permission = "read") {
-                return 403;
-            }
-            proxy_read_timeout 60;
-            proxy_pass  http://kubedoor-alarm.kubedoor;
+        location /api/image/tags {
+            proxy_read_timeout 300;
+            proxy_pass  http://kubedoor-master.kubedoor;
+        }
+
+        location /api/get_dpm_pods {
+            proxy_read_timeout 300;
+            proxy_pass  http://kubedoor-master.kubedoor;
+        }
+
+        location /api/update-image {
+            proxy_set_header X-User-Name $remote_user;
+            proxy_set_header X-User-Permission $user_permission;
+            proxy_read_timeout 300;
+            proxy_pass  http://kubedoor-master.kubedoor;
         }
 
         location /api/ {

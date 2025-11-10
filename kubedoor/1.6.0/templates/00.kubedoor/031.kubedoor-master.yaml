@@ -25,8 +25,166 @@ data:
   DEFAULT_AT: {{ .Values.kubedoor_alarm.DEFAULT_AT | quote }}
   ALERTMANAGER_EXTURL: {{ .Values.kubedoor_alarm.ALERTMANAGER_EXTURL | quote }}
   LOG_LEVEL: INFO
+  ALERT_DEDUP_WINDOW: '300'
+  DB_HOST: {{ .Values.mysql.DB_HOST | quote }}
+  DB_NAME: {{ .Values.mysql.DB_NAME | quote }}
+  DB_PASSWORD: {{ .Values.mysql.DB_PASSWORD | quote }}
+  DB_PORT: {{ .Values.mysql.DB_PORT | quote }}
+  DB_USER: {{ .Values.mysql.DB_USER | quote }}
+
+  REGISTRY_SECRET: |
+    {
+      "swr.cn-south-1.myhuaweicloud.com": {
+        "default": {
+          "ak": "xxxxxxxx",
+          "sk": "xxxxxxxxxxxxxxxxxxx"
+        }
+      },
+      "registry.cn-shenzhen.aliyuncs.com": {
+        "default": {
+          "ak": "xxxxxxxxx",
+          "sk": "xxxxxxxxxxxxxxxxxxx"
+        },
+        "myk8s-1": {
+          "ak": "xxxxxxxxx",
+          "sk": "xxxxxxxxxxxxxxxxxxx"
+        }
+      },
+      "harbor.xxxxx.com": {
+        "default": {
+          "ak": "username",
+          "sk": "password"
+        }
+      }
+    }
+  UPDATE_IMAGE: |
+    {
+      "default": {
+        "isOperationAllowed": false
+      },
+      "k8s_name": {
+        "isOperationAllowed": true,
+        "allowedOperationPeriod": "19:00-08:00",
+        "user": [
+          "a0001",
+          "a0002"
+        ]
+      }
+    }
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubedoor-master-file-cfg
+  namespace: kubedoor
+data:
+  alert_rules.json: |
+    {
+      "global_ignore_rules": [
+        {
+          "name": "环境过滤规则(排除非生产环境[注意:当前未开启])",
+          "enabled": false,
+          "conditions": {
+            "k8s": {
+              "not_contains": ["prod"]
+            }
+          }
+        },
+        {
+          "name": "常见忽略事件[示例:防止告警规则中有正常事件被匹配到,可以加到忽略规则中]",
+          "enabled": true,
+          "conditions": {
+            "reason": {
+              "contains": ["BackOffStart", "SuccessfulCreate", "SuccessfulMountVolume"]
+            }
+          }
+        }
+      ],
+      "alert_rules": [
+        {
+          "name": "关键事件告警",
+          "enabled": true,
+          "severity": "critical",
+          "conditions": {
+            "reason": {
+              "contains": ["OOM", "NodeNotReady", "Unreachable"]
+            },
+            "level": {
+              "contains": ["Warning"]
+            }
+          }
+        },
+        {
+          "name": "健康检查失败告警",
+          "enabled": true,
+          "severity": "warning",
+          "conditions": {
+            "reason": {
+              "contains": ["Unhealthy"]
+            },
+            "name": {
+              "not_starts_with": ["deploy-datax-cloud-"]
+            },
+            "count": {
+              "greater_than": 1
+            }
+          }
+        },
+        {
+          "name": "重启事件告警",
+          "enabled": true,
+          "severity": "warning",
+          "conditions": {
+            "message": {
+              "contains": ["restart"]
+            }
+          }
+        },
+        {
+          "name": "挂载失败告警",
+          "enabled": true,
+          "severity": "warning",
+          "conditions": {
+            "reason": {
+              "contains": ["FailedMount", "FailedAttachVolume"]
+            }
+          }
+        },
+        {
+          "name": "调度失败告警",
+          "enabled": true,
+          "severity": "warning",
+          "conditions": {
+            "reason": {
+              "contains": ["FailedScheduling", "Insufficient"]
+            }
+          }
+        },
+        {
+          "name": "资源压力告警",
+          "enabled": true,
+          "severity": "warning",
+          "conditions": {
+            "reason": {
+              "contains": ["Pressure", "OutOf", "Evict"]
+            }
+          }
+        },
+        {
+          "name": "僵尸进程告警",
+          "enabled": true,
+          "severity": "warning",
+          "conditions": {
+            "reason": {
+              "contains": ["ProcessZ"]
+            }
+          }
+        }
+      ]
+    }
 
 ---
+
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -89,6 +247,9 @@ spec:
           env:
             - name: TZ
               value: Asia/Shanghai
+          volumeMounts:
+            - name: kubedoor-master-file-cfg
+              mountPath: /k8s_event/rules
           resources:
             limits:
               cpu: "1"
@@ -112,7 +273,16 @@ spec:
             failureThreshold: 3
           imagePullPolicy: Always
       restartPolicy: Always
+      volumes:
+        - name: kubedoor-master-file-cfg
+          configMap:
+            name: kubedoor-master-file-cfg
+            items:
+              - key: alert_rules.json
+                path: alert_rules.json
+
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
