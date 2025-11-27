@@ -17,6 +17,9 @@ spec:
       containers:
         - name: imni-tools
           image: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/iib0011/omni-tools:latest
+          env:
+            - name: DEFAULT_LANG
+              value: zh
           securityContext:
             runAsUser: 0
           imagePullPolicy: IfNotPresent
