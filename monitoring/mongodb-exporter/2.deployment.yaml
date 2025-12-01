@@ -1,0 +1,80 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongodb-exporter
+  name: mongodb-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9216
+    protocol: TCP
+    targetPort: 9216
+  selector:
+    app: mongodb-exporter
+  type: ClusterIP
+[root@hs-nj-it-k8s-master-01:~/workspace/git/k8s-deploy/monitoring/mongodb-exporter 15:25:06] # cat 2.deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mongodb-exporter
+  name: mongodb-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb-exporter
+  template:
+    metadata:
+      labels:
+        app: mongodb-exporter
+    spec:
+      containers:
+      - args:
+          - --mongodb.uri=mongodb://root:123456@mongodb-0.mongodb.database.svc.cluster.local:27017,mongodb-1.mongodb.database.svc.cluster.local:27017,mongodb-2.mongodb.database.svc.cluster.local:27017/?replicaSet=cluster
+          - --collect-all
+          - --split-cluster=true
+        image: docker.io/percona/mongodb_exporter:0.47.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9216
+          timeoutSeconds: 3
+        name: mongodb-exporter
+        ports:
+        - containerPort: 9216
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9216
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 2Gi
+          requests:
+            cpu: 200m
+            memory: 1Gi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime

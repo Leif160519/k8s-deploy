@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: mongodb-exporter
+  name: mongodb-exporter
+  namespace: monitoring
+spec:
+  ports:
+  - name: http
+    port: 9216
+    protocol: TCP
+    targetPort: 9216
+  selector:
+    app: mongodb-exporter
+  type: ClusterIP
