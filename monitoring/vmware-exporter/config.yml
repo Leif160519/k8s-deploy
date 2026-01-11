@@ -7,6 +7,24 @@ default:
   fetch_custom_attributes: False
   fetch_tags: False
   fetch_alarms: True
+
+  # vcenter配置
+  collect_vcenter: True
+  collect_vcenter_hots: True
+  collect_vcenter_clusters: True
+  collect_vcenter_alarms: True
+  collect_vcenter_health: True
+  collect_vcenter_services: True
+
+  # cluster相关配置
+  collect_clusters: True
+  collect_clusters_only: False
+
+  collect_datacenters: True
+  collect_resourcepools: True
+  collect_folders: True
+
+  # 资源收集配置
   collect_only:
       vms: True
       vmguests: True
