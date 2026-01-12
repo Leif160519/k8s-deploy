@@ -62,7 +62,7 @@ kubectl create token admin-user -n default --duration 8760h（执行完会自动
 ```
 
 注意：
-- 0.jenkins:2.484的jdk要求是17.0，对应的agent的jdk也是同样的版本
+- 0.jenkins:2.484的jdk要求是17.0，对应的agent的jdk也是同样的版本,如果用到jenkins，需要将jnlp的镜像从`https://hub.docker.com/r/jenkins/jnlp-slave`换成jenkins/inbound-agent:latest
 - 1.创建serviceaccount的角色权限必须为cluster-admin，否则访问某些资源会没有权限
 - 2.创建token的命令可以重复执行，每次执行会生成不同的token，且旧token不会过期，可以用如下命令验证：
 ```
