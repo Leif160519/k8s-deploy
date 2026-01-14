@@ -27,7 +27,7 @@ rules:
     verbs: ["get","list","watch"]
   - apiGroups: [""]
     resources: ["secrets"]
-    verbs: ["get","list"]
+    verbs: ["get","list","watch"]
   - apiGroups: [""]
     resources: [""]
     verbs: [""]
