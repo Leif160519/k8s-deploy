@@ -30,6 +30,8 @@ spec:
         - --path.procfs=/host/proc
         - --path.sysfs=/host/sys
         - --collector.filesystem.ignored-mount-points='^/(dev|proc|sys|run)($$|/)'
+        - --collector.systemd
+        - --collector.systemd.unit-whitelist=.+\.service
         ports:
         - containerPort: 9100
         securityContext:
@@ -45,6 +47,9 @@ spec:
           mountPath: /etc/localtime
         - name: log
           mountPath: /var/log/prometheus
+        - name: dbus-socket
+          mountPath: /var/run/dbus/system_bus_socket
+          readOnly: true
       volumes:
       - name: proc
         hostPath:
@@ -59,4 +64,8 @@ spec:
       - name: log
         hostPath:
           path: /var/log/prometheus
+          type: ""
+      - name: dbus-socket
+        hostPath:
+          path: /var/run/dbus/system_bus_socket
           type: ""
