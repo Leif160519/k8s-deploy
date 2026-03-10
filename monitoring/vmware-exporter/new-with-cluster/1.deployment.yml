@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: vmware-exporter
+  name: vmware-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vmware-exporter
+  template:
+    metadata:
+      labels:
+        app: vmware-exporter
+    spec:
+      containers:
+      - args:
+          - -vmware.username=public
+          - -vmware.password=123456
+          - -vmware.vcenter=192.168.31.200
+          - -vmware.granularity=20
+          - -vmware.interval=20
+          - -vmware.insecureTLS
+          - -collector.cluster=true
+          - -collector.datacenter=true
+          - -collector.datastore=true
+          - -collector.host=true
+          - -collector.vm=true
+          - -collector.esxcli.host.nic=true
+          - -collector.esxcli.storage=true
+          - -disable.default.collectors=true
+          - -prom.maxRequests=0
+          - -http.address=:9169
+          - -log.level=debug
+          - -log.format=logfmt
+        image: meisite/vmware-exporter:latest
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9169
+          timeoutSeconds: 3
+        name: vmware-exporter
+        ports:
+        - containerPort: 9169
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9169
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 3Gi
+          requests:
+            cpu: 100m
+            memory: 2Gi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
