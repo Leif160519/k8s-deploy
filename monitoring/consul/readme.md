@@ -51,6 +51,7 @@ consul snapshot restore --http-addr=https://consul.github.icu --token=9ce1358e-d
 - 8.验证
 
 ## 故障排查
+因为数据存储故障，导致consul起不来
 ```
 ==> Starting Consul agent...
                Version: '1.16.0'
