@@ -30,16 +30,14 @@ spec:
               cpu: "0.25"
               memory: 0.5Gi
           livenessProbe:
-            httpGet:
+            tcpSocket:
               port: 3001
-              path: /
             initialDelaySeconds: 10
             timeoutSeconds: 5
             failureThreshold: 10
           readinessProbe:
-            httpGet:
+            tcpSocket:
               port: 3001
-              path: /
             initialDelaySeconds: 10
           volumeMounts:
             - mountPath: /etc/localtime
