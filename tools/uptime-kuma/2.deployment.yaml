@@ -1,0 +1,57 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: uptime-kuma
+  namespace: tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: uptime-kuma
+  template:
+    metadata:
+      labels:
+        app: uptime-kuma
+    spec:
+      containers:
+        - name: uptime-kuma
+          image: louislam/uptime-kuma:2
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3001
+              name: https
+              protocol: TCP
+          resources:
+            limits:
+              cpu: "0.5"
+              memory: 1Gi
+            requests:
+              cpu: "0.25"
+              memory: 0.5Gi
+          livenessProbe:
+            httpGet:
+              port: 3001
+              path: /
+            initialDelaySeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 10
+          readinessProbe:
+            httpGet:
+              port: 3001
+              path: /
+            initialDelaySeconds: 10
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+            - mountPath: /app/data
+              name: uptime-kuma
+              subPath: uptime-kuma/data
+      volumes:
+        - hostPath:
+            path: /etc/localtime
+            type: ""
+          name: localtime
+        - name: uptime-kuma
+          persistentVolumeClaim:
+            claimName: uptime-kuma
