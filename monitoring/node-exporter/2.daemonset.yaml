@@ -28,6 +28,7 @@ spec:
         - --no-collector.zfs
         - --web.listen-address=0.0.0.0:9100
         - --path.procfs=/host/proc
+        - --path.rootfs=/host/root
         - --path.sysfs=/host/sys
         - --collector.filesystem.ignored-mount-points='^/(dev|proc|sys|run)($$|/)'
         - --collector.systemd
@@ -50,6 +51,9 @@ spec:
         - name: dbus-socket
           mountPath: /var/run/dbus/system_bus_socket
           readOnly: true
+        - name: root
+          mountPath: /host/root
+          readOnly: true
       volumes:
       - name: proc
         hostPath:
@@ -68,4 +72,8 @@ spec:
       - name: dbus-socket
         hostPath:
           path: /var/run/dbus/system_bus_socket
+          type: ""
+      - name: root
+        hostPath:
+          path: /
           type: ""
