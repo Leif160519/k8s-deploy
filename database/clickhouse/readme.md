@@ -36,6 +36,6 @@ kubectl rollout restart deployment -n monitoring grafana
 将9363端口暴露出来，之后在prometheus中添加clickhouse的job即可
 
 ## 添加看板
-- [14192-clickhouse][]
+- [14192-clickhouse][1]
 
 [1]: https://grafana.com/grafana/dashboards/14192-clickhouse/
