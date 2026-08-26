@@ -1,0 +1,7 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: minio-rclone-sc
+provisioner: csi-rclone
+parameters:
+  pathPattern: "${.PVC.namespace}/${.PVC.annotations.csi-rclone/storage-path}"
