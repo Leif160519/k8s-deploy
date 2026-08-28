@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: fping-exporter
+  name: fping-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fping-exporter
+  template:
+    metadata:
+      labels:
+        app: fping-exporter
+    spec:
+      containers:
+      - image: bbrks/fping-exporter
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9605
+          timeoutSeconds: 3
+        name: fping-exporter
+        ports:
+        - containerPort: 9605
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 5
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          successThreshold: 1
+          tcpSocket:
+            port: 9605
+          timeoutSeconds: 3
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 500Mi
+        securityContext:
+          privileged: true
+          runAsUser: 0
+        volumeMounts:
+        - mountPath: /etc/localtime
+          name: localtime
+      volumes:
+      - hostPath:
+          path: /etc/localtime
+          type: ""
+        name: localtime
