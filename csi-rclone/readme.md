@@ -8,8 +8,7 @@
 - parameters: 可在此处覆盖 Secret 中的默认参数,但 Secret 中的值优先级更高
 - pathPattern: pod数据存储的路径，默认就放在remotePath下，建议根据命名空间等信息进行隔离
 
-> access key和secret key确保对remotePath有consuladmin或者readwrite权限!
-
+> access key和secret key确保是在"Identity"-"Users"中创建的,并且对remotePath有consuladmin或者readwrite权限!
 
 ## 参考
 - [wunderio/csi-rclone][1]
