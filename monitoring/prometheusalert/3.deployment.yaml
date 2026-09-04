@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: prometheusalert
-        image: feiyu563/prometheus-alert:latest
+        image: feiyu563/prometheus-alert:master
         imagePullPolicy: IfNotPresent
         env:
         - name: PA_RUNMODE
