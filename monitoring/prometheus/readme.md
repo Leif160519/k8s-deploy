@@ -66,6 +66,12 @@ ts=2024-06-16T02:05:03.903Z caller=main.go:1148 level=warn fs_type=NFS_SUPER_MAG
 
 ## 说明
 - 随着监控目标的增加，prometheus的内存需求也会跟着增长，在分配的内存即将用完的时候，prometheus pod会经常OOMKiller，所以需要修改其分配的最大内存资源
+- 若同一个K8S集群中有多个命名空间需要部署prometheus,且ServiceAccount是同名的情况下,那么需要在其他命名空间的ClusterRoleBinding里面新增subjects,在其他命名空间里也创建同名ServiceAccount,这样多个prometheus pod拥有相同的读写权限
+```
+- kind: ServiceAccount
+  name: prometheus
+  namespace: xxx   # xxx代表除monitoring的其他命名空间
+```
 
 ## 参考
 - [comfigmap-reload][1]
